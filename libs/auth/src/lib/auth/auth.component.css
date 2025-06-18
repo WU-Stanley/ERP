@@ -1,0 +1,6 @@
+.header-img{
+    background-image: url("/BackImg.jpg");
+    /* background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCA03fZk-nvjxiPV_-2Ou_5cnynFu1Aw2r7oaA8SZQP_5Li2hOhKPTLyj3qDWdrZxw0UP_gJnqGAaqSPM8cl3zEqR6-CwNhAA7ze0RjGAgnV6rJCwaqQk1nTXoM3lZsIeu5BkkOHiGxsnnlnJ7kD6_kAJt-EudlfiX6gRhXssHrVp69o8w0QuMwWMBnq0_QMTx0UtOKpfvM83cwyrAdh2CX7DRzYPo-M_6NPytxePEvglKDhg8dsYuOjyy8t8ZPBznnUFmqJDIVcSk"); */
+background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;}

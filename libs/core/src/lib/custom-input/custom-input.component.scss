@@ -1,0 +1,72 @@
+.custom-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  margin: 20px;
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 12px 8px 4px;
+    border: 1px solid #ccc;
+    border-radius: 10px; // Changed to make it circular-like
+    transition: border 0.2s ease;
+    background: #fff;
+
+    &.focused,
+    &.has-error {
+      border-color: #13461c;
+    }
+
+    &.has-error {
+      border-color: #d32f2f;
+    }
+
+    label {
+      position: absolute;
+      top: 12px;
+      left: 8px;
+      font-size: 14px;
+      color: #999;
+      pointer-events: none;
+      transition: 0.2s ease all;
+    }
+
+    &.focused label,
+    &:has(input:not(:placeholder-shown)) label {
+      top: -6px;
+      left: 6px;
+      font-size: 12px;
+      background: white;
+      padding: 0 4px;
+      color: #13461c;;
+    }
+
+    .input-field {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: transparent;
+      padding: 6px 0;
+      min-width: 0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 6px;
+    }
+  }
+
+  .error-message {
+    font-size: 12px;
+    color: #d32f2f;
+    margin-top: 2px;
+  }
+}
+

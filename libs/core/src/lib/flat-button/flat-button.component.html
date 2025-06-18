@@ -1,0 +1,10 @@
+  <div class=" justify-center items-center;">
+  <button [disabled]="disabled" (click)="submitAction.emit()"
+    class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f1f2f4] text-[#121416] pl-4 pr-4 font-medium text-sm leading-normal
+           hover:bg-[#121416] hover:text-[#f1f2f4] 
+           transition-all duration-300 ease-in-out 
+           transform hover:scale-105 hover:shadow-md group px-2 py-2"
+  >
+    <p class="group-hover:text-inherit hover:text-[#f1f2f4]">{{ label }}</p>
+  </button>
+  </div>

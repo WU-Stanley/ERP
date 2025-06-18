@@ -1,0 +1,44 @@
+<div class="custom-input">
+  <div
+    class="input-wrapper"
+    [class.focused]="focused || value"
+    [class.has-error]="hasError()"
+  >
+    <label [for]="id">{{ label }}</label>
+
+    <ng-content select="[prefix]"></ng-content>
+
+    <input
+      class="input-field"
+      [type]="inputType"
+      [value]="value"
+      [disabled]="disabled"
+      [placeholder]="focused ? placeholder : ''"
+      (input)="onInputChange($event)"
+      (focus)="focused = true"
+      (blur)="focused = false; onTouched()"
+      [id]="id"
+      [name]="name"
+      [autocomplete]="autocomplete"
+      [readonly]="readonly"
+      [disabled]="disabled"
+      [ngStyle]="{ width: width, height: height }"
+    />
+
+    <ng-content select="[suffix]"></ng-content>
+
+    <button
+      *ngIf="type === 'password'"
+      type="button"
+      class="toggle-btn"
+      (click)="togglePasswordVisibility()"
+      aria-label="Toggle password visibility"
+    >
+      {{ hidePassword ? '👁️' : '🙈' }}
+    </button>
+  </div>
+
+  <div class="error-message" *ngIf="hasError()">
+    {{ errorMessage }}
+  </div>
+</div>
