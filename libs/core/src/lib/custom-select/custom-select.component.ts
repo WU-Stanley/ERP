@@ -51,9 +51,9 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() width = '100%';
   @Input() height = 'auto';
   @Input() disabled = false;
-  @Input() options: string[] = []; // List of items
+  @Input() options: string[]|object[] = []; // List of items
   @Input() labelKey = ''; // If options are objects, specify which key to display
-
+ 
   @Input() value = '';
   @Output() valueChange = new EventEmitter<any>();
 
