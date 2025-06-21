@@ -1,4 +1,4 @@
-<div class="bg-white p-6 rounded-xl shadow-md max-w-5xl mx-auto space-y-6">
+<div class="bg-white p-6 rounded-xl shadow-md max-w-6xl mx-auto space-y-6">
   <h2 class="text-2xl font-bold text-gray-800">Manage Permissions</h2>
 
   <!-- Staff Select -->
@@ -10,57 +10,65 @@
   ></lib-custom-select>
 
   <!-- Search -->
-  <input
-    type="text"
-    [(ngModel)]="searchTerm"
-    placeholder="Search permissions..."
-    class="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-  />
-
-  <!-- Permissions List -->
-  <div class="grid gap-4">
-    @for (permission of filteredPermissions; track permission.id) {
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-all">
-        <div class="flex-1 space-y-1">
-          <p class="text-base font-medium text-gray-800">
+  <div class="flex justify-end">
+    <lib-custom-input
+      type="text"
+      [(ngModel)]="searchTerm"
+      [autocomplete]="'on'"
+      [id]="'searchPerm'"
+      [label]="'Search Permissions'"
+      [type]="'search'"
+      [placeholder]="'Search permissions...'"
+    ></lib-custom-input>
+  </div>
+  <!-- Permissions Table -->
+  <div class="overflow-auto rounded-lg border border-gray-200">
+    <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+      <thead class="bg-gray-100 text-gray-700 font-medium">
+        <tr>
+          <th class="px-4 py-3">Permission</th>
+          <th class="px-4 py-3">Description</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 bg-white">
+        @for (permission of filteredPermissions;let index=$index; track
+        permission.id) {
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-4 py-3 font-medium text-gray-800">
             {{ permission.name }}
-          </p>
-          <p class="text-sm text-gray-500">
+          </td>
+          <td class="px-4 py-3 text-gray-600">
             {{ permission.description }}
-          </p>
-          <span
-            class="inline-block mt-1 px-2 py-0.5 text-xs rounded-full font-semibold"
-            [ngClass]="{
-              'bg-green-100 text-green-700': permission.status === 'Assigned',
-              'bg-red-100 text-red-700': permission.status === 'Revoked',
-              'bg-yellow-100 text-yellow-700': permission.status !== 'Assigned' && permission.status !== 'Revoked'
-            }"
-          >
-            {{ permission.status }}
-          </span>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex gap-2 mt-4 sm:mt-0 sm:ml-6">
-          @if (permission.status !== 'Assigned') {
-            <button
-              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
-              (click)="assignPermission(permission)"
+          </td>
+          <td class="px-4 py-3">
+            <span
+              class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold"
+              [ngClass]="{
+                'bg-green-100 text-green-700': permission.status === 'Assigned',
+                'bg-red-100 text-red-700': permission.status === 'Revoked',
+                'bg-yellow-100 text-yellow-700':
+                  permission.status !== 'Assigned' &&
+                  permission.status !== 'Revoked'
+              }"
             >
+              {{ permission.status }}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            @if (permission.status!== 'Assigned') {
+            <lib-flat-button label="Assign" (click)="assignPermission(index)">
               Assign
-            </button>
-          }
-          @else {
-            <button
-              class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
-              (click)="revokePermission(permission)"
-            >
-              Revoke
-            </button>
-          }
-        </div>
-      </div>
-    }
+            </lib-flat-button>
+            } @else {
+            <lib-flat-button label="Revoke" (click)="revokePermission(index)">
+            </lib-flat-button>
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
   </div>
 </div>
-\
