@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, forwardRef, Injector } from '@angular/core';
+import {
+  Component,
+  Input,
+  forwardRef,
+  Injector,
+  EventEmitter,
+  Output,
+} from '@angular/core';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
@@ -12,7 +19,7 @@ import {
 @Component({
   selector: 'lib-custom-select',
   templateUrl: './custom-select.component.html',
-  styleUrls: ['../custom-input/custom-input.component.scss'],
+  styleUrls: ['../custom-select/custom-select.component.scss'],
   imports: [FormsModule, ReactiveFormsModule, CommonModule],
   providers: [
     {
@@ -23,62 +30,99 @@ import {
   ],
 })
 export class CustomSelectComponent implements ControlValueAccessor {
+  private _ngControl: any;
+
+  writeValue(obj: any): void {
+    throw new Error('Method not implemented.');
+  }
+  registerOnChange(fn: any): void {
+    throw new Error('Method not implemented.');
+  }
+  registerOnTouched(fn: any): void {
+    throw new Error('Method not implemented.');
+  }
+  setDisabledState?(isDisabled: boolean): void {
+    throw new Error('Method not implemented.');
+  }
   @Input() label = '';
   @Input() id = '';
   @Input() name = '';
+  @Input() placeholder = 'Select...';
+  @Input() width = '100%';
+  @Input() height = 'auto';
   @Input() disabled = false;
-  @Input() width = '300px';
-  @Input() height = '2rem';
-  value = '';
+  @Input() options: string[] = []; // List of items
+  @Input() labelKey = ''; // If options are objects, specify which key to display
+
+  @Input() value = '';
+  @Output() valueChange = new EventEmitter<any>();
+
+  searchTerm = '';
+  filteredOptions: any[] = [];
+  showDropdown = false;
   focused = false;
-
-  private _ngControl: NgControl | null = null;
-
   constructor(private injector: Injector) {}
 
   ngOnInit() {
+    this.setInitialValue();
     try {
       this._ngControl = this.injector.get(NgControl, null);
       if (this._ngControl) {
         this._ngControl.valueAccessor = this;
       }
-    } catch {}
+    } catch (e) {
+      // Swallow if not used in a reactive form
+    }
   }
-
   get formControl(): FormControl | null {
     return this._ngControl?.control as FormControl;
   }
-
-  writeValue(value: any): void {
-    this.value = value ?? '';
+  setInitialValue() {
+    this.searchTerm = this.getLabel(this.value);
+    this.filteredOptions = [...this.options];
   }
 
-  onChange: (val: any) => void = () => {};
-  onTouched: () => void = () => {};
-
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
+  onSearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const term = input.value;
+    this.searchTerm = term;
+    const lowerTerm = term.toLowerCase();
+    this.filteredOptions = this.options.filter((option) =>
+      this.getLabel(option).toLowerCase().includes(lowerTerm)
+    );
+    this.showDropdown = true;
   }
 
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
+  onFocus() {
+    this.focused = true;
+    this.showDropdown = true;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+  onBlur() {
+    setTimeout(() => {
+      this.focused = false;
+      this.showDropdown = false;
+    }, 200); // allow time to select
   }
 
-  onModelChange(value: string) {
-    this.value = value;
-    this.onChange(value);
+  selectOption(option: any) {
+    this.value = option;
+    this.searchTerm = this.getLabel(option);
+    this.valueChange.emit(option);
+    this.showDropdown = false;
+  }
+
+  isSelected(option: any): boolean {
+    return this.getLabel(option) === this.getLabel(this.value);
+  }
+
+  getLabel(option: any) {
+    return this.labelKey && option ? option[this.labelKey] : option;
   }
 
   hasError(): boolean {
-    return (
-      !!this.formControl &&
-      this.formControl.invalid &&
-      (this.formControl.touched || this.formControl.dirty)
-    );
+    // Implement based on your validation logic
+    return false;
   }
 
   get errorMessage(): string {
@@ -86,6 +130,17 @@ export class CustomSelectComponent implements ControlValueAccessor {
     if (!control?.errors) return '';
 
     if (control.errors['required']) return 'This field is required.';
+    if (control.errors['minlength']) {
+      const requiredLength = control.errors['minlength'].requiredLength;
+      return `Minimum length is ${requiredLength} characters.`;
+    }
+    if (control.errors['maxlength']) {
+      const requiredLength = control.errors['maxlength'].requiredLength;
+      return `Maximum length is ${requiredLength} characters.`;
+    }
+    if (control.errors['email']) return 'Enter a valid email address.';
+    if (control.errors['pattern']) return 'Invalid format.';
+
     return 'Invalid input.';
   }
 }

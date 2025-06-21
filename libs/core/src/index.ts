@@ -9,3 +9,5 @@ export * from './lib/text-field/text-field.component';
 export * from './lib/custom-input/custom-input.component';
 export * from './lib/custom-select/custom-select.component';
 export * from './lib/custom-textarea/custom-textarea.component';
+export * from './lib/environment.token';
+export * from './lib/spinner/spinner.component';

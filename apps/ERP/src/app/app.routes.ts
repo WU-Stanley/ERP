@@ -1,18 +1,47 @@
 import { Route } from '@angular/router';
-import { AddStaffComponent, AuthComponent, AuthDashboardComponent, ChangePasswordComponent, ForgotPasswordComponent } from '@erp/auth'; // Adjust the import path as necessary
 
 export const appRoutes: Route[] = [
-    {path: '', redirectTo: 'auth/login', pathMatch: 'full'},
-     { path: 'auth/login', component: AuthComponent },
-  { path: 'auth/forgot-password', component: ForgotPasswordComponent },
-
-  // Protected area under layout
+  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  {
+    path: 'auth/login',
+    loadComponent: () =>
+      import('@erp/auth').then(m => m.AuthComponent)
+  },
+  {
+    path: 'auth/forgot-password',
+    loadComponent: () =>
+      import('@erp/auth').then(m => m.ForgotPasswordComponent)
+  },
   {
     path: 'auth',
-    component: AuthDashboardComponent,
+    loadComponent: () =>
+      import('@erp/auth').then(m => m.AuthDashboardComponent),
     children: [
-      { path: 'dashboard', component: AuthComponent }, // replace with actual DashboardComponent
-      { path: 'change-password', component: ChangePasswordComponent },
-      { path: 'add-staff', component: AddStaffComponent },
-    ]
-  }]
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('@erp/auth').then(m => m.AuthHomeComponent) // Make sure AuthHomeComponent exists
+      },
+      {
+        path: 'change-password',
+        loadComponent: () =>
+          import('@erp/auth').then(m => m.ChangePasswordComponent)
+      },
+      {
+        path: 'add-staff',
+        loadComponent: () =>
+          import('@erp/auth').then(m => m.AddStaffComponent)
+      },
+      {
+        path: 'mrole',
+        loadComponent: () =>
+          import('@erp/auth').then(m => m.MangeRoleComponent)
+      },
+      {
+        path: 'mpermission',
+        loadComponent: () =>
+          import('@erp/auth').then(m => m.MangePermissionComponent)
+      }
+    ],
+  },
+];

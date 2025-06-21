@@ -1,25 +1,36 @@
 <div class="custom-input">
   <div
     class="input-wrapper"
-    [class.focused]="focused || value"
+    [class.focused]="focused || searchTerm"
     [class.has-error]="hasError()"
   >
     <label [for]="id">{{ label }}</label>
 
     <div class="input-field-wrapper">
-      <select
-        [ngStyle]="{ width: width, height: height }"
+      <input
+        type="text"
         class="input-field"
+        [ngStyle]="{ width: width, height: height }"
         [disabled]="disabled"
         [id]="id"
         [name]="name"
-        [ngModel]="value"
-        (ngModelChange)="onModelChange($event)"
-        (focus)="focused = true"
-        (blur)="focused = false; onTouched()"
-      >
-        <ng-content></ng-content>
-      </select>
+        [placeholder]="placeholder"
+        [value]="searchTerm"
+        (input)="onSearch($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        autocomplete="off"
+      />
+
+      <ul class="dropdown" *ngIf="showDropdown && filteredOptions.length">
+        <li
+          *ngFor="let option of filteredOptions"
+          (mousedown)="selectOption(option)"
+          [class.selected]="isSelected(option)"
+        >
+          {{ getLabel(option) }}
+        </li>
+      </ul>
     </div>
   </div>
 

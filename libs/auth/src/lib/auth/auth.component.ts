@@ -20,18 +20,21 @@ import {
   CancelRoundedButtonComponent,
   CancelButtonComponent,
   FlatButtonComponent,
+  
 } from '@erp/core';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router'; 
 
 @Component({
   selector: 'lib-auth',
   imports: [
     CommonModule,
-        RouterModule,
+    RouterModule,
     ReactiveFormsModule,
     CustomInputComponent,
     SubmitRoundedButtonComponent,
-     
+    
   ],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './auth.component.html',
@@ -40,10 +43,25 @@ import { RouterModule } from '@angular/router';
 export class AuthComponent implements OnInit {
   disabled = true;
   signInForm!: FormGroup;
-
-  constructor(private formBuilder: FormBuilder) {}
+  verifyForm!: FormGroup;
+  res: any;
+  showPassword = false;
+isProcessing =false;
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    (()=>{
+const token = localStorage.getItem('token');
+if(token){this.router.navigate(['/auth/dashboard'])}
+    })();
+    this.verifyForm = this.formBuilder.group({
+      token: ['', [Validators.required]],
+      email: ['', [Validators.email, Validators.required]],
+    });
     this.signInForm = this.formBuilder.group({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [
@@ -51,25 +69,40 @@ export class AuthComponent implements OnInit {
         Validators.minLength(6),
       ]),
     });
-    this.signInForm.valueChanges.subscribe((val) =>
-      console.log('form changed:', val)
-    );
-    
   }
 
   submitForm() {
+    this.isProcessing=true;
     console.log('value', this.signInForm.value);
-    // if (this.signInForm.valid) {
-    //   console.log('Form submitted:', this.signInForm.value);
-    //     // Handle form submission logic here
-    //   } else {
-    //     console.log('Form is invalid');
-    //     // Handle form validation errors here
-    //   }
+    const value = this.signInForm.value;
+    this.authService.login(value).subscribe((res) => {
+      console.log('Login Response: ', res);
+      this.res = res;
+      this.isProcessing = false;
+    });
   }
-  navigateToSignUp() {
-    console.log('Navigating to sign up page');
-    // Implement navigation logic here, e.g., using a router service
+  verifyToken() {
+    this.isProcessing =true;
+    this.verifyForm.patchValue({
+      email: this.signInForm.get('email')?.value,
+    });
+    console.log('verify form: ', this.verifyForm.value);
+    this.authService
+      .verifyLoginToken(this.verifyForm.value)
+      .subscribe((tokenRes) => {this.isProcessing=false;
+        console.log('token response: ', tokenRes);
+        this.authService.setEnv(tokenRes);
+        // this.authService.refToken.set(this.res.refreshToken)
+        // this.authService.tokenExpires.set(15);
+        if (this.res.data.isDefault) {
+          this.router.navigate(['auth/change-password']);
+        } else {
+          this.router.navigate(['auth/dashboard']);
+        }
+      });
+  }
+  togglePassword(){
+    this.showPassword =!this.showPassword;
   }
   navigateToForgotPassword() {
     console.log('Navigating to forgot password page');

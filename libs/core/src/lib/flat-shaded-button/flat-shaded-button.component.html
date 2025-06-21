@@ -1,5 +1,13 @@
- 
-<button style="background-color: rgb(215, 214, 214);" class="flex min-w-[84px] max-w-[480px] py-2 px-2 cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f1f2f4] text-[#121416] text-sm font-medium leading-normal w-full">
-  <span class="truncate">Assigned</span>
+<button
+  style="background-color: rgb(215, 214, 214)"
+  class="flex min-w-[84px] max-w-[480px] py-2 px-2 cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#f1f2f4] text-[#121416] text-sm font-medium leading-normal w-full"
+>
+  <div class="flex gap-2group-hover:text-inherit hover:text-[#f1f2f4]">
+    @if(isProcessing){
+    <lib-spinner [size]="32" color="#10b981"></lib-spinner>
+
+    }
+
+    <span>{{ label }}</span>
+  </div>
 </button>
- 

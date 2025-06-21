@@ -8,34 +8,36 @@
 
     <ng-content select="[prefix]"></ng-content>
 
-    <input
-      class="input-field"
-      [type]="inputType"
-      [value]="value"
-      [disabled]="disabled"
-      [placeholder]="focused ? placeholder : ''"
-      (input)="onInputChange($event)"
-      (focus)="focused = true"
-      (blur)="focused = false; onTouched()"
-      [id]="id"
-      [name]="name"
-      [autocomplete]="autocomplete"
-      [readonly]="readonly"
-      [disabled]="disabled"
-      [ngStyle]="{ width: width, height: height }"
-    />
+   <input
+  class="input-field"
+  [type]="inputType || 'search'"
+  [value]="value"
+  [disabled]="disabled"
+  [placeholder]="focused ? placeholder : ''"
+  (input)="onInputChange($event)"
+  (focus)="focused = true"
+  (blur)="focused = false; onTouched()"
+  [id]="id"
+  [name]="name"
+  [autocomplete]="autocomplete || 'on'"
+  [readonly]="readonly"
+  [ngStyle]="{ width: width, height: height }"
+  role="searchbox"
+/>
 
-    <ng-content select="[suffix]"></ng-content>
 
-    <button
-      *ngIf="type === 'password'"
-      type="button"
-      class="toggle-btn"
-      (click)="togglePasswordVisibility()"
-      aria-label="Toggle password visibility"
-    >
-      {{ hidePassword ? '👁️' : '🙈' }}
-    </button>
+    <span class="suffix-wrapper">
+      <ng-content select="[suffix]"></ng-content>
+      <button
+        *ngIf="oldType === 'password'"
+        type="button"
+        class="toggle-btn"
+        (click)="togglePasswordVisibility()"
+        aria-label="Toggle password visibility"
+      >
+        {{ hidePassword ? '👁️' : '🙈' }}
+      </button>
+    </span>
   </div>
 
   <div class="error-message" *ngIf="hasError()">

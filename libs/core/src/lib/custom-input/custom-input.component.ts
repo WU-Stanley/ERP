@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, forwardRef, Injector } from '@angular/core';
+import { Component, Input, forwardRef, Injector, Output } from '@angular/core';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
   NgControl,
   FormControl,
 } from '@angular/forms';
+import { EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'lib-custom-input',
@@ -32,9 +33,11 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() autocomplete = 'off';
   @Input() width='300px';
   @Input() height='2rem';
+  oldType = ''
   value = '';
   focused = false;
   hidePassword = true;
+  @Output() hidePasswordAction=new EventEmitter(false);
 
   private _ngControl: NgControl | null = null;
 
@@ -43,6 +46,7 @@ export class CustomInputComponent implements ControlValueAccessor {
 
   ngOnInit() {
     try {
+      this.oldType=this.type;
       this._ngControl = this.injector.get(NgControl, null);
       if (this._ngControl) {
         this._ngControl.valueAccessor = this;
@@ -89,8 +93,9 @@ export class CustomInputComponent implements ControlValueAccessor {
     return this.type === 'password' && this.hidePassword ? 'password' : this.type;
   }
 
-  togglePasswordVisibility() {
+  togglePasswordVisibility() { 
     this.hidePassword = !this.hidePassword;
+    this.hidePasswordAction.emit(this.hidePassword);
   }
 
   hasError(): boolean {

@@ -5,3 +5,6 @@ export * from './lib/add-staff/add-staff.component';
 export * from './lib/mange-permission/mange-permission.component';
 export * from './lib/mange-role/mange-role.component';
 export * from './lib/auth-dashboard/auth-dashboard.component';
+export * from './lib/auth.service';
+export * from './lib/auth.interceptor';
+export * from './lib/auth-home/auth-home.component'

@@ -1,4 +1,4 @@
-<div [formGroup]="signInForm"
+<div 
   class="header-img"
   style="
     display: flex;
@@ -20,9 +20,31 @@
     <img class="mx-auto" style="height: 150px; width: auto;" src="logo.png" alt="Logo" />
     <div class="mt-4"></div>
     <br />
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Welcome back</h1>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Welcome back, @if (res) {<span>{{res.data.fullName}}</span> }</h1>
 </div>
-    <lib-custom-input
+@if(res){
+  <div [formGroup]="verifyForm">
+  <lib-custom-input 
+      formControlName="token"
+      [label]="'Login Token'"
+      [id]="'loginToken'"
+      [name]="'loginToken'"
+      [placeholder]="'Enter your login token sent to your email'"
+      [type]="'text'" 
+      (focused)="true"
+    >
+    </lib-custom-input> 
+      <div class="flex justify-center items-center mt-6 p-4">
+      <lib-submit-rounded-button 
+         [isProcessing]="isProcessing"
+       [disabled]="signInForm.invalid"
+        [label]="'Sign In'"
+        (submitAction)="verifyToken()"
+      >Verify Token</lib-submit-rounded-button>
+    </div></div>
+} @else{
+  <div [formGroup]="signInForm">
+    <lib-custom-input 
       formControlName="email"
       [label]="'Email'"
       [id]="'email'"
@@ -32,15 +54,7 @@
       (focused)="true"
     >
     </lib-custom-input> 
-    <!-- <lib-text-field
-      [label]="'Password'"
-      [id]="'password'"
-      [name]="'password'"
-      [placeholder]="'Enter your password'"
-      [type]="'password'"
-      [control]="signInForm.controls['password']"
-    >
-    </lib-text-field> -->
+     
     <div class="mt-4"></div>
     <lib-custom-input 
       formControlName="password"
@@ -48,7 +62,9 @@
       [id]="'password'"
       [name]="'password'"
       [placeholder]="'Enter your password'"
-      [type]="'password'" 
+      
+          [type]="showPassword ? 'text' : 'password'"
+          (hidePasswordAction)="togglePassword()"
       (focused)="true"
      
     >
@@ -66,11 +82,15 @@
   </div>
     <div class="flex justify-center items-center mt-6 p-4">
       <lib-submit-rounded-button 
+      [isProcessing]="isProcessing"
+      label="Log In"
        [disabled]="signInForm.invalid"
         [label]="'Sign In'"
         (submitAction)="submitForm()"
-      >Log In</lib-submit-rounded-button>
+      ></lib-submit-rounded-button>
+      
     </div>
-    
+    </div>
+  }
 </div>
 

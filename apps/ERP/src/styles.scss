@@ -3,3 +3,9 @@
 @tailwind utilities;
 
 /* You can add global styles to this file, and also import other style files */
+::ng-deep .custom-snackbar-success {
+  background-color: #2e7d32; /* dark green */
+  color: #ffffff; /* white text */
+  font-weight: 500;
+  font-size: 14px;
+}
