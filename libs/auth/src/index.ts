@@ -7,4 +7,10 @@ export * from './lib/mange-role/mange-role.component';
 export * from './lib/auth-dashboard/auth-dashboard.component';
 export * from './lib/auth.service';
 export * from './lib/auth.interceptor';
-export * from './lib/auth-home/auth-home.component'
+export * from './lib/auth-home/auth-home.component';
+export * from './lib/role.service';
+export * from './lib/department.service';
+export * from './lib/dtos/department.dto';
+export * from './lib/dtos/role.dto';
+export * from './lib/dtos/CreateStaff.dto'
+export * from './lib/dtos/api.response';

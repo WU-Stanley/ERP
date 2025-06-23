@@ -3,11 +3,13 @@
 
   <!-- Staff Select -->
   <lib-custom-select
+  [formControl]="staffControl"
     [options]="staffList"
-    [labelKey]="'name'"
-    [placeholder]="'Select staff'"
+    [labelKey]="'fullName'"
+    [placeholder]="'Select staff to assign permission'"
     class="w-full max-w-md"
-  ></lib-custom-select>
+    label="Staff"
+      ></lib-custom-select>
 
   <!-- Search -->
   <div class="flex justify-end">
@@ -18,7 +20,7 @@
       [id]="'searchPerm'"
       [label]="'Search Permissions'"
       [type]="'search'"
-      [placeholder]="'Search permissions...'"
+            [placeholder]="'Search permissions...'"
     ></lib-custom-input>
   </div>
   <!-- Permissions Table -->

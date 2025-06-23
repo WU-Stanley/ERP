@@ -4,20 +4,22 @@ import {
   NO_ERRORS_SCHEMA,
   OnInit,
 } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatListModule } from '@angular/material/list';
 import {
-  CustomInputComponent,
   CustomSelectComponent,
+  SpinnerComponent,
   SubmitRoundedButtonComponent,
 } from '@erp/core';
 import { AuthService } from '../auth.service';
-import { Role, RoleService } from '../role.service';
-
+import { RoleService } from '../role.service';
+import { RoleDto } from '../dtos/role.dto';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { UserDto } from '../dtos/usertype.dto';
 
 @Component({
   selector: 'lib-mange-role',
@@ -25,41 +27,79 @@ import { Role, RoleService } from '../role.service';
   styleUrls: ['./mange-role.component.css'],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA],
   imports: [
-    CustomInputComponent,
     CustomSelectComponent,
+    SpinnerComponent,
     SubmitRoundedButtonComponent,
+    ReactiveFormsModule,
+    FormsModule,
   ],
 })
 export class MangeRoleComponent implements OnInit {
-  roles: Role[] = [];
-  newRole: Partial<Role> = {};
-  constructor(private authService: AuthService,private roleService:RoleService) {}
-  ngOnInit() {
+  roles: RoleDto[] = [];
+  newRole: Partial<RoleDto> = {};
+  staffList: UserDto[] = [];
+  roleForm!: FormGroup;
+  userRoles: RoleDto[] = [];
+  selectedStaffId = '';
+  isProcessing = false;
+
+  constructor(
+    private authService: AuthService,
+    private roleService: RoleService,
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.roleForm = this.fb.group({
+      userId: ['', [Validators.required]],
+      roleId: ['', [Validators.required]],
+    });
+    this.loadStaffs();
+    this.roleForm.get('userId')?.valueChanges.subscribe((userId: string) => {
+      console.log('user id selected: ', userId);
+      this.selectedStaffId = userId;
+      this.loadUserRoles(userId);
+    });
     this.loadRoles();
   }
 
-  loadRoles() {
-        this.roleService.getRoles().subscribe(roles =>{
-          console.log('Roles:',roles);
-      this.roles=roles;
+  loadRoles(): void {
+    this.roleService.getRoles().subscribe((roles: RoleDto[]) => {
+      console.log('Roles:', roles);
+      this.roles = roles;
+    });
+  }
+
+  loadUserRoles(userId: string): void {
+    this.isProcessing = true;
+    this.authService.getUserRoles(userId).subscribe((userRoles: RoleDto[]) => {
+      console.log('user roles: ', userRoles);
+      this.userRoles = userRoles;
+      this.isProcessing = false;
+    });
+  }
+
+  loadStaffs(): void {
+    this.authService.getAllStaff().subscribe((res) => {
+      console.log('user list res: ', res);
+      this.staffList = res.data ?? [];
+    });
+  }
+  assignRole() {
+    console.log('assigning role: ', this.roleForm.value);
+    this.authService.assignRoleToUser(this.roleForm.value).subscribe(res =>{
+      console.log('Assign role res: ',res);
+      this.loadUserRoles(this.roleForm.value.userId);
     })
   }
-
-  addRole() {
-    if (this.newRole.name && this.newRole.description) {
-      const newId = this.roles.length
-        ? Math.max(...this.roles.map((r) => r.id)) + 1
-        : 1;
-      this.roles.push({
-        id: newId,
-        name: this.newRole.name,
-        description: this.newRole.description,
-      } as Role);
-      this.newRole = {};
-    }
-  }
-
-  removeRole(id: number) {
-    this.roles = this.roles.filter((role) => role.id !== id);
+  removeRole(role: RoleDto): void {
+    this.authService
+      .removeRoleFromUser(this.selectedStaffId, role.id)
+      .subscribe((res: any) => {
+        console.log('res: ', res);
+        if (res != null) {
+          this.userRoles = this.userRoles.filter((u: RoleDto) => u.id != role.id);
+        }
+      });
   }
 }

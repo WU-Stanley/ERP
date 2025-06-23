@@ -1,3 +1,58 @@
-<p>
-  add-staff works!
-</p>
+<div class="min-h-screen flex items-center justify-center bg-gray-100 ">
+  <div
+    [formGroup]="userForm"
+    class="max-w-md w-full p-6 bg-white rounded shadow justify-center items-center"
+  >
+    <h2 class="text-2xl font-bold mb-6">Create New Staff</h2>
+    <div class="mb-4">
+      <lib-custom-input
+        formControlName="userEmail"
+        id="email"
+        name="email"
+        type="email"
+        label="Email"
+        placeholder="Enter staff email"
+      />
+    </div>
+    <div class="mb-4">
+      <lib-custom-input
+        formControlName="fullName"
+        id="fullname"
+        name="fullname"
+        type="text"
+        label="Fullname"
+        placeholder="Enter staff fullname"
+      ></lib-custom-input>
+    </div>
+    <div class="mb-4">
+      <lib-custom-select
+        formControlName="departmentId"
+        id="department"
+        name="department"
+        type="text"
+        label="Department"
+        [placeholder]="'Select department'"
+        [options]="departments"
+        labelKey="name"
+      ></lib-custom-select>
+    </div>
+    <div class="mb-6">
+      <lib-custom-select
+        formControlName="userTypeId"
+        id="userType"
+        name="userType"
+        [options]="userTypes"
+        labelKey="name"
+        label="User Type"
+        placeholder="Select user type"
+      >
+      </lib-custom-select>
+    </div>
+    <lib-submit-rounded-button
+      (submitAction)="onSubmit()"
+      class="flex justify-center"
+      label="Add Staff"
+      [isProcessing]="isProcessing"
+    ></lib-submit-rounded-button>
+  </div>
+</div>

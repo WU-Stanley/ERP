@@ -3,6 +3,10 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppEnvironment, ENVIRONMENT } from '@erp/core';
 import { Subscription, timer } from 'rxjs';
+import { UserDto, UserTypeDto } from './dtos/usertype.dto';
+import { CreateStaffDto } from './dtos/CreateStaff.dto';
+import { ApiResponse } from './dtos/api.response';
+import { PermissionDto } from './dtos/permission.dto';
 // Update the import path to the correct relative path for your environment file
 // import { environment } from '../../../environments/environment';
 
@@ -11,14 +15,17 @@ import { Subscription, timer } from 'rxjs';
 })
 export class AuthService {
  
+ 
+
+
   refToken = signal('');
   tokenExpires = signal(0);
   private refreshSubscription?: Subscription;
 
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
-  constructor( private router: Router) { 
-  }
+  constructor(private router: Router) {}
+
   login(formValue: { email: string; password: string }) {
     return this.http.post(this.env.apiUrl + '/auth/login', formValue);
   }
@@ -28,6 +35,28 @@ export class AuthService {
       value
     );
   }
+   assignRoleToUser(value: any) {
+   return this.http.post(this.env.apiUrl+`/Role/assign/${value.userId}/${value.roleId}`,value);
+  }
+    removeRoleFromUser(selectedStaffId: string, roleId: string) {
+    return this.http.delete(this.env.apiUrl+`/Role/remove/${selectedStaffId}/${roleId}`)
+  }
+    getUserRoles(selectedStaffId: any) {
+   return this.http.get<any>(this.env.apiUrl+'/Role/user/'+selectedStaffId);
+  }
+   getPermissions() {
+    return this.http.get<ApiResponse<PermissionDto[]>>(this.env.apiUrl+"/Permission");
+  }
+  getUserTypes() {
+    return this.http.get<{
+      Message: string;
+      Status: boolean;
+      data: Array<UserTypeDto>;
+    }>(this.env.apiUrl + '/auth/get-user-type');
+  }
+    getAllStaff() {
+   return this.http.get<ApiResponse<UserDto[]>>(this.env.apiUrl+'/auth/users')
+  }
   changePassword(json: any) {
     return this.http.post(this.env.apiUrl + '/auth/change-password', json);
   }
@@ -36,21 +65,22 @@ export class AuthService {
     if (!token) {
       return 0;
     }
-     try {
+    try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-       
-      const exp= payload.exp * 1000; // convert to milliseconds
-     console.log('exp: ',exp);
-     return exp; } catch (e) {
+
+      const exp = payload.exp * 1000; // convert to milliseconds
+      console.log('exp: ', exp);
+      return exp;
+    } catch (e) {
       console.error('Invalid token format');
       return Date.now();
     }
   }
- 
-  scheduleTokenRefresh() { 
-      this.clearRefreshTimer();
-const now = Date.now();
-const expiration= this.getTokenExpiration();
+
+  scheduleTokenRefresh() {
+    this.clearRefreshTimer();
+    const now = Date.now();
+    const expiration = this.getTokenExpiration();
     const refreshIn = expiration - now - 60_000; // refresh 1 minute before expiry
 
     if (refreshIn <= 0) {
@@ -59,12 +89,12 @@ const expiration= this.getTokenExpiration();
       return;
     }
 
-      this.refreshSubscription = timer(expiration).subscribe(
-        () => {
-          this.refreshToken();
-        }
-      );
-    
+    this.refreshSubscription = timer(expiration).subscribe(() => {
+      this.refreshToken();
+    });
+  }
+  addStaff(value: CreateStaffDto) {
+    return this.http.post<object>(this.env.apiUrl+'/auth/register',value)
   }
   setEnv(tokenRes: any) {
     localStorage.setItem('token', tokenRes.token);
@@ -94,7 +124,8 @@ const expiration= this.getTokenExpiration();
       });
   }
 
-  logout() {console.log('logout clicked')
+  logout() {
+    console.log('logout clicked');
     this.clearRefreshTimer();
     localStorage.removeItem('token');
     localStorage.removeItem('refToken');

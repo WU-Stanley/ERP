@@ -20,7 +20,8 @@ import {
   selector: 'lib-custom-select',
   templateUrl: './custom-select.component.html',
   styleUrls: ['../custom-select/custom-select.component.scss'],
-  imports: [FormsModule, ReactiveFormsModule, CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -30,20 +31,8 @@ import {
   ],
 })
 export class CustomSelectComponent implements ControlValueAccessor {
-  private _ngControl: any;
+  private _ngControl: NgControl | null = null;
 
-  writeValue(obj: any): void {
-    throw new Error('Method not implemented.');
-  }
-  registerOnChange(fn: any): void {
-    throw new Error('Method not implemented.');
-  }
-  registerOnTouched(fn: any): void {
-    throw new Error('Method not implemented.');
-  }
-  setDisabledState?(isDisabled: boolean): void {
-    throw new Error('Method not implemented.');
-  }
   @Input() label = '';
   @Input() id = '';
   @Input() name = '';
@@ -51,16 +40,18 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() width = '100%';
   @Input() height = 'auto';
   @Input() disabled = false;
-  @Input() options: string[]|object[] = []; // List of items
-  @Input() labelKey = ''; // If options are objects, specify which key to display
- 
-  @Input() value = '';
+  @Input() options: string[] | object[] = [];
+  @Input() labelKey = '';
   @Output() valueChange = new EventEmitter<any>();
 
   searchTerm = '';
   filteredOptions: any[] = [];
   showDropdown = false;
   focused = false;
+  private _value: any;
+
+  onChange: (_: any) => void = () => {};
+  onTouched: () => void = () => {};
   constructor(private injector: Injector) {}
 
   ngOnInit() {
@@ -71,15 +62,40 @@ export class CustomSelectComponent implements ControlValueAccessor {
         this._ngControl.valueAccessor = this;
       }
     } catch (e) {
-      // Swallow if not used in a reactive form
+      // Swallow error if not used in a reactive form
     }
   }
+
+  get value() {
+    return this._value;
+  }
+
+  writeValue(value: any): void {
+    this._value = value;
+    this.searchTerm = this.getLabel(value);
+    console.log('select value: ', value);
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+
   get formControl(): FormControl | null {
     return this._ngControl?.control as FormControl;
   }
+
   setInitialValue() {
     this.searchTerm = this.getLabel(this.value);
     this.filteredOptions = [...this.options];
+    this.showDropdown = true;
   }
 
   onSearch(event: Event) {
@@ -102,27 +118,37 @@ export class CustomSelectComponent implements ControlValueAccessor {
     setTimeout(() => {
       this.focused = false;
       this.showDropdown = false;
-    }, 200); // allow time to select
+      this.onTouched();
+    }, 200);
   }
 
-  selectOption(option: any) {
-    this.value = option;
+  selectOption(option: any) { 
+    this._value = option;
     this.searchTerm = this.getLabel(option);
-    this.valueChange.emit(option);
+    this.onChange(this.labelKey ? option['id'] : option);
+    this.valueChange.emit(this.labelKey ? option['id'] : option);
+    this.onTouched();
     this.showDropdown = false;
+  }
+  setValue(value: any) {
+    this._value = value;
+    this.searchTerm = this.getLabel(value);
+    this.onChange(value);
+    this.valueChange.emit(value);
+    console.log('select value 1: ', value);
   }
 
   isSelected(option: any): boolean {
     return this.getLabel(option) === this.getLabel(this.value);
   }
 
-  getLabel(option: any) {
+  getLabel(option: any): string {
     return this.labelKey && option ? option[this.labelKey] : option;
   }
 
   hasError(): boolean {
-    // Implement based on your validation logic
-    return false;
+    const control = this.formControl;
+    return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
   get errorMessage(): string {

@@ -31,38 +31,68 @@
         >
           <span class="material-symbols-outlined">rule</span>
         </a>
+        <a
+          routerLink="/auth/add-staff"
+          class="hover:bg-gray-200 p-2 rounded"
+          title="Create New Staff"
+        >
+          <span class="material-symbols-outlined">person_add</span>
+        </a>
         <a routerLink="/settings" class="hover:bg-gray-200 p-2 rounded">
           <span class="material-symbols-outlined"> settings </span>
         </a>
         <!-- Add more links -->
       </div>
-      <button (click)="logout()" class="hover:bg-gray-200 p-2 rounded w-full mt-auto">
+      <button
+        (click)="logout()"
+        class="hover:bg-gray-200 p-2 rounded w-full mt-auto"
+      >
         <span class="material-symbols-outlined"> logout </span>
       </button>
     </nav>
     }@else{
     <nav class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)]">
       <div class="flex-1 flex flex-col space-y-2">
-        <a routerLink="/dashboard" class="hover:bg-gray-200 p-2 rounded"
-          >Dashboard</a
+        <div class="flex items-center hover:bg-gray-200 p-2 rounded">
+          <span class="material-symbols-outlined"> dashboard </span>
+          <a routerLink="/dashboard" class="pl-2">Dashboard</a>
+        </div>
+        <div class="flex items-center hover:bg-gray-200 p-2 rounded">
+          <span class="material-symbols-outlined"> security </span>
+          <a routerLink="/auth/mrole" class="pl-2" title="Manage Permissions">
+            Manage Roles</a
+          >
+        </div>
+ <div class="flex items-center hover:bg-gray-200 p-2 rounded">
+          <span class="material-symbols-outlined"> rule </span>
+        
+        <a routerLink="/auth/mpermission" class="pl-2">
+          Manage Permissions </a
         >
-        <a
-          routerLink="/auth/mrole"
-          class="hover:bg-gray-200 p-2 rounded"
-          title="Manage Permissions"
-        >
-          Manage Roles</a
-        >
-        <a routerLink="/auth/mpermission" class="hover:bg-gray-200 p-2 rounded">
-          Manage Permissions
+        </div>
+         <div class="flex items-center hover:bg-gray-200 p-2 rounded">
+          <span class="material-symbols-outlined"> person_add</span>
+        
+        <a routerLink="/auth/add-staff" class="pl-2">
+          Create New Staff
         </a>
-        <a routerLink="/settings" class="hover:bg-gray-200 p-2 rounded"
+        </div>
+         <div class="flex items-center hover:bg-gray-200 p-2 rounded">
+          <span class="material-symbols-outlined"> settings </span>
+        
+        <a routerLink="/settings" class="pl-2"
           >Settings</a
         >
+        </div>
         <!-- Add more links -->
       </div>
-      <button (click)="logout()" class="hover:bg-gray-200 p-2 rounded w-full mt-auto text-left">
-        <span class="material-symbols-outlined align-middle mr-2"> logout </span>
+      <button
+        (click)="logout()"
+        class="hover:bg-gray-200 p-2 rounded w-full mt-auto text-left"
+      >
+        <span class="material-symbols-outlined align-middle mr-2">
+          logout
+        </span>
         Logout
       </button>
     </nav>
