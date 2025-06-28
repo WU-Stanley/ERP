@@ -1,12 +1,16 @@
-import { HttpBackend, HttpClient, HttpRequest } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppEnvironment, ENVIRONMENT } from '@erp/core';
-import { Subscription, timer } from 'rxjs';
+import { firstValueFrom, Subscription, timer } from 'rxjs';
 import { UserDto, UserTypeDto } from './dtos/usertype.dto';
 import { CreateStaffDto } from './dtos/CreateStaff.dto';
 import { ApiResponse } from './dtos/api.response';
-import { PermissionDto } from './dtos/permission.dto';
+import { UserPermissionDto } from './dtos/permission.dto';
+import { User } from './dtos/user.dto';
+import { UserRole } from './dtos/user-roles.dto';
+import { RoleDto } from './dtos/role.dto';
+import { Permissions } from './enums/permissions.enum';
 // Update the import path to the correct relative path for your environment file
 // import { environment } from '../../../environments/environment';
 
@@ -14,10 +18,8 @@ import { PermissionDto } from './dtos/permission.dto';
   providedIn: 'root',
 })
 export class AuthService {
- 
- 
-
-
+  private accessToken: string | null = null;
+  user = signal<User | null>(null);
   refToken = signal('');
   tokenExpires = signal(0);
   private refreshSubscription?: Subscription;
@@ -25,27 +27,27 @@ export class AuthService {
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
   constructor(private router: Router) {}
-
+ 
   login(formValue: { email: string; password: string }) {
-    return this.http.post(this.env.apiUrl + '/auth/login', formValue);
+    return this.http.post<ApiResponse<{ token: string; data: User; refreshToken: string }>>(this.env.apiUrl + '/auth/login', formValue);
   }
-  verifyLoginToken(value: any) {
-    return this.http.post<any>(
+  verifyLoginToken(value: { token: string }) {
+    return this.http.post<ApiResponse<{ valid: boolean }>>(
       this.env.apiUrl + '/auth/verify-login-token',
       value
     );
   }
-   assignRoleToUser(value: any) {
-   return this.http.post(this.env.apiUrl+`/Role/assign/${value.userId}/${value.roleId}`,value);
+  assignRoleToUser(value: { userId: string; roleId: string }) {
+    return this.http.post<ApiResponse<unknown>>(this.env.apiUrl + `/Role/assign/${value.userId}/${value.roleId}`, value);
   }
-    removeRoleFromUser(selectedStaffId: string, roleId: string) {
-    return this.http.delete(this.env.apiUrl+`/Role/remove/${selectedStaffId}/${roleId}`)
+  removeRoleFromUser(selectedStaffId: string, roleId: string) {
+    return this.http.delete<ApiResponse<unknown>>(this.env.apiUrl + `/Role/remove/${selectedStaffId}/${roleId}`);
   }
-    getUserRoles(selectedStaffId: any) {
-   return this.http.get<any>(this.env.apiUrl+'/Role/user/'+selectedStaffId);
+  getUserRoles(selectedStaffId: string) {
+    return this.http.get<RoleDto[]>(this.env.apiUrl + '/Role/user/' + selectedStaffId);
   }
-   getPermissions() {
-    return this.http.get<ApiResponse<PermissionDto[]>>(this.env.apiUrl+"/Permission");
+  getPermissions() {
+    return this.http.get<ApiResponse<UserPermissionDto[]>>(this.env.apiUrl + "/Permission");
   }
   getUserTypes() {
     return this.http.get<{
@@ -54,11 +56,11 @@ export class AuthService {
       data: Array<UserTypeDto>;
     }>(this.env.apiUrl + '/auth/get-user-type');
   }
-    getAllStaff() {
-   return this.http.get<ApiResponse<UserDto[]>>(this.env.apiUrl+'/auth/users')
+  getAllStaff() {
+    return this.http.get<ApiResponse<UserDto[]>>(this.env.apiUrl + '/auth/users');
   }
-  changePassword(json: any) {
-    return this.http.post(this.env.apiUrl + '/auth/change-password', json);
+  changePassword(json: { oldPassword: string; newPassword: string }) {
+    return this.http.post<ApiResponse<unknown>>(this.env.apiUrl + '/auth/change-password', json);
   }
   getTokenExpiration(): number {
     const token = localStorage.getItem('token');
@@ -93,6 +95,7 @@ export class AuthService {
       this.refreshToken();
     });
   }
+
   addStaff(value: CreateStaffDto) {
     return this.http.post<object>(this.env.apiUrl+'/auth/register',value)
   }
@@ -100,6 +103,30 @@ export class AuthService {
     localStorage.setItem('token', tokenRes.token);
     localStorage.setItem('user', JSON.stringify(tokenRes.data));
     localStorage.setItem('refToken', tokenRes.refreshToken);
+    this.user.set(tokenRes.data);
+  }
+   setAccessToken(token: string) {
+    this.accessToken = token;
+  }
+
+  getAccessToken(): string | null {
+    return this.accessToken;
+  }
+
+  clearAccessToken() {
+    this.accessToken = null;
+  }
+  async refreshAccessToken(): Promise<boolean> {
+    try {
+      const response: any = await firstValueFrom(
+        this.http.post(this.env.apiUrl + '/auth/refresh-token', {}, { withCredentials: true })
+      );
+      this.setAccessToken(response.token);
+      return true;
+    } catch (error) {
+      this.clearAccessToken();
+      return false;
+    }
   }
   refreshToken() {
     const refreshToken = localStorage.getItem('refToken');
@@ -109,11 +136,11 @@ export class AuthService {
     }
 
     this.http
-      .post(this.env.apiUrl + '/auth/refresh-token', {
+      .post<{ token: string; data: User; refreshToken: string }>(this.env.apiUrl + '/auth/refresh-token', {
         refreshToken: refreshToken,
       })
       .subscribe({
-        next: (res: any) => {
+        next: (res) => {
           console.log('setting new tokens: ', res);
           this.setEnv(res);
           this.scheduleTokenRefresh(); // ⏰ Reschedule
@@ -137,4 +164,33 @@ export class AuthService {
       this.refreshSubscription.unsubscribe();
     }
   }
+    hasRole(role: string) {
+             return this.user()?.userRoles?.find(a =>a.role.name.includes(role));
+    }
+ hasAnyPermission(permissions: string[]): boolean {
+  const storedUser = localStorage.getItem('user');
+  const user: User | null = this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
+
+  if (!user || !user.userPermissions?.length) {
+    return false;
+  }
+
+  const userPerms = user.userPermissions
+    .map(up => up.permission?.name?.toLowerCase() || '')
+    .filter(p => !!p); // filter out empty
+
+  const hasMatch = permissions.some(required =>
+    userPerms.includes(required.toLowerCase() ||userPerms.includes(Permissions.AdminAccess))
+  );
+
+  console.log('Checking permissions:', {
+    requested: permissions,
+    userPermissions: userPerms,
+    result: hasMatch
+  });
+
+  return hasMatch;
+}
+
+
 }

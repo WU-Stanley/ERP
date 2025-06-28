@@ -20,11 +20,10 @@ import {
   CancelRoundedButtonComponent,
   CancelButtonComponent,
   FlatButtonComponent,
-  
 } from '@erp/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router'; 
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'lib-auth',
@@ -34,7 +33,6 @@ import { Router } from '@angular/router';
     ReactiveFormsModule,
     CustomInputComponent,
     SubmitRoundedButtonComponent,
-    
   ],
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './auth.component.html',
@@ -46,7 +44,7 @@ export class AuthComponent implements OnInit {
   verifyForm!: FormGroup;
   res: any;
   showPassword = false;
-isProcessing =false;
+  isProcessing = false;
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
@@ -54,9 +52,11 @@ isProcessing =false;
   ) {}
 
   ngOnInit() {
-    (()=>{
-const token = localStorage.getItem('token');
-if(token){this.router.navigate(['/auth/dashboard'])}
+    (() => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.router.navigate(['/auth/dashboard']);
+      }
     })();
     this.verifyForm = this.formBuilder.group({
       token: ['', [Validators.required]],
@@ -72,24 +72,35 @@ if(token){this.router.navigate(['/auth/dashboard'])}
   }
 
   submitForm() {
-    this.isProcessing=true;
+    this.isProcessing = true;
     console.log('value', this.signInForm.value);
     const value = this.signInForm.value;
-    this.authService.login(value).subscribe((res) => {
-      console.log('Login Response: ', res);
-      this.res = res;
-      this.isProcessing = false;
-    });
+    value.password = value.password.trim();
+    value.email = value.email.trim();
+    this.authService.login(value).subscribe(
+      (res) => {
+        console.log('Login Response: ', res);
+        this.res = res;
+        this.isProcessing = false;
+        if (!res.data?.data.twoFactorEnabled) {
+          this.authService.setEnv(res);
+          this.router.navigate(['auth/dashboard']);
+        }
+      },
+      (error) => {
+        this.isProcessing = false;
+      }
+    );
   }
   verifyToken() {
-    this.isProcessing =true;
+    this.isProcessing = true;
     this.verifyForm.patchValue({
       email: this.signInForm.get('email')?.value,
     });
     console.log('verify form: ', this.verifyForm.value);
-    this.authService
-      .verifyLoginToken(this.verifyForm.value)
-      .subscribe((tokenRes) => {this.isProcessing=false;
+    this.authService.verifyLoginToken(this.verifyForm.value).subscribe(
+      (tokenRes) => {
+        this.isProcessing = false;
         console.log('token response: ', tokenRes);
         this.authService.setEnv(tokenRes);
         // this.authService.refToken.set(this.res.refreshToken)
@@ -99,10 +110,14 @@ if(token){this.router.navigate(['/auth/dashboard'])}
         } else {
           this.router.navigate(['auth/dashboard']);
         }
-      });
+      },
+      (error) => {
+        this.isProcessing = false;
+      }
+    );
   }
-  togglePassword(){
-    this.showPassword =!this.showPassword;
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
   navigateToForgotPassword() {
     console.log('Navigating to forgot password page');

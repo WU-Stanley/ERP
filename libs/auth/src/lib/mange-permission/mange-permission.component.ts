@@ -8,7 +8,8 @@ import {
 } from '@erp/core';
 import { AuthService } from '../auth.service';
 import { UserDto } from '../dtos/usertype.dto';
-import { PermissionDto } from '../dtos/permission.dto';
+import {  UserPermissionDto } from '../dtos/permission.dto';
+import { PermissionService } from '../permission.service';
 
 @Component({
   selector: 'lib-mange-permission',
@@ -24,16 +25,22 @@ import { PermissionDto } from '../dtos/permission.dto';
   ],
 })
 export class MangePermissionComponent implements OnInit {
-  constructor(private authService:AuthService){}
+  selectedStaffId='';
+  constructor(private authService:AuthService,private permissionService:PermissionService){}
   ngOnInit(): void {
 this.loadStaffList();
-this.loadPermissions()
+// this.loadPermissions();
+this.staffControl.valueChanges.subscribe(staffId =>{
+  console.log('selected staff: ',staffId);
+  this.selectedStaffId =staffId;
+  this.loadStaffPermissions()
+})
   }
   searchTerm = '';
   staffControl = new FormControl();
   staffList:UserDto[] = [ ];
 
-  permissionList:PermissionDto[]=[];
+  permissionList?:UserPermissionDto[]=[];
 
   // permissionList = [
   //   {
@@ -100,7 +107,7 @@ this.loadPermissions()
 
   get filteredPermissions() {
     const term = this.searchTerm.toLowerCase();
-    return this.permissionList.filter(
+    return this.permissionList?.filter(
       (p) =>
         p.name.toLowerCase().includes(term) ||
         p.description.toLowerCase().includes(term)
@@ -114,17 +121,46 @@ loadStaffList(){
 }
 loadPermissions(){
   this.authService.getPermissions().subscribe(res =>{
-    console.log('permission: ',res);
     this.permissionList = (res.data??[]);
-    console.log('permissions : ',this.permissionList)
   })
 }
-  assignPermission(index: number) {
-    // this.filteredPermissions[index].status = 'Assigned';
+  assignPermission(permission:UserPermissionDto) {
+   this.permissionService.assignUserPermission(this.selectedStaffId,permission.name).subscribe(res =>{
+    console.log('assign res: ',res);
+   const index = this.permissionList?.findIndex(a => a.id == permission.id);
+   if (
+     this.permissionList &&
+     index !== undefined &&
+     index !== null &&
+     index > -1 &&
+     this.permissionList[index]
+   ) {
+     this.permissionList[index].assigned = true;
+   }
+   })
   }
 
-  revokePermission(index: number) {
-    // permission.status = 'Revoked';
-    // this.permissionList[index].status = 'Revoked';
+  revokePermission(permission:UserPermissionDto) {
+   this.permissionService.revokeUserPermission(this.selectedStaffId,permission.name).subscribe(res=>{
+    console.log('revoke res: ',res)
+    const index = this.permissionList?.findIndex(a => a.id === permission.id);
+    if (
+      this.permissionList &&
+      typeof index === 'number' &&
+      index > -1 &&
+      this.permissionList[index]
+    ) {
+      this.permissionList[index].assigned = false;
+    }
+   })
+  }
+  loadStaffPermissions(){
+if(this.selectedStaffId){
+  this.permissionService.getUserPermissions(this.selectedStaffId).subscribe(res =>{
+ 
+    this.permissionList=(res.data??[]);
+    
+  })
+}
   }
 }

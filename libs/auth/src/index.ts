@@ -14,3 +14,8 @@ export * from './lib/dtos/department.dto';
 export * from './lib/dtos/role.dto';
 export * from './lib/dtos/CreateStaff.dto'
 export * from './lib/dtos/api.response';
+export * from './lib/dtos/permission.dto';
+export * from './lib/enums/permissions.enum';
+export * from './lib/enums/roles.enum';
+export * from './lib/guards/permission.guard';
+export * from './lib/directives/has-permissions.directive';

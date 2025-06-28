@@ -53,13 +53,21 @@ export class AddStaffComponent implements OnInit {
     this.getUserTypes();
     this.userForm = this.fb.group({
       userEmail: ['', [Validators.required, Validators.email]],
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
       userName: [''],
       userTypeId: ['', [Validators.required]],
       departmentId: ['', [Validators.required]],
       dateCreated: [new Date()],
       password: ['', [Validators.required]],
-      // role:['',]
+    });
+
+    this.userForm.get('firstName')?.valueChanges.subscribe(() => {
+      this.updateFullName();
+    });
+    this.userForm.get('lastName')?.valueChanges.subscribe(() => {
+      this.updateFullName();
     });
     this.userForm.valueChanges.subscribe((val) => {
       // console.log('Form changed:', val);
@@ -82,15 +90,19 @@ export class AddStaffComponent implements OnInit {
       console.log('user types: ', userTypes);
       this.userTypes = userTypes.data;
     });
+  } private updateFullName() {
+    const firstName = this.userForm.get('firstName')?.value || '';
+    const lastName = this.userForm.get('lastName')?.value || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    this.userForm.get('fullName')?.setValue(fullName); 
   }
   onSubmit() {
     this.isProcessing = true;
-    console.log('first form: ',this.userForm.value, this.userForm.value.userTypeId,this.userForm.value.departmentId);
-    const value = this.userForm.value;
+     const value = this.userForm.value;
 
     value.userName = value.fullName;
-    // value.departmentId = value.departmentId.id;
-    // value.userTypeId = value.userTypeId.id;
+    value.dateCreated = value.dateCreated ??new Date();
+   
     value.password = (Math.random() * 10).toString(32).substring(0, 10);
 
     this.authService.addStaff(value).subscribe(

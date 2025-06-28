@@ -1,6 +1,7 @@
-export interface PermissionDto{
+export interface UserPermissionDto{
+    permission: any;
     id:string;
     name: string;
     description: string;
-    status:string;
+    assigned:boolean;
 }

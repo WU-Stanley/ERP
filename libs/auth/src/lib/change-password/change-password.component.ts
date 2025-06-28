@@ -16,6 +16,7 @@ import {
 import { CustomInputComponent, SubmitRoundedButtonComponent } from '@erp/core';
 import { AuthService } from '../auth.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'lib-change-password',
@@ -38,10 +39,12 @@ export class ChangePasswordComponent implements OnInit {
   showNewPassword = false;
   showConfirmPassword = false;
   user = JSON.parse(localStorage.getItem('user') || 'null');
+isProcessing=false;
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private sb: MatSnackBar
+    private sb: MatSnackBar,
+    private router:Router
   ) {}
 
   ngOnInit() {
@@ -91,6 +94,7 @@ export class ChangePasswordComponent implements OnInit {
 
   onSubmit() {
     if (this.changePasswordForm.valid) {
+      this.isProcessing=true;
       this.changePasswordForm.patchValue({
         email: this.user.userEmail,
       });
@@ -99,13 +103,17 @@ export class ChangePasswordComponent implements OnInit {
         console.log('Change password response: ', res);
         this.user.isDefault =false;
         localStorage.setItem('user',JSON.stringify(this.user));
+
         this.sb.open('Your password has been changed successfully!', 'X', {
           duration: 3000,
           panelClass: ['custom-snackbar-success'],
           horizontalPosition: 'right',
           verticalPosition: 'top',
         });
+        this.isProcessing=false;
+        this.router.navigate(['/auth'])
       },error=>{
+         this.isProcessing=false;
         console.log('Error: ',error)
         if(error.status ==400){
           this.sb.open(error.error,'X',{duration:3000})

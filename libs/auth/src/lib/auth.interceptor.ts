@@ -25,6 +25,12 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigate(['/auth/login'])
       },3000)  ;
       }
+        if (error.status === 403) {
+        console.warn('403 Access denied!');
+        // Optional: clear token
+        localStorage.removeItem('token');
+        mb.open('403 Access Denied!','X',{duration:3000})
+      }
       return throwError(() => error);
     })
   );
