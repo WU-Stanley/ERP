@@ -25,6 +25,6 @@ export class PermissionService {
   revokeUserPermission(selectedStaffId: string, name: string) {
     return this.http.post<ApiResponse<any>>(
       this.env.apiUrl + '/Permission/RevokePermissionFromUser',
-      { userId: selectedStaffId, permission: name }
+      { userId: selectedStaffId, permission: name },{withCredentials:true}
     );}
 }

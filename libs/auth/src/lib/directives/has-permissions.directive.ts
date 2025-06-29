@@ -22,8 +22,7 @@ export class HasAnyPermissionDirective implements OnInit {
 
   ngOnInit(): void {
     const hasAny = this.auth.hasAnyPermission(this.permissions);
-    console.log('has any: ',hasAny,'permissions: ',this.permissions)
-    if (hasAny) {
+     if (hasAny) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainer.clear();

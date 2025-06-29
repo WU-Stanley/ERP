@@ -11,8 +11,6 @@ import { User } from './dtos/user.dto';
 import { UserRole } from './dtos/user-roles.dto';
 import { RoleDto } from './dtos/role.dto';
 import { Permissions } from './enums/permissions.enum';
-// Update the import path to the correct relative path for your environment file
-// import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -21,46 +19,75 @@ export class AuthService {
   private accessToken: string | null = null;
   user = signal<User | null>(null);
   refToken = signal('');
+  
   tokenExpires = signal(0);
   private refreshSubscription?: Subscription;
 
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
   constructor(private router: Router) {}
- 
+
   login(formValue: { email: string; password: string }) {
-    return this.http.post<ApiResponse<{ token: string; data: User; refreshToken: string }>>(this.env.apiUrl + '/auth/login', formValue);
+    return this.http.post<ApiResponse< User>>(
+      this.env.apiUrl + '/auth/login',
+      formValue,
+      { withCredentials: true }
+    );
   }
   verifyLoginToken(value: { token: string }) {
     return this.http.post<ApiResponse<{ valid: boolean }>>(
       this.env.apiUrl + '/auth/verify-login-token',
-      value
+      value,
+      { withCredentials: true }
     );
   }
   assignRoleToUser(value: { userId: string; roleId: string }) {
-    return this.http.post<ApiResponse<unknown>>(this.env.apiUrl + `/Role/assign/${value.userId}/${value.roleId}`, value);
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + `/Role/assign/${value.userId}/${value.roleId}`,
+      value,
+      { withCredentials: true }
+    );
   }
   removeRoleFromUser(selectedStaffId: string, roleId: string) {
-    return this.http.delete<ApiResponse<unknown>>(this.env.apiUrl + `/Role/remove/${selectedStaffId}/${roleId}`);
+    return this.http.delete<ApiResponse<unknown>>(
+      this.env.apiUrl + `/Role/remove/${selectedStaffId}/${roleId}`,
+      { withCredentials: true }
+    );
   }
   getUserRoles(selectedStaffId: string) {
-    return this.http.get<RoleDto[]>(this.env.apiUrl + '/Role/user/' + selectedStaffId);
+    return this.http.get<RoleDto[]>(
+      this.env.apiUrl + '/Role/user/' + selectedStaffId,
+      { withCredentials: true }
+    );
   }
   getPermissions() {
-    return this.http.get<ApiResponse<UserPermissionDto[]>>(this.env.apiUrl + "/Permission");
+    return this.http.get<ApiResponse<UserPermissionDto[]>>(
+      this.env.apiUrl + "/Permission",
+      { withCredentials: true }
+    );
   }
   getUserTypes() {
     return this.http.get<{
       Message: string;
       Status: boolean;
       data: Array<UserTypeDto>;
-    }>(this.env.apiUrl + '/auth/get-user-type');
+    }>(
+      this.env.apiUrl + '/auth/get-user-type',
+      { withCredentials: true }
+    );
   }
   getAllStaff() {
-    return this.http.get<ApiResponse<UserDto[]>>(this.env.apiUrl + '/auth/users');
+    return this.http.get<ApiResponse<UserDto[]>>(
+      this.env.apiUrl + '/auth/users',
+      { withCredentials: true }
+    );
   }
   changePassword(json: { oldPassword: string; newPassword: string }) {
-    return this.http.post<ApiResponse<unknown>>(this.env.apiUrl + '/auth/change-password', json);
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/change-password',
+      json,
+      { withCredentials: true }
+    );
   }
   getTokenExpiration(): number {
     const token = localStorage.getItem('token');
@@ -87,25 +114,30 @@ export class AuthService {
 
     if (refreshIn <= 0) {
       console.warn('Token already expired or near expiry, refreshing now...');
-      this.refreshToken();
+      // this.refreshToken();
       return;
     }
 
     this.refreshSubscription = timer(expiration).subscribe(() => {
-      this.refreshToken();
+      // this.refreshToken();
     });
   }
 
   addStaff(value: CreateStaffDto) {
-    return this.http.post<object>(this.env.apiUrl+'/auth/register',value)
+    return this.http.post<object>(
+      this.env.apiUrl + '/auth/register',
+      value,
+      { withCredentials: true }
+    );
   }
   setEnv(tokenRes: any) {
     localStorage.setItem('token', tokenRes.token);
+    this.setAccessToken(tokenRes.token);
     localStorage.setItem('user', JSON.stringify(tokenRes.data));
-    localStorage.setItem('refToken', tokenRes.refreshToken);
+    // localStorage.setItem('refToken', tokenRes.refreshToken);
     this.user.set(tokenRes.data);
   }
-   setAccessToken(token: string) {
+  setAccessToken(token: string) {
     this.accessToken = token;
   }
 
@@ -119,8 +151,13 @@ export class AuthService {
   async refreshAccessToken(): Promise<boolean> {
     try {
       const response: any = await firstValueFrom(
-        this.http.post(this.env.apiUrl + '/auth/refresh-token', {}, { withCredentials: true })
+        this.http.post(
+          this.env.apiUrl + '/auth/refresh-token',
+          {},
+          { withCredentials: true }
+        )
       );
+      console.log('access token: ', response);
       this.setAccessToken(response.token);
       return true;
     } catch (error) {
@@ -136,9 +173,11 @@ export class AuthService {
     }
 
     this.http
-      .post<{ token: string; data: User; refreshToken: string }>(this.env.apiUrl + '/auth/refresh-token', {
-        refreshToken: refreshToken,
-      })
+      .post<{ token: string; data: User; refreshToken: string }>(
+        this.env.apiUrl + '/auth/refresh-token',
+        { refreshToken: refreshToken },
+        { withCredentials: true }
+      )
       .subscribe({
         next: (res) => {
           console.log('setting new tokens: ', res);
@@ -164,33 +203,26 @@ export class AuthService {
       this.refreshSubscription.unsubscribe();
     }
   }
-    hasRole(role: string) {
-             return this.user()?.userRoles?.find(a =>a.role.name.includes(role));
-    }
- hasAnyPermission(permissions: string[]): boolean {
-  const storedUser = localStorage.getItem('user');
-  const user: User | null = this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
-
-  if (!user || !user.userPermissions?.length) {
-    return false;
+  hasRole(role: string) {
+    return this.user()?.userRoles?.find(a => a.role.name.includes(role));
   }
+  hasAnyPermission(permissions: string[]): boolean {
+    const storedUser = localStorage.getItem('user');
+    const user: User | null = this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
 
-  const userPerms = user.userPermissions
-    .map(up => up.permission?.name?.toLowerCase() || '')
-    .filter(p => !!p); // filter out empty
+    if (!user || !user.userPermissions?.length) {
+      return false;
+    }
 
-  const hasMatch = permissions.some(required =>
-    userPerms.includes(required.toLowerCase() ||userPerms.includes(Permissions.AdminAccess))
-  );
+    const userPerms = user.userPermissions
+      .map(up => up.permission?.name?.toLowerCase() || '')
+      .filter(p => !!p); // filter out empty
+    const isAdmin = userPerms.includes(Permissions.AdminAccess.toLowerCase());
 
-  console.log('Checking permissions:', {
-    requested: permissions,
-    userPermissions: userPerms,
-    result: hasMatch
-  });
+    const hasMatch = permissions.some(required =>
+      userPerms.includes(required.toLowerCase()) || isAdmin
+    );
 
-  return hasMatch;
-}
-
-
+    return hasMatch;
+  }
 }

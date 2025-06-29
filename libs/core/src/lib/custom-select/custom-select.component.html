@@ -14,7 +14,7 @@
         [disabled]="disabled"
         [id]="id"
         [name]="name"
-        [placeholder]="placeholder"
+        [placeholder]="focused ? placeholder : ''"
         [value]="searchTerm"
         (input)="onSearch($event)"
         (focus)="onFocus()"

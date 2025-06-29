@@ -10,6 +10,6 @@ export class DepartmentService {
   private env = inject<AppEnvironment>(ENVIRONMENT);
   constructor(private router: Router) {}
   getDepartments() {
-    return this.http.get<DepartmentDto[]>(this.env.apiUrl + '/department');
+    return this.http.get<DepartmentDto[]>(this.env.apiUrl + '/department',{withCredentials:true});
   }
 }

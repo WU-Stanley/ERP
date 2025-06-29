@@ -82,7 +82,7 @@ export class AuthComponent implements OnInit {
         console.log('Login Response: ', res);
         this.res = res;
         this.isProcessing = false;
-        if (!res.data?.data.twoFactorEnabled) {
+        if (!res?.data?.twoFactorEnabled) {
           this.authService.setEnv(res);
           this.router.navigate(['auth/dashboard']);
         }
@@ -102,9 +102,7 @@ export class AuthComponent implements OnInit {
       (tokenRes) => {
         this.isProcessing = false;
         console.log('token response: ', tokenRes);
-        this.authService.setEnv(tokenRes);
-        // this.authService.refToken.set(this.res.refreshToken)
-        // this.authService.tokenExpires.set(15);
+        this.authService.setEnv(tokenRes); 
         if (this.res.data.isDefault) {
           this.router.navigate(['auth/change-password']);
         } else {

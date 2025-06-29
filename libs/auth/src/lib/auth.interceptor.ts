@@ -1,37 +1,54 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from './auth.service';
+import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
+import {
+  BehaviorSubject,
+  catchError,
+  from,
+  switchMap,
+  throwError
+} from 'rxjs';
+
+let isRefreshing = false;
+const refreshSubject = new BehaviorSubject<boolean>(false);
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
-  const mb= new MatSnackBar()
-  const router = inject(Router);
+  const authService = inject(AuthService);
 
-  const authReq = req.clone({
-    setHeaders: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  const accessToken = authService.getAccessToken();
+  const clonedReq = accessToken
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${accessToken}`, },withCredentials:true })
+    : req; 
+  return next(clonedReq).pipe(
+    catchError((error) => {
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === 401 &&
+        !isRefreshing
+      ) {
+        isRefreshing = true;
+        refreshSubject.next(false);
 
-  return next(authReq).pipe(
-    catchError(error => {
-      if (error.status === 401) {
-        console.warn('401 Unauthorized - redirecting to login...');
-        // Optional: clear token
-        localStorage.removeItem('token');
-        mb.open('Session expired. Login again!','X',{duration:3000})
-      setTimeout(()=>{
-        router.navigate(['/auth/login'])
-      },3000)  ;
+        return from(authService.refreshAccessToken()).pipe(
+          switchMap((success) => {
+            isRefreshing = false;
+console.log('ref token success: ',success)
+            if (success) {
+              refreshSubject.next(true);
+              const newToken = authService.getAccessToken(); 
+              const retryReq = req.clone({
+                setHeaders: { Authorization: `Bearer ${newToken}` }
+              });
+              return next(retryReq);
+            } else {
+              return throwError(() => error);
+            }
+          })
+        );
+      } else {
+        return throwError(() => error);
       }
-        if (error.status === 403) {
-        console.warn('403 Access denied!');
-        // Optional: clear token
-        localStorage.removeItem('token');
-        mb.open('403 Access Denied!','X',{duration:3000})
-      }
-      return throwError(() => error);
     })
   );
 };
