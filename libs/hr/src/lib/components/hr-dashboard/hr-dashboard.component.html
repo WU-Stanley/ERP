@@ -1,0 +1,208 @@
+<div class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <div
+    [class.w-64]="!isCollapsed"
+    [class.w-16]="isCollapsed"
+    class="bg-white border-r transition-all duration-300 overflow-hidden"
+  >
+    <div
+      class="h-16 flex items-center justify-center font-bold text-lg border-b"
+    >
+      <button *ngIf="!isCollapsed" (click)="navigateToDashboard()">
+        WuERP
+      </button>
+      <button (click)="navigateToDashboard()" *ngIf="isCollapsed">Wu</button>
+    </div>
+    <nav class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)]">
+      <div class="flex-1 flex flex-col space-y-2">
+        <ng-container *ngFor="let item of menuItems">
+          <!-- Collapsed View -->
+          <ng-container *ngIf="isCollapsed">
+            <div *ngIf="!item.children">
+              <a
+                *libHasAnyPermission="item.permissions!"
+                [routerLink]="item.route"
+                routerLinkActive="bg-gray-300"
+                class="hover:bg-gray-200 p-2 rounded"
+                [title]="item.label"
+              >
+                <span class="material-symbols-outlined">{{ item.icon }}</span>
+              </a>
+            </div>
+            <div *ngIf="item.children">
+              <div
+                *libHasAnyPermission="item.permissions!"
+                tabindex="0"
+                role="button"
+                class="hover:bg-gray-200 p-2 rounded cursor-pointer"
+                [title]="item.label"
+                (click)="toggleMenu(item.label)"
+                (keydown.enter)="toggleMenu(item.label)"
+                (keydown.space)="
+                  $event.preventDefault(); toggleMenu(item.label)
+                "
+              >
+                <span class="material-symbols-outlined">{{ item.icon }}</span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Expanded View -->
+          <ng-container *ngIf="!isCollapsed">
+            <div *ngIf="!item.children">
+              <a
+                *libHasAnyPermission="item.permissions!"
+                [routerLink]="item.route"
+                routerLinkActive="bg-gray-300"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="flex items-center hover:bg-gray-200 p-2 rounded"
+              >
+                <span class="material-symbols-outlined">{{ item.icon }}</span>
+                <span class="pl-2">{{ item.label }}</span>
+              </a>
+            </div>
+            <div *ngIf="item.children" class="group">
+              <div
+                *libHasAnyPermission="item.permissions!"
+                tabindex="0"
+                role="button"
+                class="flex items-center justify-between hover:bg-gray-200 p-2 rounded cursor-pointer"
+                (click)="toggleMenu(item.label)"
+                (keydown.enter)="toggleMenu(item.label)"
+                (keydown.space)="
+                  $event.preventDefault(); toggleMenu(item.label)
+                "
+              >
+                <div class="flex items-center">
+                  <span class="material-symbols-outlined">{{ item.icon }}</span>
+                  <span class="pl-2">{{ item.label }}</span>
+                </div>
+                <span
+                  class="material-symbols-outlined text-sm"
+                  *ngIf="!openedMenus[item.label]"
+                  >chevron_right</span
+                >
+                <span
+                  class="material-symbols-outlined text-sm"
+                  *ngIf="openedMenus[item.label]"
+                  >keyboard_arrow_down</span
+                >
+              </div>
+              <div
+                *ngIf="openedMenus[item.label]"
+                class="ml-8 mt-1 space-y-1 transition-all"
+              >
+                <a
+                  *ngFor="let sub of item.children"
+                  [routerLink]="sub.route"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  routerLinkActive="bg-gray-200 font-medium"
+                  class="block hover:bg-gray-100 p-2 rounded"
+                >
+                  {{ sub.label }}
+                </a>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+      <button
+        (click)="logout()"
+        class="hover:bg-gray-200 p-2 rounded w-full mt-auto text-left"
+      >
+        <span class="material-symbols-outlined align-middle mr-2">logout</span>
+        Logout
+      </button>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top Navbar -->
+   <header class="h-14 bg-white shadow flex items-center justify-between px-4">
+  <div class="flex items-center space-x-4">
+    <button
+      (click)="toggleSidebar()"
+      class="text-gray-600 hover:text-black focus:outline-none"
+    >
+      <svg
+        *ngIf="!isCollapsed"
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+      <svg
+        *ngIf="isCollapsed"
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3 12h18M3 6h18M3 18h18"
+        ></path>
+      </svg>
+    </button>
+    <span class="font-semibold text-gray-700 pl-2">HRMS</span>
+  </div>
+
+  <div class="relative" (clickOutside)="dropdownOpen = false">
+    <button
+      (click)="dropdownOpen = !dropdownOpen"
+      class="flex items-center space-x-2 focus:outline-none"
+      aria-haspopup="true"
+      [attr.aria-expanded]="dropdownOpen"
+    >
+      <span class="font-semibold text-gray-700">{{ user.fullName }}</span>
+      <span class="material-symbols-outlined">expand_more</span>
+    </button>
+
+    <div
+      *ngIf="dropdownOpen"
+      class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
+    >
+      <a
+        routerLink="/profile"
+        class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+      >
+        <span class="material-symbols-outlined mr-2">account_circle</span>
+        Profile
+      </a>
+      <a
+        routerLink="/settings"
+        class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+      >
+        <span class="material-symbols-outlined mr-2">settings</span>
+        Settings
+      </a>
+      <button
+        type="button"
+        (click)="logout()"
+        class="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left"
+      >
+        <span class="material-symbols-outlined mr-2">logout</span>
+        Logout
+      </button>
+    </div>
+  </div>
+</header>
+
+    <!-- Page Content -->
+    <main class="p-4 overflow-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

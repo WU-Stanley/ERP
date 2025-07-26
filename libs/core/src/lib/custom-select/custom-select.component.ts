@@ -42,6 +42,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() disabled = false;
   @Input() options: string[] | object[] = [];
   @Input() labelKey = '';
+  @Input() fieldValue = '';
   @Output() valueChange = new EventEmitter<any>();
 
   searchTerm = '';
@@ -55,7 +56,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
   constructor(private injector: Injector) {}
 
   ngOnInit() {
-    this.setInitialValue();
+    // this.setInitialValue();
     try {
       this._ngControl = this.injector.get(NgControl, null);
       if (this._ngControl) {
@@ -112,6 +113,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
   onFocus() {
     this.focused = true;
     this.showDropdown = true;
+    this.setInitialValue()
   }
 
   onBlur() {
@@ -135,7 +137,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
     this.searchTerm = this.getLabel(value);
     this.onChange(value);
     this.valueChange.emit(value);
-    console.log('select value 1: ', value);
+    // console.log('select value 1: ', value);
   }
 
   isSelected(option: any): boolean {
@@ -143,7 +145,13 @@ export class CustomSelectComponent implements ControlValueAccessor {
   }
 
   getLabel(option: any): string {
-    return this.labelKey && option ? option[this.labelKey] : option;
+    let label= this.labelKey && option ? option[this.labelKey] : option;
+    console.log('option: ',option,' label ',label, ' labelKey: ',this.labelKey);
+    if(!label && option && this.options.length){
+      label = (this.options.find((a:any) =>a['id'] == option) as any)[this.labelKey]
+    }
+    console.log('final label: ',label)
+    return label;
   }
 
   hasError(): boolean {

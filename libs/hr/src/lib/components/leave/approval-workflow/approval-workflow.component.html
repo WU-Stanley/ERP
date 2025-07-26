@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-gray-100 p-6 max-w-10xl mx-auto w-full">
+  <div class="flex gap-6">
+    <!-- Left: Workflow List -->
+    <div class="w-full bg-white rounded shadow p-4">
+      <div class="flex justify-start gap-6">
+        <h2 class="text-xl font-bold mb-4">Approval Workflows</h2>
+        <lib-flat-button label="+ New Approval Workflow" (click)="toggleForm()">
+          
+        </lib-flat-button>
+      </div>
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div
+    *ngFor="let flow of approvalWorkflows;let i=index" 
+    class="border p-4 rounded shadow bg-white mt-8"
+  (mouseenter)="showEdit(i)">
+    <div class="flex font-semibold text-lg justify-between">{{ flow.name }}
+     @if(flowEditIndex===i){ <button (click)="editWorkflow(i)" class="material-symbols-outlined ">edit</button>}
+    </div>
+    <div class="text-sm text-gray-500 mb-2">
+      {{ flow.steps?.length }} Steps
+    </div>
+
+    <div class="space-y-1 text-sm">
+      <div *ngFor="let step of flow.steps">
+        <div class="text-gray-700">
+          <strong>Step {{ step.stepOrder }}:</strong>
+          {{ step.approverType }} -
+          {{
+            step.approverType === 'ROLE'
+              ? getRoleName(step.approverValue)
+              : getUserName(step.approverValue)
+          }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+  <!-- Right: Slide-in Form Overlay -->
+  @if(showForm){
+  <div
+    class="absolute top-0 right-0 h-full w-full max-w-xl bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
+    [ngClass]="{ 'translate-x-0': showForm, 'translate-x-full': !showForm }"
+  >
+    <div class="p-6 overflow-y-auto h-full" [formGroup]="approvalWorkflowForm">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col">
+          <h2 class="text-2xl font-bold">Create New Approval Workflow</h2>
+        <span class="gray-40">Define a multi-step approval process for leave request</span>
+        
+        </div>
+        <button (click)="toggleForm()" class="text-gray-500 hover:text-red-500">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Form Content (reuse your form code here) -->
+      <lib-custom-input
+        formControlName="name"
+        type="text"
+        label="Approval Workflow Name"
+        placeholder="Enter Approval Workflow Name"
+      ></lib-custom-input>
+
+      <div class="mt-4 flex justify-end">
+        <lib-flat-button (click)="addStep()" label="Add Step"></lib-flat-button>
+      </div>
+
+      <div class="mt-4 space-y-4" formArrayName="steps">
+        <div
+          *ngFor="let step of steps.controls; let i = index"
+          [formGroupName]="i"
+          class="bg-gray-100 p-4 rounded shadow"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-semibold">Step {{ i + 1 }}</h3>
+            <button
+              (click)="removeStep(i)"
+              class="text-red-500 hover:text-red-700"
+            >
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+
+          <lib-custom-input
+            formControlName="stepOrder"
+            label="Step Order"
+            type="number"
+            placeholder="Step Order"
+          ></lib-custom-input>
+
+          <lib-custom-select
+            formControlName="approverType"
+            [options]="approverTypes"
+            label="Approver Type"
+            placeholder="Select Approver Type"
+            
+          ></lib-custom-select>
+
+          <ng-container *ngIf="getApproverTypeValue(i) === 'ROLE'">
+            <lib-custom-select
+              formControlName="approverValue"
+              [options]="roles"
+              labelKey="name"
+              label="Approver Role"
+              placeholder="Select Role"
+            ></lib-custom-select>
+          </ng-container>
+
+          <ng-container *ngIf="getApproverTypeValue(i) === 'USER'">
+            <lib-custom-select
+              formControlName="approverValue"
+              [options]="staffs"
+              labelKey="fullName"
+              label="Approver User"
+              placeholder="Select User"
+            ></lib-custom-select>
+          </ng-container>
+        </div>
+      </div>
+      @if(steps.length && approvalWorkflowForm.valid){
+      <div class="flex gap-6 mt-6 items-center justify-center">
+        <lib-flat-button label="Reset Form" (submitAction)="resetForm()"></lib-flat-button>
+        <lib-submit-rounded-button
+        class="items-center"
+          (submitAction)="onSubmit()"
+          label="Submit"
+          [isProcessing]="isProcessing"
+        ></lib-submit-rounded-button>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>

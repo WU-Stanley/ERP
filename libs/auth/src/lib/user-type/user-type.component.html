@@ -1,0 +1,123 @@
+<div class="bg-white flex flex-col justify-start p-8 container">
+  <div
+    style="min-width: 70vw; max-width: 80vw"
+    class="flex flex-row justify-start mb-6"
+  >
+    <h2 class="text-2xl font-bold text-gray-800 gap-[10px] mr-2">User Types</h2>
+  </div>
+  <div class="flex flex-row justify-end items-center">
+    <lib-custom-input
+      type="text"
+      [(ngModel)]="searchTerm"
+      [autocomplete]="'on'"
+      [id]="'searchPerm'"
+      [label]="'Search User Types'"
+      [type]="'search'"
+      [placeholder]="'Search user types...'"
+    ></lib-custom-input>
+    <lib-flat-button
+      label="+ Add User Type"
+      class="mr-2"
+      (click)="openDialog()"
+    ></lib-flat-button>
+    <!-- <lib-flat-button label="View All"></lib-flat-button> -->
+  </div>
+
+  <!-- Role list -->
+
+  <div class="overflow-auto rounded-lg border border-gray-200">
+    <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+      <thead class="bg-gray-100 text-gray-700 font-medium">
+        <tr>
+          <th class="px-4 py-3">Name</th>
+          <th class="px-4 py-3">Description</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 bg-white">
+        @for (userTypes of filteredUserTypes;let index=$index; track userTypes.id) {
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-4 py-3 font-medium text-gray-800">
+            {{ userTypes.name }}
+          </td>
+          <td class="px-4 py-3 text-gray-600">
+            {{ userTypes.description }}
+          </td>
+          <td class="px-4 py-3">
+            <span
+              class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-green-700"
+            >
+              {{userTypes.isActive ? 'Active' : 'Inactive'}}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <!-- <lib-flat-button
+              label="Manage Role Permission"
+              [routerLink]="['/auth/mroles']"
+              [queryParams]="{ roleName: role.name }"
+              class="text-blue-600 hover:text-blue-800"
+            >
+              Manage
+            </lib-flat-button> -->
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+<!-- Slide-in Form Overlay -->
+<div
+  class="fixed top-0 right-0 h-full w-full z-50 bg-black bg-opacity-40 transition-opacity duration-300"
+  *ngIf="isDialogOpen"
+>
+  <!-- Form Panel -->
+  <div
+    class="absolute right-0 top-0 h-full w-full sm:w-[400px] bg-white shadow-xl p-6 flex flex-col transition-transform duration-500 transform translate-x-0"
+  >
+    <!-- Close Button -->
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-gray-800">Add New User Type</h3>
+      <button
+        class="text-gray-500 hover:text-gray-700 text-2xl"
+        (click)="handleDialogClose(null)"
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+
+    <!-- Form Content -->
+    <div [formGroup]="userTypeForm">
+      <div class="mb-4">
+        <lib-custom-input
+          formControlName="name"
+          id="name"
+          name="name"
+          type="text"
+          label="User Type Name"
+          placeholder="Enter user type name"
+        />  
+      </div>
+        <div class="mb-4">
+          <lib-custom-textarea
+            width="100%"
+            formControlName="description"
+            id="description"
+            name="description"
+            label="Description"
+            placeholder="Enter role description"
+          ></lib-custom-textarea>
+        </div>
+
+      <div class="flex justify-end">
+        <lib-submit-rounded-button
+          label="Add User Type"
+          [isProcessing]="isProcessing"
+          (submitAction)="onAddUserType()"
+        ></lib-submit-rounded-button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

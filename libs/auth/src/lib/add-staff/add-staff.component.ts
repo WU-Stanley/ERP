@@ -37,6 +37,7 @@ export class AddStaffComponent implements OnInit {
   departments: DepartmentDto[] = [];
   userForm!: FormGroup;
   userTypes: UserTypeDto[] = [];
+  employmentTypes: any[] = [];
   isProcessing = false;
 
   constructor(
@@ -51,6 +52,8 @@ export class AddStaffComponent implements OnInit {
     // this.getRoles();
     this.getDepartments();
     this.getUserTypes();
+    this.getEmploymentTypes();
+    
     this.userForm = this.fb.group({
       userEmail: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required]],
@@ -61,6 +64,7 @@ export class AddStaffComponent implements OnInit {
       departmentId: ['', [Validators.required]],
       dateCreated: [new Date()],
       password: ['', [Validators.required]],
+      employmentTypeId: ['', [Validators.required]],
     });
 
     this.userForm.get('firstName')?.valueChanges.subscribe(() => {
@@ -73,11 +77,22 @@ export class AddStaffComponent implements OnInit {
       // console.log('Form changed:', val);
     });
   }
+  getEmploymentTypes() {
+    this.authService.getEmploymentTypes().subscribe((employmentTypes) => {
+      console.log('employment types: ', employmentTypes);
+      if(employmentTypes.data?.length) {
+        this.employmentTypes = employmentTypes.data;
+      }
+      console.log('employment types: ', this.employmentTypes);
+    });
+  }
   getRoles() {
     this.roleService.getRoles().subscribe((roles) => {
       console.log('found roles: ', roles);
-      this.roles = roles;
-    });
+      this.roles = roles.data??[];
+    },((error) => {
+      console.error('Error fetching roles:', error);
+    }));
   }
   getDepartments() {
     this.departmentService.getDepartments().subscribe((depts) => {

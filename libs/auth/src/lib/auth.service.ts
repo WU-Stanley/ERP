@@ -3,12 +3,11 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppEnvironment, ENVIRONMENT } from '@erp/core';
 import { firstValueFrom, Subscription, timer } from 'rxjs';
-import { UserDto, UserTypeDto } from './dtos/usertype.dto';
+import { EmploymentTypeDto, UserDto, UserTypeDto } from './dtos/usertype.dto';
 import { CreateStaffDto } from './dtos/CreateStaff.dto';
 import { ApiResponse } from './dtos/api.response';
 import { UserPermissionDto } from './dtos/permission.dto';
-import { User } from './dtos/user.dto';
-import { UserRole } from './dtos/user-roles.dto';
+import { User } from './dtos/user.dto'; 
 import { RoleDto } from './dtos/role.dto';
 import { Permissions } from './enums/permissions.enum';
 
@@ -16,7 +15,7 @@ import { Permissions } from './enums/permissions.enum';
   providedIn: 'root',
 })
 export class AuthService {
-  private accessToken: string | null = null;
+ private accessToken: string | null = null;
   user = signal<User | null>(null);
   refToken = signal('');
   
@@ -26,7 +25,35 @@ export class AuthService {
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
   constructor(private router: Router) {}
+ addEmploymentType(value: any) {
+    return this.http.post<ApiResponse<EmploymentTypeDto>>(
+      this.env.apiUrl + '/auth/create-employment-type',
+      value,
+      { withCredentials: true }
+    );
+  }
+   
+   addUserType(data: UserTypeDto) {
+    return this.http.post<ApiResponse<UserTypeDto>>(
+      this.env.apiUrl + '/auth/create-user-type',
+      data,
+      { withCredentials: true }
+    );
+  }
 
+  getEmploymentTypes() {
+    return this.http.get<ApiResponse<any[]>>(
+      this.env.apiUrl + '/auth/get-employment-types',
+      { withCredentials: true }
+    );
+  }
+
+   getAllRoles() {
+   return this.http.get<ApiResponse<RoleDto[]>>(
+      this.env.apiUrl + '/Role',
+      { withCredentials: true }
+    );  
+  }
   login(formValue: { email: string; password: string }) {
     return this.http.post<ApiResponse< User>>(
       this.env.apiUrl + '/auth/login',
@@ -49,13 +76,13 @@ export class AuthService {
     );
   }
   removeRoleFromUser(selectedStaffId: string, roleId: string) {
-    return this.http.delete<ApiResponse<unknown>>(
+    return this.http.delete<ApiResponse<RoleDto>>(
       this.env.apiUrl + `/Role/remove/${selectedStaffId}/${roleId}`,
       { withCredentials: true }
     );
   }
   getUserRoles(selectedStaffId: string) {
-    return this.http.get<RoleDto[]>(
+    return this.http.get<ApiResponse<RoleDto[]>>(
       this.env.apiUrl + '/Role/user/' + selectedStaffId,
       { withCredentials: true }
     );
@@ -173,7 +200,7 @@ export class AuthService {
     }
 
     this.http
-      .post<{ token: string; data: User; refreshToken: string }>(
+      .post<{ token: string; data: UserDto; refreshToken: string }>(
         this.env.apiUrl + '/auth/refresh-token',
         { refreshToken: refreshToken },
         { withCredentials: true }
@@ -192,6 +219,12 @@ export class AuthService {
 
   logout() {
     console.log('logout clicked');
+    this.http.post(this.env.apiUrl+"/auth/logout",{}).subscribe(res =>{
+    this.clearRefreshTimer();
+    localStorage.removeItem('token');
+    localStorage.removeItem('refToken');
+    this.router.navigate(['/auth/login']);
+    });
     this.clearRefreshTimer();
     localStorage.removeItem('token');
     localStorage.removeItem('refToken');

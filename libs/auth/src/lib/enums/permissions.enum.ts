@@ -112,5 +112,8 @@ export enum Permissions {
   // Reports
   ViewHRReports = 'ViewHRReports',
   GenerateDepartmentReports = 'GenerateDepartmentReports',
-  ExportData = 'ExportData'
+  ExportData = 'ExportData',
+  SuperAdminAccess = "SuperAdminAccess",
+  ViewLeaveReports = "ViewLeaveReports",
+  ManageLeave = "ManageLeave"
 }

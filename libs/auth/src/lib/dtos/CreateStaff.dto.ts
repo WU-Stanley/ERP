@@ -6,4 +6,5 @@ export interface CreateStaffDto{
     dateCreated:Date;
     departmentId:string;
     userTypeId:string;
+    employmentTypeId:string;
 }

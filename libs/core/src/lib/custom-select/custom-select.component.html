@@ -15,7 +15,7 @@
         [id]="id"
         [name]="name"
         [placeholder]="focused ? placeholder : ''"
-        [value]="searchTerm"
+        [value]="searchTerm ? searchTerm : fieldValue"
         (input)="onSearch($event)"
         (focus)="onFocus()"
         (blur)="onBlur()"

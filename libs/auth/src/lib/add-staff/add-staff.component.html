@@ -56,6 +56,18 @@
       >
       </lib-custom-select>
     </div>
+    <div class="mb-6">
+      <lib-custom-select
+        formControlName="employmentTypeId"
+        id="employmentType"
+        name="employmentType"
+        [options]="employmentTypes"
+        labelKey="name"
+        label="Employment Type"
+        placeholder="Select employment type"
+      >
+      </lib-custom-select>
+    </div>
     <lib-submit-rounded-button
       (submitAction)="onSubmit()"
       class="flex justify-center"

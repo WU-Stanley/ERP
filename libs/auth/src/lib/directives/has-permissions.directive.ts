@@ -22,7 +22,7 @@ export class HasAnyPermissionDirective implements OnInit {
 
   ngOnInit(): void {
     const hasAny = this.auth.hasAnyPermission(this.permissions);
-     if (hasAny) {
+     if (hasAny || !this.permissions || this.permissions.length === 0) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainer.clear();

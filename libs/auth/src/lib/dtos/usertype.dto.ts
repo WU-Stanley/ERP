@@ -14,3 +14,11 @@ export interface UserDto {
   userTypeId: string;
   departmentId: string;
 }
+export interface EmploymentTypeDto {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}

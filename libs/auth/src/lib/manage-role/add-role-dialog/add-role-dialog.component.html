@@ -1,0 +1,42 @@
+
+<div  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="close()"
+> 
+  <div
+    (click)="$event.stopPropagation()"
+    class="min-h-fit w-full max-w-md bg-white p-6 rounded shadow"
+  >
+    <div [formGroup]="roleForm">
+      <h2 class="text-2xl font-bold mb-6">Create New Role</h2>
+
+      <div class="mb-4">
+        <lib-custom-input
+          formControlName="name"
+          id="name"
+          name="name"
+          type="text"
+          label="Role Name"
+          placeholder="Enter role name"
+        />
+      </div>
+
+      <div class="mb-4">
+        <lib-custom-input
+          formControlName="description"
+          id="description"
+          name="description"
+          type="text"
+          label="Description"
+          placeholder="Enter role description"
+        ></lib-custom-input>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <lib-flat-button type="button" label="Cancel" (click)="close()"></lib-flat-button>
+        <lib-submit-rounded-button
+          label="Add Role"
+          [isProcessing]="isProcessing" (submitAction)="onAddRole()"
+        ></lib-submit-rounded-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -11,7 +11,7 @@ import {
   selector: 'lib-custom-textarea',
   templateUrl: './custom-textarea.component.html',
   styleUrls: ['../custom-input/custom-input.component.scss'],
-  imports:[CommonModule],
+  imports: [CommonModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -41,8 +41,12 @@ export class CustomTextareaComponent implements ControlValueAccessor {
         this._ngControl.valueAccessor = this;
       }
     } catch {
-      // 
+      //
     }
+  }
+  adjustHeight(textArea: HTMLTextAreaElement): void {
+    textArea.style.height = 'auto'; 
+    textArea.style.height = textArea.scrollHeight + 'px'; 
   }
 
   get formControl(): FormControl | null {
@@ -54,10 +58,10 @@ export class CustomTextareaComponent implements ControlValueAccessor {
   }
 
   onChange: (val: any) => void = () => {
-    // 
+    //
   };
   onTouched: () => void = () => {
-    // 
+    //
   };
 
   registerOnChange(fn: any): void {
@@ -79,13 +83,16 @@ export class CustomTextareaComponent implements ControlValueAccessor {
   }
 
   hasError(): boolean {
-    return !!this.formControl && this.formControl.invalid && (this.formControl.touched || this.formControl.dirty);
+    return (
+      !!this.formControl &&
+      this.formControl.invalid &&
+      (this.formControl.touched || this.formControl.dirty)
+    );
   }
 
   get errorMessage(): string {
     const control = this.formControl;
     if (!control?.errors) return '';
-
     if (control.errors['required']) return 'This field is required.';
     return 'Invalid input.';
   }

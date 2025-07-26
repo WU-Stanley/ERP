@@ -1,15 +1,19 @@
+
 export * from './lib/auth/auth.component';
 export * from './lib/forgot-password/forgot-password.component';
 export * from './lib/change-password/change-password.component';
-export * from './lib/add-staff/add-staff.component';
-export * from './lib/mange-permission/mange-permission.component';
-export * from './lib/mange-role/mange-role.component';
+export * from './lib/add-staff/add-staff.component'; 
+export * from './lib/manage-role/manage-role.component';
+export * from './lib/mange-staff-permission/manage-staff-permission.component';
+export * from './lib/manage-staff-role/manage-staff-role.component';
 export * from './lib/auth-dashboard/auth-dashboard.component';
 export * from './lib/auth.service';
 export * from './lib/auth.interceptor';
 export * from './lib/auth-home/auth-home.component';
 export * from './lib/role.service';
 export * from './lib/department.service';
+export * from './lib/dtos/user.dto';
+export * from './lib/dtos/usertype.dto';
 export * from './lib/dtos/department.dto';
 export * from './lib/dtos/role.dto';
 export * from './lib/dtos/CreateStaff.dto'
@@ -19,3 +23,12 @@ export * from './lib/enums/permissions.enum';
 export * from './lib/enums/roles.enum';
 export * from './lib/guards/permission.guard';
 export * from './lib/directives/has-permissions.directive';
+export * from './lib/manage-role/add-role-dialog/add-role-dialog.component'
+export * from './lib/manage-role/add-role-dialog/add-role-dialog.component' ;
+export * from './lib/role-list/role-list.component';
+export * from './lib/user-type/user-type.component';
+export * from './lib/employment-type/employment-type.component';
+export * from './lib/department/department.component';
+export * from './lib/enums/index';
+export * from './lib/auth.service';
+export * from './lib/role.service'

@@ -15,9 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@./shared": ["libs/shared/src/index.ts"],
+      "@erp/hr": ["libs/hr/src/index.ts"],
       "@erp/auth": ["libs/auth/src/index.ts"],
-      "@erp/core": ["libs/core/src/index.ts"]
+      "@erp/core": ["libs/core/src/index.ts"],
+      "@erp/shared": ["libs/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

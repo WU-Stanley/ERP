@@ -1,5 +1,4 @@
-export * from './lib/core/core.component';
-export * from './lib/submit-button/submit-button.component';
+ export * from './lib/submit-button/submit-button.component';
 export * from './lib/submit-rounded-button/submit-rounded-button.component';
 export * from './lib/cancel-button/cancel-button.component';
 export * from './lib/cancel-rounded-button/cancel-rounded-button.component';
@@ -11,3 +10,5 @@ export * from './lib/custom-select/custom-select.component';
 export * from './lib/custom-textarea/custom-textarea.component';
 export * from './lib/environment.token';
 export * from './lib/spinner/spinner.component';
+export * from './lib/app-switcher-fab/app-switcher-fab.component';
+ 
