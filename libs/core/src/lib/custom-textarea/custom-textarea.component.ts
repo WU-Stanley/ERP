@@ -31,6 +31,7 @@ export class CustomTextareaComponent implements ControlValueAccessor {
   focused = false;
 
   private _ngControl: NgControl | null = null;
+  @Input() row = 1;
 
   constructor(private injector: Injector) {}
 
@@ -45,8 +46,8 @@ export class CustomTextareaComponent implements ControlValueAccessor {
     }
   }
   adjustHeight(textArea: HTMLTextAreaElement): void {
-    textArea.style.height = 'auto'; 
-    textArea.style.height = textArea.scrollHeight + 'px'; 
+    textArea.style.height = 'auto';
+    textArea.style.height = textArea.scrollHeight + 'px';
   }
 
   get formControl(): FormControl | null {

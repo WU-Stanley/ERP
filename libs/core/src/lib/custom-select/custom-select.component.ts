@@ -32,13 +32,13 @@ import {
 })
 export class CustomSelectComponent implements ControlValueAccessor {
   private _ngControl: NgControl | null = null;
-
+  @Input() multiple = false;
   @Input() label = '';
   @Input() id = '';
   @Input() name = '';
   @Input() placeholder = 'Select...';
-  @Input() width = '100%';
-  @Input() height = 'auto';
+  @Input() width = '320px';
+  @Input() height = 'autos';
   @Input() disabled = false;
   @Input() options: string[] | object[] = [];
   @Input() labelKey = '';
@@ -49,7 +49,8 @@ export class CustomSelectComponent implements ControlValueAccessor {
   filteredOptions: any[] = [];
   showDropdown = false;
   focused = false;
-  private _value: any;
+
+  private _value: any = this.multiple ? [] : null;
 
   onChange: (_: any) => void = () => {};
   onTouched: () => void = () => {};
@@ -58,6 +59,8 @@ export class CustomSelectComponent implements ControlValueAccessor {
   ngOnInit() {
     // this.setInitialValue();
     try {
+      this._value = this.multiple ? [] : null;
+
       this._ngControl = this.injector.get(NgControl, null);
       if (this._ngControl) {
         this._ngControl.valueAccessor = this;
@@ -72,9 +75,13 @@ export class CustomSelectComponent implements ControlValueAccessor {
   }
 
   writeValue(value: any): void {
-    this._value = value;
-    this.searchTerm = this.getLabel(value);
-    console.log('select value: ', value);
+    if (this.multiple) {
+      this._value = Array.isArray(value) ? value : [];
+      this.searchTerm = '';
+    } else {
+      this._value = value;
+      this.searchTerm = this.getLabel(value);
+    }
   }
 
   registerOnChange(fn: any): void {
@@ -113,7 +120,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
   onFocus() {
     this.focused = true;
     this.showDropdown = true;
-    this.setInitialValue()
+    this.setInitialValue();
   }
 
   onBlur() {
@@ -124,13 +131,37 @@ export class CustomSelectComponent implements ControlValueAccessor {
     }, 200);
   }
 
-  selectOption(option: any) { 
-    this._value = option;
-    this.searchTerm = this.getLabel(option);
-    this.onChange(this.labelKey ? option['id'] : option);
-    this.valueChange.emit(this.labelKey ? option['id'] : option);
+  selectOption(option: any) {
+    if (this.multiple) {
+      const exists = this._value?.some((v: any) =>
+        this.compareValues(v, option)
+      );
+      if (exists) {
+        this._value = this._value.filter(
+          (v: any) => !this.compareValues(v, option)
+        );
+      } else {
+        this._value = [...this._value, option];
+      }
+
+      this.searchTerm = this._value
+        .map((v: any) => this.getLabel(v))
+        .join(', ');
+      const emitVal = this.labelKey
+        ? this._value.map((v: any) => v['id'])
+        : this._value;
+      this.onChange(emitVal);
+      this.valueChange.emit(emitVal);
+    } else {
+      this._value = option;
+      this.searchTerm = this.getLabel(option);
+      const emitVal = this.labelKey ? option['id'] : option;
+      this.onChange(emitVal);
+      this.valueChange.emit(emitVal);
+      this.showDropdown = false;
+    }
+
     this.onTouched();
-    this.showDropdown = false;
   }
   setValue(value: any) {
     this._value = value;
@@ -141,17 +172,43 @@ export class CustomSelectComponent implements ControlValueAccessor {
   }
 
   isSelected(option: any): boolean {
+    if (this.multiple) {
+      return this._value?.some((v: any) => this.compareValues(v, option));
+    }
     return this.getLabel(option) === this.getLabel(this.value);
   }
 
+  compareValues(a: any, b: any): boolean {
+    if (!a || !b) return false;
+    if (this.labelKey)
+      return a[this.labelKey] === b[this.labelKey] || a['id'] === b['id'];
+    return a === b;
+  }
   getLabel(option: any): string {
-    let label= this.labelKey && option ? option[this.labelKey] : option;
-    console.log('option: ',option,' label ',label, ' labelKey: ',this.labelKey);
-    if(!label && option && this.options.length){
-      label = (this.options.find((a:any) =>a['id'] == option) as any)[this.labelKey]
+    if (!option) return '';
+    if (typeof option === 'object') {
+      return this.labelKey ? option[this.labelKey] : option.toString();
     }
-    console.log('final label: ',label)
-    return label;
+
+    // fallback: find object in options by id
+    if (this.labelKey && this.options && Array.isArray(this.options)) {
+      const found = (this.options as any[]).find((o) => o['id'] == option);
+      return found ? found[this.labelKey] : option;
+    }
+
+    return option;
+  }
+
+  removeSelected(option: any) {
+    this._value = this._value.filter(
+      (v: any) => !this.compareValues(v, option)
+    );
+    this.searchTerm = this._value.map((v: any) => this.getLabel(v)).join(', ');
+    const emitVal = this.labelKey
+      ? this._value.map((v: any) => v['id'])
+      : this._value;
+    this.onChange(emitVal);
+    this.valueChange.emit(emitVal);
   }
 
   hasError(): boolean {

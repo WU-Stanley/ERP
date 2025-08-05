@@ -11,3 +11,10 @@ export enum Roles {
   Intern = 'Intern',
   Contractor = 'Contractor'
 }
+
+export enum VisibilityTypes{
+ROLE='ROLE',
+DEPARTMENT = 'DEPARTMENT',
+'USER TYPE' ='USER_TYPE',
+'EMPLOYMENT TYPE' = 'EMPLOYMENT_TYPE'
+}

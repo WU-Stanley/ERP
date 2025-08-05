@@ -56,7 +56,7 @@
       font-size: 16px;
       background: transparent;
       padding: 6px 0;
-      width: 100%;
+      min-width: 0;
     }
 
     .dropdown {
@@ -84,6 +84,31 @@
       &:hover,
       &.selected {
         background-color: #f0f0f0;
+      }
+    }
+    .selected-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+
+      .selected-item {
+        background: #e0f2f1;
+        color: #00796b;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        button {
+          background: transparent;
+          border: none;
+          font-size: 14px;
+          cursor: pointer;
+          line-height: 1;
+        }
       }
     }
   }

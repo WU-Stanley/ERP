@@ -1,12 +1,19 @@
-<div class="custom-input">
+<div class="custom-input"[ngStyle]="{ width: width, height: height }"
+>
   <div
     class="input-wrapper"
     [class.focused]="focused || searchTerm"
     [class.has-error]="hasError()"
   >
     <label [for]="id">{{ label }}</label>
-
-    <div class="input-field-wrapper">
+    <div *ngIf="multiple && value?.length" class="selected-items">
+      <span class="selected-item" *ngFor="let val of value">
+        {{ getLabel(val) }}
+        <button type="button" (click)="removeSelected(val)">×</button>
+      </span>
+    </div>
+    <div class="input-field-wrapper"[ngStyle]="{ width: width, height: height }"
+>
       <input
         type="text"
         class="input-field"
@@ -15,7 +22,7 @@
         [id]="id"
         [name]="name"
         [placeholder]="focused ? placeholder : ''"
-        [value]="searchTerm ? searchTerm : fieldValue"
+        [value]="multiple ? '' : searchTerm ? searchTerm : fieldValue"
         (input)="onSearch($event)"
         (focus)="onFocus()"
         (blur)="onBlur()"

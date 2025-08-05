@@ -1,21 +1,22 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input,  Output } from '@angular/core';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'lib-flat-button',
-  templateUrl: './flat-button.component.html',
-  styleUrls: ['./flat-button.component.css'],
-    imports:[SpinnerComponent, CommonModule]
-  
+  selector: 'lib-add-button',
+  templateUrl: './add-button.component.html',
+  styleUrls: ['./add-button.component.css'],
+  imports:[SpinnerComponent,CommonModule]
 })
-export class FlatButtonComponent {
+export class AddButtonComponent  {
+ 
 @Output() submitAction = new EventEmitter<void>();
 @Input() disabled = false;
 @Input() styles: { [key: string]: string } = {};
 @Input() classList   = '';
-@Input() label = 'Revoked';
+@Input() label = 'Add New';
 @Input() isProcessing =false;
+@Input() isFixed =false;
 
   constructor() { 
     // 

@@ -1,0 +1,21 @@
+  
+<button class="flex items-center space-x-2 cursor-pointer select-none" (click)="toggle()">
+  @if(labelLocation === 'start'){
+  <span  class="text-sm">{{ label }}</span>
+  }
+  <div class="relative">
+    <div
+      class="w-12 h-6 rounded-full transition-colors duration-300"
+      [ngClass]="checked ? color : 'bg-gray-300'"
+    ></div>
+    <div
+      class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300"
+      [ngStyle]="{
+        transform: checked ? 'translateX(24px)' : 'translateX(0)'
+      }"
+    ></div>
+  </div>
+  @if(labelLocation === 'end'){
+  <span  class="text-sm">{{ label }}</span>
+  }
+</button>

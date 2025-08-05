@@ -17,13 +17,7 @@ import {
   RoleService,
   UserDto,
 } from '@erp/auth';
-import {
-  CustomInputComponent,
-  CustomSelectComponent,
-  FlatButtonComponent,
-  FlatShadedButtonComponent,
-  SubmitRoundedButtonComponent,
-} from '@erp/core';
+import { CustomInputComponent, CustomSelectComponent, FlatButtonComponent, FlatShadedButtonComponent, SubmitRoundedButtonComponent, CancelButtonComponent, AddButtonComponent } from '@erp/core';
 import { ApprovalWorkflowService } from '../../../services/approval-workflow.service';
 import { CreateApprovalFlowDto } from '../../../dtos/leave.dto';
 @Component({
@@ -40,9 +34,12 @@ import { CreateApprovalFlowDto } from '../../../dtos/leave.dto';
     SubmitRoundedButtonComponent,
     FlatShadedButtonComponent,
     FlatButtonComponent,
-  ],
+    AddButtonComponent
+],
 })
 export class ApprovalWorkflowComponent implements OnInit {
+
+
   flowEditIndex!: number;
   approvalWorkflowForm!: FormGroup;
   isProcessing = false;
@@ -53,6 +50,8 @@ export class ApprovalWorkflowComponent implements OnInit {
   rolesTryAgain = 0;
   showForm = false;
   approvalWorkflows: CreateApprovalFlowDto[] = [];
+  isShow=false;
+activeMenuIndex: any;
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,
@@ -72,6 +71,13 @@ export class ApprovalWorkflowComponent implements OnInit {
       steps: this.fb.array([]),
     });
   }
+  viewWrokflow(index: number) {
+       this.toggleMenu(this.activeMenuIndex);
+}
+
+toggleMenu(index: number) {
+  this.activeMenuIndex = this.activeMenuIndex === index ? null : index;
+}
   editWorkflow(index: number) {
     const workflow = this.approvalWorkflows[index];
     this.approvalWorkflowForm.patchValue(workflow);
@@ -84,11 +90,10 @@ export class ApprovalWorkflowComponent implements OnInit {
         })
       );
     });
-    this.toggleForm();
+    this.toggleMenu(this.activeMenuIndex);
+    this.toggleForm()
   }
-  showEdit(index: number) {
-    this.flowEditIndex = index;
-  }
+
   getRoleName(roleId: string): string {
     const role = this.roles.find((r) => r.id === roleId);
     return role ? role.name : roleId;

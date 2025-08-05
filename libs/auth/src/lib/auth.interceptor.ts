@@ -54,7 +54,11 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                 })
               );
             } else {
-              return throwError(() => error);
+              return throwError(() => 
+                {
+                  // console.log('Error => ',error);
+                  authService.logout()
+                  return error});
             }
           })
         );

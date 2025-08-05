@@ -1,0 +1,89 @@
+<style>
+  .trustees-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .trustees-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .trustee-card {
+    display: flex;
+    gap: 1rem;
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    align-items: flex-start;
+  }
+
+  .trustee-card img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .trustee-content h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  .trustee-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #444;
+  }
+</style>
+
+<h2 class="ft-ftorange main-news-title commnmain-title text-start">Board of Trustees</h2>
+<p>
+  Discover the exceptional leaders and experts who lend their insights and experience to shape the strategic direction of our university. Our Board of Trustees is composed of accomplished individuals from diverse fields, committed to advancing education and fostering a bright future for our institution.
+</p>
+
+<div class="container my-5">
+  <div class="row g-4">
+    <!-- Trustee Card Start -->
+    <div class="col-md-6">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="d-flex p-3">
+          <img src="https://www.wigweuniversity.edu.ng/wp-content/uploads/2024/03/WIGWE-UNIVERSITY1979-1.jpg" alt="Uche Wigwe" class="rounded-circle me-3" width="90" height="90" style="object-fit: cover;">
+          <div>
+            <h5 class="card-title mb-2">Uche Wigwe</h5>
+            <p class="card-text small text-muted">
+              Uche Wigwe is the Managing Partner of Wigwe and Partners, a firm established with a mandate to deliver top-notch legal advocacy and advisory services with international best practices and standards. Prior to the establishment of this firm, he co-founded a law practice; Akanbi & Wigwe Legal Practitioners, whose services attracted an impressive local and international clientele.
+
+              A well-seasoned professional with an eclectic mix of local and international experience garnered over twenty (20) years. His wealth spans across Corporate & Commercial Law, Commercial Litigation, Business Formation, Insolvency Practice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Trustee Card End -->
+
+    <!-- Repeat for other trustees -->
+    <div class="col-md-6">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="d-flex p-3">
+          <img src="https://www.wigweuniversity.edu.ng/wp-content/uploads/2023/08/board-trustees-img-4.jpg" alt="Trustee Name" class="rounded-circle me-3" width="90" height="90" style="object-fit: cover;">
+          <div>
+            <h5 class="card-title mb-2">Trustee Name</h5>
+            <p class="card-text small text-muted">
+              [Trustee bio here...]
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add 5 more cards just like above... -->
+  </div>
+</div>

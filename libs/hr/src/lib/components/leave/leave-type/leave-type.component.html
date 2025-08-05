@@ -1,13 +1,33 @@
-@if(leaveTypes.length) {
-  @for (leaveType of leaveTypes; let index = $index; track leaveType.id) {
-    <div class="bg-gray-200 flex flex-col p-4 max-w-sm rounded shadow relative">
+<div class="min-h-screen bg-gray-100 px-6">
+  <nav class="text-sm text-gray-500 mb-2">
+    Home / HR / Leave /<span class="text-gray-700 font-medium"
+      >Leave Types</span
+    >
+  </nav>
+<div class="flex flex-wrap items-center justify-between w-full gap-4 mb-4">
+  <h1 class="text-2xl font-bold text-gray-800">Leave Type</h1>
+  <lib-add-button
+    label="Create New Leave Type"
+    (submitAction)="toggleLeaveTypeForm()"
+    class="shrink-0"
+  ></lib-add-button>
+</div>
+  @if(leaveTypes.length) {
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (leaveType of leaveTypes; let index = $index; track leaveType.id) {
+    <div
+      class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer relative"
+    >
       <!-- Header row -->
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined">trip_origin</span>
         <span class="font-medium">{{ leaveType.name }}</span>
 
         <!-- Menu toggle button -->
-        <button class="material-symbols-outlined ml-auto" (click)="toggleMenu(index)">
+        <button
+          class="material-symbols-outlined ml-auto"
+          (click)="toggleMenu(index)"
+        >
           more_vert
         </button>
 
@@ -16,56 +36,70 @@
           *ngIf="activeMenuIndex === index"
           class="absolute top-10 right-4 z-50 bg-white shadow-md rounded border w-32"
         >
-         <ul class="flex flex-col text-sm text-gray-800">
-  <li>
-    <button
-      class="w-full text-left hover:bg-gray-100 px-4 py-2"
-      (click)="viewLeaveType(leaveType.id)"
-    >
-      View
-    </button>
-  </li>
-  <li>
-    <button
-      class="w-full text-left hover:bg-gray-100 px-4 py-2"
-      (click)="editLeaveType(leaveType.id)"
-    >
-      Edit
-    </button>
-  </li>
-</ul>
-
+          <ul class="flex flex-col text-sm text-gray-800">
+            <li>
+              <button
+                class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                (click)="viewLeaveType(leaveType.id)"
+              >
+                View
+              </button>
+            </li>
+            <li>
+              <button
+                class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                (click)="editLeaveType(leaveType.id)"
+              >
+                Edit
+              </button>
+            </li> <li>
+              <button
+                class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                (click)="addLeavePolicy(leaveType.id)"
+              >
+                Add Policy
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
 
       <!-- Details row -->
       <div class="flex gap-4 mt-6 text-sm text-gray-700 flex-wrap">
         @if (leaveType.isPaid) {
-          <span class="px-2 py-1 bg-green-100 rounded">Paid time off</span>
+        <span class="px-2 py-1 bg-green-100 rounded">Paid time off</span>
+        } @if (leaveType.visibilityRules.length) {
+        <div class="flex gap-2 flex-wrap">
+          @for (vis of leaveType.visibilityRules; let visIndex = $index; track
+          vis.id) {
+          <span class="px-2 py-1 bg-blue-100 rounded">
+            {{ vis.visibilityType }}: {{ vis.value }}
+          </span>
+          }
+        </div>
         }
 
-        @if (leaveType.visibilityRules.length) {
-          <div class="flex gap-2 flex-wrap">
-            @for (vis of leaveType.visibilityRules; let visIndex = $index; track vis.id) {
-              <span class="px-2 py-1 bg-blue-100 rounded">
-                {{ vis.visibilityType }}: {{ vis.value }}
-              </span>
-            }
-          </div>
-        }
-
-        <span class="px-2 py-1 rounded" [ngClass]="leaveType.isActive ? 'bg-green-200' : 'bg-red-200'">
+        <span
+          class="px-2 py-1 rounded"
+          [ngClass]="leaveType.isActive ? 'bg-green-200' : 'bg-red-200'"
+        >
           {{ leaveType.isActive ? 'Active' : 'In-Active' }}
         </span>
       </div>
     </div>
-  }
 
-  <!-- Floating Button -->
-  <lib-flat-button
-    class="fixed bottom-20 right-20"
-    classList="bg-white shadow-md h-9 hover:bg-[#121416]"
-    label=" + Create New Leave Type "
-    (submitAction)="showLeaveTypeForm()"
-  ></lib-flat-button>
-}
+    }
+
+    <!-- Floating Button -->
+    <!-- <lib-add-button
+    [isFixed]="true"
+      label="Create New Leave Type "
+      (submitAction)="toggleLeaveTypeForm()"
+    ></lib-add-button> -->
+    <!-- The leave type form -->
+ @if(showForm){
+ <lib-leave-type-form (emitToggleForm)="toggleLeaveTypeForm()"></lib-leave-type-form>
+ }
+  </div>
+  }
+</div>

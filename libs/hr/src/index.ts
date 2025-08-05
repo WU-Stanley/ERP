@@ -7,3 +7,4 @@ export * from './lib/components/leave/leave-policies/leave-policies.component';
 export * from './lib/components/leave/leave-approval/leave-approval.component'; 
 export * from './lib/components/leave/leave-reports/leave-reports.component';
 export * from './lib/components/leave/approval-workflow/approval-workflow.component';
+export * from './lib/components/leave/leave-type-form/leave-type-form.component';

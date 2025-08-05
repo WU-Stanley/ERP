@@ -1,0 +1,5 @@
+.custom-radio-group {
+  display: flex;
+  flex-direction: column; // Radios usually stacked vertically
+  gap: 8px; // Spacing between individual radio buttons
+}

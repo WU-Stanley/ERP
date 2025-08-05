@@ -1,0 +1,168 @@
+<div
+  [formGroup]="leaveTypeForm"
+  class="fixed top-10 right-0 w-[500px] h-full bg-white shadow-lg z-50 overflow-y-auto shadow-lg transform transition-transform duration-300 ease-in-out scroll p-4"
+>
+  <div class="flex justify-between items-cente p-6">
+    <div class="flex flex-col">
+      <h2 class="text-2xl font-bold">Create New Leave Type</h2>
+      <span class="gray-40">Define a leave type for leave request</span>
+    </div>
+    <button (click)="toggleForm()" class="text-gray-500 hover:text-red-500">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <!-- Grid Layout -->
+  <div class="grid grid-cols-1  gap-6">
+    <!-- Left Column -->
+    <div class="w-full">
+      <div>
+        <lib-custom-input
+          formControlName="name"
+          label="Leave Type Name"
+          placeholder="Enter the name of the leave type"
+        ></lib-custom-input>
+      </div>
+
+      <div class="flex flex-wrap">
+        <lib-custom-input
+          formControlName="maxDays"
+          type="number"
+          label="Entitle Days"
+           
+          placeholder="Enter the annual entitlement in days"
+        ></lib-custom-input>
+        <lib-custom-input
+          formControlName="maxDaysPerRequest"
+           
+          type="number"
+          label="Max Days Per Request"
+          placeholder="Enter maximum days per request"
+        ></lib-custom-input>
+        <!-- <input type="date" class="w-full border rounded px-3 py-2" /> -->
+      </div>
+
+      <div class="flex gap-4">
+        <div class="flex-1">
+          <lib-custom-input
+            label="Color Tag"
+            type="color"
+            placeholder="Select color tag for the leave type"
+          ></lib-custom-input>
+          <!-- <select class="w-full border rounded px-3 py-2"></select> -->
+        </div>
+      </div>
+
+      <div class="w-full">
+        <lib-custom-textarea
+          [row]="3"
+          label="Comment"
+          placeholder="Describe the leave in details"
+        ></lib-custom-textarea>
+      </div>
+      <!-- <div class="grid grid-cols-2 gap-4">
+        <lib-custom-checkbox
+          formControlName="allowBackdatedRequest"
+          label="Allow Backdated Request"
+        ></lib-custom-checkbox>
+        <lib-custom-checkbox
+          formControlName="allowNegativeBalance"
+          label=" Allow Negative Balance"
+        ></lib-custom-checkbox>
+
+        <lib-custom-checkbox
+          formControlName="includePublicHolidays"
+          label="Include Public Holidays"
+        ></lib-custom-checkbox>
+        <lib-custom-checkbox
+          formControlName="isPaid"
+          label="Is Paid Leave"
+        ></lib-custom-checkbox>
+      </div> -->
+    <!-- </div> -->
+
+    <!-- Right Column -->
+    <!-- <div class="space-y-4"> -->
+      <div>
+        <lib-custom-select
+         
+          label="Employee Type"
+          [multiple]="true"
+          [options]="employmentTypes"
+          labelKey="name"
+          placeholder="Select employee type if applicable"
+        ></lib-custom-select>
+      </div>
+
+      <div class="flex flex-wrap">
+        <lib-custom-input
+          type="number"
+          label="Minimum Service Period"
+           
+          placeholder="Enter minimum serivice period in years"
+        ></lib-custom-input>
+        <lib-custom-select
+          type="date"
+          label="Gender"
+        
+          height="35px"
+          [options]="genders"
+          labelKey="label"
+          placeholder="Select Gender if applicable"
+        ></lib-custom-select>
+      </div>
+
+      <div class="flex flex-col w-full">
+        <div class="flex justify-between items-center">
+          <h3>Visibility Rules</h3>
+          <lib-add-button
+            label="Add Rule"
+            (submitAction)="addVisibility()"
+          ></lib-add-button>
+        </div>
+        <div formArrayName="visibilityRules" class="m-4">
+          <div
+            *ngFor="let rule of visibilityRules.controls; let i = index"
+            [formGroupName]="i"
+            class="flex flex-wrap justify-between items-center"
+          >
+            <lib-custom-select
+              formControlName="visibilityType"
+              [labelKey]="'label'"
+              placeholder="Enter Visibility Type"
+              [options]="visibilityTypes"
+              width="250px"
+              type="text"
+              formControlName="visibilityType"
+              label="Visibility Type"
+            ></lib-custom-select>
+            <lib-custom-select
+              width="250px"
+              formControlName="value"
+              [multiple]="true"
+              type="text"
+              labelKey="name"
+              placeholder="Select visibility value"
+              [options]="getOptions(i)"
+              formControlName="value"
+              label="Value"
+            ></lib-custom-select>
+            <lib-flat-button
+              label="Remove"
+              classList="bg-red-300 text-gray-500"
+              (click)="removeRule(i)"
+              >Remove</lib-flat-button
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Actions -->
+  <div class="flex justify-end gap-4 m-8 mr-12 pr-12">
+    <lib-cancel-button (cancelAction)="cancel()"><span>Cancel</span></lib-cancel-button>
+    <lib-submit-rounded-button label="Save"></lib-submit-rounded-button>
+    <!-- <button class="px-6 py-2 rounded border border-gray-400 text-gray-700 hover:bg-gray-100">Cancel</button>
+    <button class="px-6 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400"></button> -->
+  </div>
+</div>

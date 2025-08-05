@@ -57,6 +57,7 @@ export interface LeaveTypeDto {
   isActive: boolean;
   requireDocument?: boolean;
   approvalFlowId: string; // Guid
+  colorTag:string;
   visibilityRules: LeaveTypeVisibilityDto[]; // assuming LeaveTypeVisibility interface exists
 }
 export interface LeaveTypeVisibilityDto {
