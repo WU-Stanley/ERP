@@ -1,9 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
-import {
-  HttpErrorResponse,
-} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   BehaviorSubject,
   catchError,
@@ -54,11 +52,11 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                 })
               );
             } else {
-              return throwError(() => 
-                {
-                  // console.log('Error => ',error);
-                  authService.logout()
-                  return error});
+              return throwError(() => {
+                // console.log('Error => ',error);
+                authService.logout();
+                return error;
+              });
             }
           })
         );

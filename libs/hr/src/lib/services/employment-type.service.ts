@@ -10,16 +10,24 @@ export class EmploymentTypeService {
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
 
-  constructor() {}
+  constructor() {
+    //
+  }
 
   getEmploymentTypes() {
-    return this.http.get<ApiResponse<EmploymentTypeDto>>(
+    return this.http.get<ApiResponse<EmploymentTypeDto[]>>(
       this.env.apiUrl + route + '/get-employment-types'
     );
   }
-  createEmployementType(data: EmploymentTypeDto) {
-    return this.http.post(
+  createEmploymentType(data: EmploymentTypeDto) {
+    return this.http.post<ApiResponse<EmploymentTypeDto>>(
       this.env.apiUrl + route + '/create-employment-type',
+      data
+    );
+  }
+  updateEmploymentType(data: EmploymentTypeDto) {
+    return this.http.post<ApiResponse<EmploymentTypeDto>>(
+      this.env.apiUrl + route + '/update-employment-type/' + data.id,
       data
     );
   }

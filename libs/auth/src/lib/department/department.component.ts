@@ -35,10 +35,10 @@ import { CommonModule } from '@angular/common';
 })
 export class DepartmentComponent implements OnInit {
   departmentForm!: FormGroup;
- 
+
   searchTerm = '';
   isProcessing = false;
-  isDialogOpen = false; 
+  isDialogOpen = false;
   departments: DepartmentDto[] = [];
   constructor(
     private authService: AuthService,
@@ -86,8 +86,8 @@ export class DepartmentComponent implements OnInit {
   }
   loadDepartments() {
     this.departmentService.getDepartments().subscribe((departments) => {
-      this.departments = departments || [];
-      console.log('loaded departments: ',departments)
+      this.departments = departments.data || [];
+      console.log('loaded departments: ', departments);
     });
   }
 }

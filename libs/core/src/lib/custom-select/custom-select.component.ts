@@ -6,6 +6,7 @@ import {
   Injector,
   EventEmitter,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -44,6 +45,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() labelKey = '';
   @Input() fieldValue = '';
   @Output() valueChange = new EventEmitter<any>();
+  @Input() readonly = false;
 
   searchTerm = '';
   filteredOptions: any[] = [];
@@ -52,8 +54,12 @@ export class CustomSelectComponent implements ControlValueAccessor {
 
   private _value: any = this.multiple ? [] : null;
 
-  onChange: (_: any) => void = () => {};
-  onTouched: () => void = () => {};
+  onChange: (_: any) => void = () => {
+    //
+  };
+  onTouched: () => void = () => {
+    //
+  };
   constructor(private injector: Injector) {}
 
   ngOnInit() {
@@ -69,15 +75,32 @@ export class CustomSelectComponent implements ControlValueAccessor {
       // Swallow error if not used in a reactive form
     }
   }
-
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['options'] && this.options?.length) {
+      // Rebuild searchTerm when options change
+      if (this.multiple) {
+        this.searchTerm = this._value?.length
+          ? this._value.map((v: string) => this.getLabel(v)).join(', ')
+          : '';
+      } else {
+        this.searchTerm = this.getLabel(this._value);
+      }
+    }
+  }
   get value() {
     return this._value;
   }
 
   writeValue(value: any): void {
     if (this.multiple) {
-      this._value = Array.isArray(value) ? value : [];
-      this.searchTerm = '';
+      if (Array.isArray(value)) {
+        this._value = value;
+      } else {
+        this._value = value ? [value] : [];
+      }
+      this.searchTerm = this._value
+        .map((v: string) => this.getLabel(v))
+        .join(', ');
     } else {
       this._value = value;
       this.searchTerm = this.getLabel(value);

@@ -1,3 +1,5 @@
+import { EmploymentTypeDto, UserDto } from '@erp/auth';
+
 export interface LeaveRequestCreateDto {
   leaveTypeId: string; // Guid
   startDate: Date;
@@ -18,6 +20,7 @@ export interface CreateLeaveTypeDto {
   isActive: boolean;
   approvalFlowId: string;
   visibilityJson?: string;
+  id?: string;
 }
 
 export interface CreateApprovalFlowDto {
@@ -53,13 +56,25 @@ export interface LeaveTypeDto {
   name: string; // e.g., "Annual Leave"
   maxDays: number;
   isPaid: boolean;
+  gender?: string;
   description?: string;
   isActive: boolean;
   requireDocument?: boolean;
-  approvalFlowId: string; // Guid
-  colorTag:string;
+  approvalFlowId: string;
+  approvalFlow: ApprovalFlowDto;
+  colorTag: string;
   visibilityRules: LeaveTypeVisibilityDto[]; // assuming LeaveTypeVisibility interface exists
 }
+export interface ApprovalFlowDto {
+  id?: string;
+  name: string;
+  isActive: boolean;
+  createdBy: string; // Guid
+  createdAt: Date;
+  visibilityJson?: string; // Optional: if approval flow has visibility scope
+  steps?: ApprovalStep[]; // Optional: array of ApprovalStep
+}
+
 export interface LeaveTypeVisibilityDto {
   id: string; // Guid
   leaveTypeId: string; // Guid
@@ -70,7 +85,7 @@ export interface LeaveTypeVisibilityDto {
 
 export interface LeavePolicyDto {
   leaveTypeId: any;
-  employmentType?: string; // e.g., "FullTime", "Contract"
+  employmentTypeId?: string; // e.g., "FullTime", "Contract"
   roleName?: string; // Optional: if some roles have custom entitlement
   annualEntitlement: number;
   isAccrualBased: boolean;
@@ -78,6 +93,10 @@ export interface LeavePolicyDto {
   maxCarryOverDays: number;
   allowNegativeBalance: boolean;
   createdAt: Date;
+  updatedAt?: Date;
+  id?: string; // Guid
+  leaveType?: LeaveTypeDto;
+  employmentType?: EmploymentTypeDto; // e.g., "FullTime", "Contract"
 }
 
 export interface ApprovalStep {
@@ -96,4 +115,21 @@ export interface LeaveBalanceDto {
   usedDays: number;
   remainingDays: number;
   year: number; // e.g., 2023
+}
+
+export interface LeaveRequestDto {
+  totalDays: number;
+  userId: string;
+  leaveTypeId: string;
+  startDate: Date;
+  endDate: Date;
+  supportDocument?: string;
+  reason: string;
+  status: string; // Pending, Approved, Rejected
+  appliedAt: Date;
+
+  leaveType?: LeaveTypeDto;
+  user?: UserDto;
+
+  id?: string;
 }

@@ -7,12 +7,14 @@
     <label [for]="id">{{ label }}</label>
 
     <div class="input-field-wrapper">
-      <textarea style="width: 100%"
+      <textarea
+        style="width: 100%"
         #textAreaRef
         class="input-field"
         [disabled]="disabled"
+        [readOnly]="disabled"
         [placeholder]="focused ? placeholder : ''"
-        (input)="onInputChange($event); "
+        (input)="onInputChange($event)"
         (focus)="focused = true"
         (blur)="focused = false; onTouched()"
         [id]="id"

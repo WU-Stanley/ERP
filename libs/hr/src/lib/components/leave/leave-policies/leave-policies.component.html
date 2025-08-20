@@ -1,71 +1,138 @@
-<div class="min-h-screen bg-gray-100 p-6 max-w-10xl mx-auto w-full">
-  <div class="flex gap-6">
-    <!-- Left: leave type List -->
-    <div class="w-full bg-white rounded shadow p-4">
-      <div class="flex justify-start gap-6">
-        <h2 class="text-xl font-bold mb-4">Leave Policies</h2>
-        <lib-flat-button label="+ New Leave Policy" (click)="toggleForm()">
-          
-        </lib-flat-button>
-      </div>
- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-  <div
-    *ngFor="let flow of leavePolicies;let i=index" 
-    class="border p-4 rounded shadow bg-white mt-8"
-  (mouseenter)="showEdit(i)">
-    <div class="flex font-semibold text-lg justify-between">
-      {{ flow.leaveTypeId['Name'] }}
-     @if(editIndex===i){ <button (click)="edit(flow)" class="material-symbols-outlined ">edit</button>}
-    </div>
-    <div class="text-sm text-gray-500 mb-2">
-      <!-- {{ flow.steps?.length }} Steps -->
-    </div>
-
-  
-  </div>
+<div
+  *ngIf="isLoading() && !leavePolicies().length; else content"
+  class="h-full justify-center items-center w-full"
+>
+  <p>Loading Leave Policies...</p>
 </div>
-
+<ng-template #content>
+  <div class="min-h-screen bg-gray-100 px-6 max-w-10xl mx-auto w-full">
+    <nav class="text-sm text-gray-500 mb-2">
+      Home / HR / Leave /<span class="text-gray-700 font-medium"
+        >Leave Policies</span
+      >
+    </nav>
+    <div class="flex flex-wrap items-center justify-between w-full gap-4 mb-4">
+      <h1 class="text-2xl font-bold text-gray-800">Leave Policy</h1>
+      <lib-add-button
+        label="Create New Leave Policy"
+        (submitAction)="toggleForm()"
+        class="shrink-0"
+      ></lib-add-button>
     </div>
+    <!-- Left: leave type List -->
+    @if(leavePolicies().length) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (leavePolicy of leavePolicies(); let index = $index; track
+      leavePolicy.id) {
+      <div
+        class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer relative"
+      >
+        <!-- Header row -->
+        <div class="flex items-center gap-2">
+          <!-- <span
+            [ngStyle]="{
+              color: leaveType.colorTag !== null ? leaveType.colorTag : 'black'
+            }"
+            class="material-symbols-outlined"
+            >trip_origin</span
+          > -->
+          <span class="font-medium"
+            >{{ leavePolicy.leaveType?.name }} Policy</span
+          >
+
+          <!-- Menu toggle button -->
+          <button
+            class="material-symbols-outlined ml-auto"
+            (click)="toggleMenu(index)"
+          >
+            more_vert
+          </button>
+
+          <!-- Dropdown menu -->
+          <div
+            *ngIf="activeMenuIndex === index"
+            class="absolute top-10 right-4 z-50 bg-white shadow-md rounded border w-32"
+          >
+            <ul class="flex flex-col text-sm text-gray-800">
+              <li>
+                <button
+                  class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                  (click)="view(leavePolicy.id!)"
+                >
+                  View
+                </button>
+              </li>
+              <li>
+                <button
+                  class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                  (click)="editPolicy(leavePolicy)"
+                >
+                  Edit
+                </button>
+              </li>
+              <li>
+                <button
+                  class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                  (click)="deletePolicy(leavePolicy.id!)"
+                >
+                  Delete
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Details row -->
+        <div class="flex gap-4 mt-6 text-sm text-gray-700 flex-wrap">
+          @if (leavePolicy.isAccrualBased) {
+          <span class="px-2 py-1 bg-green-100 rounded"
+            >Monthly Accrual: {{ leavePolicy.accrualRatePerMonth }}
+          </span>
+          }
+
+          <span
+            class="px-2 py-1 rounded"
+            [ngClass]="
+              leavePolicy.annualEntitlement > 10 ? 'bg-green-200' : 'bg-red-200'
+            "
+          >
+            Entitled Days: {{ leavePolicy.annualEntitlement }}
+          </span>
+          @if (leavePolicy.allowNegativeBalance) {
+          <span class="px-2 py-1 bg-yellow-100 rounded"
+            >Negative Balance Allowed</span
+          >
+          } @if (leavePolicy.employmentTypeId) {
+          <span class="px-2 py-1 bg-yellow-100 rounded">
+            Employment Type: {{ leavePolicy.employmentType?.name }}
+          </span>
+          } @if(leavePolicy.allowNegativeBalance){
+          <span class="px-2 py-1 bg-yellow-100 rounded">
+            Allows Negative Balance
+          </span>
+          } @if (leavePolicy.maxCarryOverDays) {
+          <span class="px-2 py-1 bg-yellow-100 rounded">
+            Max Carryover Days: {{ leavePolicy.maxCarryOverDays }}
+          </span>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
   </div>
 
   <!-- Right: Slide-in Form Overlay -->
   @if(showForm){
-  <div
-    class="absolute top-0 right-0 h-full w-full max-w-xl bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
-    [ngClass]="{ 'translate-x-0': showForm, 'translate-x-full': !showForm }"
-  >
-    <div class="p-6 overflow-y-auto h-full" [formGroup]="leavePolicyForm">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Create New Leave Policy</h2>
-        <button (click)="toggleForm()" class="text-gray-500 hover:text-red-500">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <!-- Form Content (reuse your form code here) -->
-      <lib-custom-select
-        formControlName="leaveTypeId"
-        type="text"
-        label="Leave Type"
-        placeholder="Select Leave type"
-      ></lib-custom-select>
-
-      <div class="mt-4 flex justify-end">
-        <!-- <lib-flat-button (click)="addStep()" label="Add Step"></lib-flat-button> -->
-      </div>
- 
-      @if(leavePolicyForm.valid){
-      <div class="flex gap-6 mt-6 items-center justify-center">
-        <lib-flat-button label="Reset Form" (submitAction)="resetForm()"></lib-flat-button>
-        <lib-submit-rounded-button
-        class="items-center"
-          (submitAction)="onSubmit()"
-          label="Submit"
-          [isProcessing]="isProcessing"
-        ></lib-submit-rounded-button>
-      </div>
-      }
-    </div>
-  </div>
+  <lib-leave-policy-form
+    (emitTogglePolicyForm)="toggleForm()"
+    (cancel)="toggleForm()"
+  ></lib-leave-policy-form>
+  } @if(showPolicyDetails){
+  <lib-leave-policy-detail
+    [leavePolicy]="selectedLeavePolicy()"
+    (editEvent)="editPolicy($event)"
+    (closeEvent)="togglePolicyDetails()"
+  ></lib-leave-policy-detail>
   }
-</div>
+</ng-template>

@@ -1,0 +1,154 @@
+<div
+  class="fixed top-10 right-0 w-[500px] h-full bg-white shadow-lg z-50 flex flex-col transform transition-transform duration-300 ease-in-out"
+>
+  <!-- Header -->
+  <div class="p-6 border-b flex justify-between items-center">
+    <h2 class="text-2xl font-bold">Leave Type Details</h2>
+    <button (click)="toggleDetails()" class="text-gray-500 hover:text-red-500">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="p-6 overflow-y-auto flex-1 space-y-4">
+    <!-- Name -->
+    <div>
+      <h3 class="text-sm text-gray-500">Name</h3>
+      <p class="font-medium">{{ leaveType?.name }}</p>
+    </div>
+
+    <!-- Max Days -->
+    <div>
+      <h3 class="text-sm text-gray-500">Maximum Days</h3>
+      <p class="font-medium">{{ leaveType?.maxDays }}</p>
+    </div>
+
+    <!-- Paid Leave -->
+    <div>
+      <h3 class="text-sm text-gray-500">Paid Leave</h3>
+      <p class="font-medium">{{ leaveType?.isPaid ? 'Yes' : 'No' }}</p>
+    </div>
+
+    <!-- Gender -->
+    <div *ngIf="leaveType?.gender">
+      <h3 class="text-sm text-gray-500">Applicable Gender</h3>
+      <p class="font-medium">{{ leaveType?.gender }}</p>
+    </div>
+
+    <!-- Description -->
+    <div *ngIf="leaveType?.description">
+      <h3 class="text-sm text-gray-500">Description</h3>
+      <p class="font-medium">{{ leaveType?.description }}</p>
+    </div>
+
+    <!-- Active -->
+    <div>
+      <h3 class="text-sm text-gray-500">Active</h3>
+      <p class="font-medium">{{ leaveType?.isActive ? 'Yes' : 'No' }}</p>
+    </div>
+
+    <!-- Require Document -->
+    <div>
+      <h3 class="text-sm text-gray-500">Requires Document</h3>
+      <p class="font-medium">{{ leaveType?.requireDocument ? 'Yes' : 'No' }}</p>
+    </div>
+
+    <!-- Color Tag -->
+    <div>
+      <h3 class="text-sm text-gray-500">Color Tag</h3>
+      <span
+        class="inline-block w-6 h-6 rounded-full border"
+        [style.background-color]="leaveType?.colorTag"
+      ></span>
+      <span class="ml-2 font-medium">{{ leaveType?.colorTag }}</span>
+    </div>
+
+    <!-- Visibility Rules -->
+    <div>
+      <h3 class="text-sm text-gray-500">Visibility Rules</h3>
+      @if (leaveType?.visibilityRules?.length) {
+      <ul class="list-disc list-inside text-sm">
+        <li *ngFor="let rule of leaveType?.visibilityRules" class="flex">
+          @if (rule.visibilityType === VisibilityTypes.DEPARTMENT) {
+          <p class="font-medium">
+            {{ rule.visibilityType }}: {{ getDepartment(rule.value) }}
+          </p>
+          } @if (rule.visibilityType === VisibilityTypes.ROLE) {
+          <p class="font-medium">
+            {{ rule.visibilityType }}: {{ getRoleName(rule.value) }}
+          </p>
+          } @if (rule.visibilityType === VisibilityTypes['EMPLOYMENT TYPE']) {
+          <p class="font-medium">
+            EMPLOYMENT TYPE: {{ getEmploymentTypeName(rule.value) }}
+          </p>
+          } @if (rule.visibilityType === VisibilityTypes['USER TYPE']) {
+          <p class="font-medium">
+            USER TYPE: {{ getUserTypeName(rule.value) }}
+          </p>
+          }
+        </li>
+      </ul>
+      } @else {
+      <p class="font-medium">Leave Type is visible to all.</p>
+      }
+    </div>
+
+    <!-- Approval Flow -->
+    <div>
+      <h3 class="text-sm text-gray-500">Approval Flow</h3>
+
+      @if (leaveType?.approvalFlow?.steps?.length) {
+      <ol class="list-inside text-sm space-y-3">
+        <li *ngFor="let step of leaveType?.approvalFlow?.steps">
+          <div class="flex flex-col p-2 border rounded-lg bg-gray-50">
+            <!-- Step Order + Name -->
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">
+                Step {{ step.stepOrder }}: {{ step.stepName }}
+              </span>
+              <span
+                class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700"
+              >
+                {{ step.approverType }}
+              </span>
+            </div>
+
+            <!-- Approver Info -->
+            <span class="text-gray-700 text-sm mt-1">
+              Approver:
+              <span class="font-medium">
+                {{ getApproverName(step.approverType, step.approverValue) }}
+              </span>
+            </span>
+
+            <!-- Condition JSON -->
+            <!-- <span class="text-gray-500 text-xs mt-1" *ngIf="step.conditionJson">
+              Condition: {{ step.conditionJson }}
+            </span> -->
+          </div>
+        </li>
+      </ol>
+      } @else {
+      <p class="font-medium">No approval flow defined.</p>
+      }
+    </div>
+
+    <!-- Type ID -->
+    <div>
+      <h3 class="text-sm text-gray-500">Type ID</h3>
+      <p class="font-mono text-xs text-gray-600">{{ leaveType?.id }}</p>
+    </div>
+  </div>
+
+  <!-- Footer Buttons -->
+  <div class="flex items-center justify-end gap-4 p-4 border-t">
+    <lib-flat-button
+      label="Close"
+      (submitAction)="toggleDetails()"
+    ></lib-flat-button>
+    <lib-submit-rounded-button
+      label="Edit Type"
+      (submitAction)="editType(leaveType)"
+    ></lib-submit-rounded-button>
+  </div>
+</div>

@@ -8,23 +8,23 @@
 
     <ng-content select="[prefix]"></ng-content>
 
-   <input
-  class="input-field"
-  [type]="inputType || 'search'"
-  [value]="value"
-  [disabled]="disabled"
-  [placeholder]="focused ? placeholder : ''"
-  (input)="onInputChange($event)"
-  (focus)="focused = true"
-  (blur)="focused = false; onTouched()"
-  [id]="id"
-  [name]="name"
-  [autocomplete]="autocomplete || 'on'"
-  [readonly]="readonly"
-  [ngStyle]="{ width: width, height: height }"
-  role="searchbox"
-/>
-
+    <input
+      class="input-field"
+      [type]="inputType || 'search'"
+      [value]="value"
+      [disabled]="disabled"
+      [readOnly]="disabled || readonly"
+      [placeholder]="focused ? placeholder : ''"
+      (input)="onInputChange($event)"
+      (focus)="focused = true"
+      (blur)="focused = false; onTouched()"
+      [id]="id"
+      [name]="name"
+      [autocomplete]="autocomplete || 'on'"
+      [readonly]="readonly"
+      [ngStyle]="{ width: width, height: height }"
+      role="searchbox"
+    />
 
     <span class="suffix-wrapper">
       <ng-content select="[suffix]"></ng-content>

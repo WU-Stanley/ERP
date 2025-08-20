@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, inject, Input, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,95 +12,112 @@ import {
   FlatButtonComponent,
   CustomInputComponent,
   CustomSelectComponent,
+  AddButtonComponent,
+  AlertService,
 } from '@erp/core';
 import { LeavePolicyDto, LeaveTypeDto } from '../../../dtos/leave.dto';
 import { EmploymentTypeService } from '../../../services/employment-type.service';
 import { LeaveTypeService } from '../../../services/leave-type.service';
 import { EmploymentTypeDto } from '@erp/auth';
+import { LeavePolicyFormComponent } from '../../forms/leave-policy-form/leave-policy-form.component';
+import {
+  EmploymentTypeStore,
+  LeavePolicyStore,
+  LeaveTypeStore,
+} from '../../../state';
+import { LeavePolicyDetailComponent } from '../detail-views/leave-policy-detail/leave-policy-detail.component';
 
 @Component({
   selector: 'lib-leave-policies',
   templateUrl: './leave-policies.component.html',
   styleUrls: ['./leave-policies.component.css'],
   imports: [
-    SubmitRoundedButtonComponent,
-    FlatButtonComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CustomInputComponent,
-    CustomSelectComponent,
+    LeavePolicyFormComponent,
+    AddButtonComponent,
+    LeavePolicyDetailComponent,
   ],
 })
 export class LeavePoliciesComponent implements OnInit {
+  showPolicyDetails = false;
+
   editIndex!: number;
 
-  isProcessing = false;
   leavePolicyForm!: FormGroup;
 
   showForm = false;
-  leavePolicies: LeavePolicyDto[] = [];
-  employmentTypes: EmploymentTypeDto | undefined;
-  leaveTypes: LeaveTypeDto[] | undefined;
+  leaveTypeStore = inject(LeaveTypeStore);
+  employmentTypeStore = inject(EmploymentTypeStore);
+  leavePolicyStore = inject(LeavePolicyStore);
+  alertService = inject(AlertService);
 
-  constructor(
-    private fb: FormBuilder,
-    private employmentTypeService: EmploymentTypeService,
-    private leaveTypeService: LeaveTypeService
-  ) {}
+  leavePolicies = computed(() => this.leavePolicyStore.leavePolicys());
+  employmentTypes = computed(() => this.employmentTypeStore.employmentTypes());
+  isEditing = computed(() => this.leavePolicyStore.isEditing());
+  isLoading = computed(() => this.leavePolicyStore.isLoading());
+  selectedLeaveType = computed(() => this.leaveTypeStore.selectedLeaveType());
+  leaveTypes = computed(() => this.leaveTypeStore.leaveTypes());
+  selectedLeavePolicy = computed(() =>
+    this.leavePolicyStore.selectedLeavePolicy()
+  );
+  deleting = false;
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
-    this.leavePolicyForm = this.fb.group({
-      leaveTypeId: ['', Validators.required],
-      employmentType: ['', Validators.required], // e.g., "FullTime", "Contract"
-      roleName: [''], // Optional
-      annualEntitlement: [0, [Validators.required, Validators.min(0)]],
-      isAccrualBased: [false],
-      accrualRatePerMonth: [0, [Validators.min(0)]],
-      maxCarryOverDays: [0, [Validators.min(0)]],
-      allowNegativeBalance: [false],
-    });
-    this.getEmploymentTypes();
-    this.getLeaveTypes();
+    console.log('Leave Policies Component Initialized');
+    if (this.leavePolicies().length === 0) {
+      this.leavePolicyStore.getAllLeavePolicys();
+    }
+    if (!this.employmentTypes().length) {
+      this.employmentTypeStore.getAllEmploymentTypes();
+    }
+    if (!this.leaveTypes().length) {
+      this.leaveTypeStore.getAllLeaveTypes();
+    }
   }
-  edit(data: LeavePolicyDto) {
-    this.leavePolicyForm.patchValue({
-      leaveTypeId: data.leaveTypeId,
-      employmentType: data.employmentType, // e.g., "FullTime", "Contract"
-      roleName: data.roleName,
-      annualEntitlement: data.annualEntitlement,
-      isAccrualBased: data.isAccrualBased,
-      accrualRatePerMonth: data.accrualRatePerMonth,
-      maxCarryOverDays: data.maxCarryOverDays,
-      allowNegativeBalance: data.allowNegativeBalance,
-      createdAt: data.createdAt,
-    });
+
+  deletePolicy(id: string) {
+    this.deleting = true;
+    this.leavePolicyStore.deleteLeavePolicy(id);
+    if (!this.isLoading()) {
+      this.deleting = false;
+
+      this.alertService.showSuccess('Leave Policy deleted successfully');
+    }
   }
+  activeMenuIndex: number | null = null;
+  view(id: string) {
+    console.log('leave policy id: ', id);
+
+    this.leavePolicyStore.selectLeavePolicyById(id);
+
+    this.showPolicyDetails = true;
+    this.toggleMenu(this.activeMenuIndex ?? 0);
+  }
+
+  toggleMenu(index: number) {
+    this.activeMenuIndex = this.activeMenuIndex === index ? null : index;
+  }
+  togglePolicyDetails() {
+    this.showPolicyDetails = false;
+  }
+  editPolicy(policy: LeavePolicyDto) {
+    this.leavePolicyStore.selectLeavePolicyById(policy.id as string);
+
+    this.toggleForm();
+
+    this.toggleMenu(this.activeMenuIndex!);
+    this.leavePolicyStore.toggleEditing();
+  }
+
   showEdit(index: number) {
     this.editIndex = index;
   }
-  onSubmit() {
-    console.log('form value: ', this.leavePolicyForm.value);
-  }
+
   toggleForm() {
     this.showForm = !this.showForm;
-    // this.resetForm(); // optional: reset form when opening
-  }
-  resetForm() {
-    this.leavePolicyForm.reset();
-  }
-  getEmploymentTypes() {
-    this.employmentTypeService
-      .getEmploymentTypes()
-      .subscribe((employmentTypes) => {
-        this.employmentTypes = employmentTypes.data;
-        console.log('Employment types: ', this.employmentTypes);
-      });
-  }
-  getLeaveTypes() {
-    this.leaveTypeService.getLeaveTypes().subscribe((res) => {
-      this.leaveTypes = res.data;
-      console.log('Leave Types: ', res);
-    });
   }
 }

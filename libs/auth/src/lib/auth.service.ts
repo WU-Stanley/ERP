@@ -7,7 +7,7 @@ import { EmploymentTypeDto, UserDto, UserTypeDto } from './dtos/usertype.dto';
 import { CreateStaffDto } from './dtos/CreateStaff.dto';
 import { ApiResponse } from './dtos/api.response';
 import { UserPermissionDto } from './dtos/permission.dto';
-import { User } from './dtos/user.dto'; 
+import { User } from './dtos/user.dto';
 import { RoleDto } from './dtos/role.dto';
 import { Permissions } from './enums/permissions.enum';
 
@@ -15,25 +15,26 @@ import { Permissions } from './enums/permissions.enum';
   providedIn: 'root',
 })
 export class AuthService {
- private accessToken: string | null = null;
+  private accessToken: string | null = null;
   user = signal<User | null>(null);
   refToken = signal('');
-  
+
   tokenExpires = signal(0);
   private refreshSubscription?: Subscription;
 
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
   constructor(private router: Router) {}
- addEmploymentType(value: any) {
+
+  addEmploymentType(value: any) {
     return this.http.post<ApiResponse<EmploymentTypeDto>>(
       this.env.apiUrl + '/auth/create-employment-type',
       value,
       { withCredentials: true }
     );
   }
-   
-   addUserType(data: UserTypeDto) {
+
+  addUserType(data: UserTypeDto) {
     return this.http.post<ApiResponse<UserTypeDto>>(
       this.env.apiUrl + '/auth/create-user-type',
       data,
@@ -48,14 +49,13 @@ export class AuthService {
     );
   }
 
-   getAllRoles() {
-   return this.http.get<ApiResponse<RoleDto[]>>(
-      this.env.apiUrl + '/Role',
-      { withCredentials: true }
-    );  
+  getAllRoles() {
+    return this.http.get<ApiResponse<RoleDto[]>>(this.env.apiUrl + '/Role', {
+      withCredentials: true,
+    });
   }
   login(formValue: { email: string; password: string }) {
-    return this.http.post<ApiResponse< User>>(
+    return this.http.post<ApiResponse<User>>(
       this.env.apiUrl + '/auth/login',
       formValue,
       { withCredentials: true }
@@ -89,20 +89,11 @@ export class AuthService {
   }
   getPermissions() {
     return this.http.get<ApiResponse<UserPermissionDto[]>>(
-      this.env.apiUrl + "/Permission",
+      this.env.apiUrl + '/Permission',
       { withCredentials: true }
     );
   }
-  getUserTypes() {
-    return this.http.get<{
-      Message: string;
-      Status: boolean;
-      data: Array<UserTypeDto>;
-    }>(
-      this.env.apiUrl + '/auth/get-user-type',
-      { withCredentials: true }
-    );
-  }
+
   getAllStaff() {
     return this.http.get<ApiResponse<UserDto[]>>(
       this.env.apiUrl + '/auth/users',
@@ -151,11 +142,9 @@ export class AuthService {
   }
 
   addStaff(value: CreateStaffDto) {
-    return this.http.post<object>(
-      this.env.apiUrl + '/auth/register',
-      value,
-      { withCredentials: true }
-    );
+    return this.http.post<object>(this.env.apiUrl + '/auth/register', value, {
+      withCredentials: true,
+    });
   }
   setEnv(tokenRes: any) {
     localStorage.setItem('token', tokenRes.token);
@@ -219,11 +208,11 @@ export class AuthService {
 
   logout() {
     console.log('logout clicked');
-    this.http.post(this.env.apiUrl+"/auth/logout",{}).subscribe(res =>{
-    this.clearRefreshTimer();
-    localStorage.removeItem('token');
-    localStorage.removeItem('refToken');
-    this.router.navigate(['/auth/login']);
+    this.http.post(this.env.apiUrl + '/auth/logout', {}).subscribe((res) => {
+      this.clearRefreshTimer();
+      localStorage.removeItem('token');
+      localStorage.removeItem('refToken');
+      this.router.navigate(['/auth/login']);
     });
     this.clearRefreshTimer();
     localStorage.removeItem('token');
@@ -237,23 +226,24 @@ export class AuthService {
     }
   }
   hasRole(role: string) {
-    return this.user()?.userRoles?.find(a => a.role.name.includes(role));
+    return this.user()?.userRoles?.find((a) => a.role.name.includes(role));
   }
   hasAnyPermission(permissions: string[]): boolean {
     const storedUser = localStorage.getItem('user');
-    const user: User | null = this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
+    const user: User | null =
+      this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
 
     if (!user || !user.userPermissions?.length) {
       return false;
     }
 
     const userPerms = user.userPermissions
-      .map(up => up.permission?.name?.toLowerCase() || '')
-      .filter(p => !!p); // filter out empty
+      .map((up) => up.permission?.name?.toLowerCase() || '')
+      .filter((p) => !!p); // filter out empty
     const isAdmin = userPerms.includes(Permissions.AdminAccess.toLowerCase());
 
-    const hasMatch = permissions.some(required =>
-      userPerms.includes(required.toLowerCase()) || isAdmin
+    const hasMatch = permissions.some(
+      (required) => userPerms.includes(required.toLowerCase()) || isAdmin
     );
 
     return hasMatch;

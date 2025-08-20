@@ -13,11 +13,13 @@
   </div>
 
   <!-- Grid Layout -->
-  <div class="grid grid-cols-1  gap-6">
+  <div class="grid grid-cols-1 gap-6">
     <!-- Left Column -->
     <div class="w-full">
       <div>
         <lib-custom-input
+          [readonly]="readonly"
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
           formControlName="name"
           label="Leave Type Name"
           placeholder="Enter the name of the leave type"
@@ -26,15 +28,17 @@
 
       <div class="flex flex-wrap">
         <lib-custom-input
+          [readonly]="readonly"
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
           formControlName="maxDays"
           type="number"
           label="Entitle Days"
-           
           placeholder="Enter the annual entitlement in days"
         ></lib-custom-input>
         <lib-custom-input
+          [readonly]="readonly"
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
           formControlName="maxDaysPerRequest"
-           
           type="number"
           label="Max Days Per Request"
           placeholder="Enter maximum days per request"
@@ -45,6 +49,9 @@
       <div class="flex gap-4">
         <div class="flex-1">
           <lib-custom-input
+            [readonly]="readonly"
+            [disabled]="selectedLeaveType() !== null && !isEditing()"
+            formControlName="colorTag"
             label="Color Tag"
             type="color"
             placeholder="Select color tag for the leave type"
@@ -55,6 +62,9 @@
 
       <div class="w-full">
         <lib-custom-textarea
+          [readonly]="readonly"
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
+          formControlName="description"
           [row]="3"
           label="Comment"
           placeholder="Describe the leave in details"
@@ -79,43 +89,50 @@
           label="Is Paid Leave"
         ></lib-custom-checkbox>
       </div> -->
-    <!-- </div> -->
+      <!-- </div> -->
 
-    <!-- Right Column -->
-    <!-- <div class="space-y-4"> -->
-      <div>
-        <lib-custom-select
-         
-          label="Employee Type"
-          [multiple]="true"
-          [options]="employmentTypes"
-          labelKey="name"
-          placeholder="Select employee type if applicable"
-        ></lib-custom-select>
-      </div>
+      <!-- Right Column -->
+      <!-- <div class="space-y-4"> -->
 
-      <div class="flex flex-wrap">
-        <lib-custom-input
-          type="number"
-          label="Minimum Service Period"
-           
-          placeholder="Enter minimum serivice period in years"
-        ></lib-custom-input>
+      <div class="mb-4">
         <lib-custom-select
-          type="date"
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
+          formControlName="gender"
           label="Gender"
-        
           height="35px"
           [options]="genders"
           labelKey="label"
           placeholder="Select Gender if applicable"
+          class="mb-4"
+          [readonly]="readonly"
         ></lib-custom-select>
       </div>
-
-      <div class="flex flex-col w-full">
+      <div class="mt-2 pt-2">
+        <lib-custom-select
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
+          label="Approval Workflow"
+          formControlName="approvalFlowId"
+          height="35px"
+          [options]="approvalWorkflows"
+          labelKey="name"
+          placeholder="Select Approval Workflow"
+          [readonly]="readonly"
+        ></lib-custom-select>
+      </div>
+      <div class="mt-2 p-4">
+        <lib-custom-checkbox
+          [disabled]="selectedLeaveType() !== null && !isEditing()"
+          label="Is Paid"
+          formControlName="isPaid"
+          height="35px"
+          placeholder="Select Approval Workflow"
+        ></lib-custom-checkbox>
+      </div>
+      <div class="flex flex-col w-full mt-4">
         <div class="flex justify-between items-center">
           <h3>Visibility Rules</h3>
           <lib-add-button
+            *libHasAnyPermission="hrAdminPermissions"
             label="Add Rule"
             (submitAction)="addVisibility()"
           ></lib-add-button>
@@ -127,6 +144,7 @@
             class="flex flex-wrap justify-between items-center"
           >
             <lib-custom-select
+              [disabled]="selectedLeaveType() !== null && !isEditing()"
               formControlName="visibilityType"
               [labelKey]="'label'"
               placeholder="Enter Visibility Type"
@@ -135,8 +153,11 @@
               type="text"
               formControlName="visibilityType"
               label="Visibility Type"
+              [readonly]="readonly"
             ></lib-custom-select>
             <lib-custom-select
+              [readonly]="readonly"
+              [disabled]="selectedLeaveType() !== null && isEditing()"
               width="250px"
               formControlName="value"
               [multiple]="true"
@@ -147,7 +168,9 @@
               formControlName="value"
               label="Value"
             ></lib-custom-select>
+
             <lib-flat-button
+              *libHasAnyPermission="hrAdminPermissions"
               label="Remove"
               classList="bg-red-300 text-gray-500"
               (click)="removeRule(i)"
@@ -159,10 +182,18 @@
     </div>
   </div>
   <!-- Actions -->
-  <div class="flex justify-end gap-4 m-8 mr-12 pr-12">
-    <lib-cancel-button (cancelAction)="cancel()"><span>Cancel</span></lib-cancel-button>
-    <lib-submit-rounded-button label="Save"></lib-submit-rounded-button>
-    <!-- <button class="px-6 py-2 rounded border border-gray-400 text-gray-700 hover:bg-gray-100">Cancel</button>
-    <button class="px-6 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400"></button> -->
+  <div
+    class="flex justify-end gap-4 m-8 mr-12 pr-12"
+    *libHasAnyPermission="hrAdminPermissions"
+  >
+    <lib-cancel-button (cancelAction)="cancel()"
+      ><span>Cancel</span></lib-cancel-button
+    >
+    <lib-submit-rounded-button
+      [disabled]="readonly || leaveTypeForm.invalid"
+      (submitAction)="submit()"
+      [label]="isLoading() ? 'Saving...' : isEditing() ? 'Update' : 'Save'"
+      [isProcessing]="isLoading()"
+    ></lib-submit-rounded-button>
   </div>
 </div>

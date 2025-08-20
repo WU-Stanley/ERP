@@ -16,6 +16,7 @@ import {
 import { UserTypeDto } from '../dtos/usertype.dto';
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
+import { UserTypeService } from '../user-type.service';
 
 @Component({
   selector: 'lib-user-type',
@@ -39,7 +40,11 @@ export class UserTypeComponent implements OnInit {
   isProcessing = false;
   isDialogOpen = false;
   userTypeForm!: FormGroup<any>;
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private userTypeService: UserTypeService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadUserTypes();
@@ -78,7 +83,7 @@ export class UserTypeComponent implements OnInit {
     );
   }
   loadUserTypes() {
-    this.authService.getUserTypes().subscribe((userTypes) => {
+    this.userTypeService.getUserTypes().subscribe((userTypes) => {
       this.userTypes = userTypes.data || [];
     });
   }

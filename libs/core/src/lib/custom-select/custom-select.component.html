@@ -1,5 +1,4 @@
-<div class="custom-input"[ngStyle]="{ width: width, height: height }"
->
+<div class="custom-input" [ngStyle]="{ width: width, height: height }">
   <div
     class="input-wrapper"
     [class.focused]="focused || searchTerm"
@@ -12,13 +11,16 @@
         <button type="button" (click)="removeSelected(val)">×</button>
       </span>
     </div>
-    <div class="input-field-wrapper"[ngStyle]="{ width: width, height: height }"
->
+    <div
+      class="input-field-wrapper"
+      [ngStyle]="{ width: width, height: height }"
+    >
       <input
         type="text"
         class="input-field"
         [ngStyle]="{ width: width, height: height }"
         [disabled]="disabled"
+        [readOnly]="disabled || readonly"
         [id]="id"
         [name]="name"
         [placeholder]="focused ? placeholder : ''"
@@ -29,7 +31,7 @@
         autocomplete="off"
         (focus)="onFocus()"
       />
-
+      @if(!readonly) {
       <ul class="dropdown" *ngIf="showDropdown && filteredOptions.length">
         <li
           *ngFor="let option of filteredOptions"
@@ -39,6 +41,7 @@
           {{ getLabel(option) }}
         </li>
       </ul>
+      }
     </div>
   </div>
 

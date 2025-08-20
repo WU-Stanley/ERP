@@ -1,3 +1,14 @@
+@use '@angular/material' as mat;
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
+:root {
+  @include mat.snack-bar-overrides(
+    // (
+    //   button-color: rgb(119, 255, 0),
+    //   container-color: #7d2e2e,
+    // )
+  );
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,4 +25,16 @@
   // max-width: 1200px;
   width: 1000px;
   margin: 0 auto;
+}
+// Global override for success snackbar
+.success-snackbar {
+  background-color: #2e7d32 !important; /* Dark green */
+  color: #ffffff !important;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Style the "Close" action text */
+.success-snackbar .mat-mdc-button {
+  color: #ffffff !important;
 }

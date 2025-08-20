@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
 @Component({
@@ -13,7 +13,7 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
       multi: true,
     },
   ],
-  imports: [CustomSlideToggleComponent, CommonModule],
+  imports: [CommonModule],
 })
 export class CustomSlideToggleComponent implements ControlValueAccessor {
   @Input() color = 'bg-green-600'; // Tailwind green
@@ -22,8 +22,12 @@ export class CustomSlideToggleComponent implements ControlValueAccessor {
 
   checked = false;
 
-  onChange = (_: any) => {};
-  onTouched = () => {};
+  onChange = (_: any) => {
+    //
+  };
+  onTouched = () => {
+    //
+  };
   @Input() labelLocation: 'start' | 'end' = 'start';
 
   toggle() {

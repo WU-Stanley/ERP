@@ -1,11 +1,23 @@
-<button class="custom-radio-label" [class.custom-radio-disabled]="disabled" [style.color]="color">
-  <div class="custom-radio-outer-circle" [style.border-color]="checked ? color : ''">
-    <div class="custom-radio-inner-circle" [style.background-color]="checked ? color : ''"></div>
+<button
+  class="custom-radio-label"
+  [class.custom-radio-disabled]="disabled"
+  [style.color]="color"
+>
+  <div
+    class="custom-radio-outer-circle"
+    [style.border-color]="checked ? color : ''"
+  >
+    <div
+      class="custom-radio-inner-circle"
+      [style.background-color]="checked ? color : ''"
+    ></div>
   </div>
-  <div class="custom-radio-content">
-    <ng-content></ng-content> {{ label }}
-  </div>
+  <div class="custom-radio-content"><ng-content></ng-content> {{ label }}</div>
 
-  <div class="custom-radio-ripple" [class.custom-radio-ripple-active]="rippleVisible"
-       [style.top]="rippleTop" [style.left]="rippleLeft"></div>
+  <div
+    class="custom-radio-ripple"
+    [class.custom-radio-ripple-active]="rippleVisible"
+    [style.top]="rippleTop"
+    [style.left]="rippleLeft"
+  ></div>
 </button>

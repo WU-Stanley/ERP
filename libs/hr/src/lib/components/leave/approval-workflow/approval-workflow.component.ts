@@ -1,4 +1,3 @@
-import { u } from '@angular/cdk/scrolling-module.d-ud2XrbF8';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
@@ -9,15 +8,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { AuthService, RoleDto, RoleService, UserDto } from '@erp/auth';
 import {
-  AuthService,
-  HasAnyPermissionDirective,
-  RoleDto,
-  User,
-  RoleService,
-  UserDto,
-} from '@erp/auth';
-import { CustomInputComponent, CustomSelectComponent, FlatButtonComponent, FlatShadedButtonComponent, SubmitRoundedButtonComponent, CancelButtonComponent, AddButtonComponent } from '@erp/core';
+  CustomInputComponent,
+  CustomSelectComponent,
+  FlatButtonComponent,
+  SubmitRoundedButtonComponent,
+  AddButtonComponent,
+} from '@erp/core';
 import { ApprovalWorkflowService } from '../../../services/approval-workflow.service';
 import { CreateApprovalFlowDto } from '../../../dtos/leave.dto';
 @Component({
@@ -28,18 +26,14 @@ import { CreateApprovalFlowDto } from '../../../dtos/leave.dto';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HasAnyPermissionDirective,
     CustomInputComponent,
     CustomSelectComponent,
     SubmitRoundedButtonComponent,
-    FlatShadedButtonComponent,
     FlatButtonComponent,
-    AddButtonComponent
-],
+    AddButtonComponent,
+  ],
 })
 export class ApprovalWorkflowComponent implements OnInit {
-
-
   flowEditIndex!: number;
   approvalWorkflowForm!: FormGroup;
   isProcessing = false;
@@ -50,8 +44,8 @@ export class ApprovalWorkflowComponent implements OnInit {
   rolesTryAgain = 0;
   showForm = false;
   approvalWorkflows: CreateApprovalFlowDto[] = [];
-  isShow=false;
-activeMenuIndex: any;
+  isShow = false;
+  activeMenuIndex: any;
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,
@@ -72,12 +66,12 @@ activeMenuIndex: any;
     });
   }
   viewWrokflow(index: number) {
-       this.toggleMenu(this.activeMenuIndex);
-}
+    this.toggleMenu(this.activeMenuIndex);
+  }
 
-toggleMenu(index: number) {
-  this.activeMenuIndex = this.activeMenuIndex === index ? null : index;
-}
+  toggleMenu(index: number) {
+    this.activeMenuIndex = this.activeMenuIndex === index ? null : index;
+  }
   editWorkflow(index: number) {
     const workflow = this.approvalWorkflows[index];
     this.approvalWorkflowForm.patchValue(workflow);
@@ -91,7 +85,7 @@ toggleMenu(index: number) {
       );
     });
     this.toggleMenu(this.activeMenuIndex);
-    this.toggleForm()
+    this.toggleForm();
   }
 
   getRoleName(roleId: string): string {

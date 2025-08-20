@@ -18,6 +18,7 @@ import {
 import { AuthService } from '../auth.service';
 import { UserTypeDto } from '../dtos/usertype.dto';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { UserTypeService } from '../user-type.service';
 
 @Component({
   selector: 'lib-add-staff',
@@ -44,6 +45,7 @@ export class AddStaffComponent implements OnInit {
     private roleService: RoleService,
     private departmentService: DepartmentService,
     private authService: AuthService,
+    private userTypeService: UserTypeService,
     private fb: FormBuilder,
     private sb: MatSnackBar
   ) {}
@@ -53,7 +55,7 @@ export class AddStaffComponent implements OnInit {
     this.getDepartments();
     this.getUserTypes();
     this.getEmploymentTypes();
-    
+
     this.userForm = this.fb.group({
       userEmail: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required]],
@@ -80,44 +82,48 @@ export class AddStaffComponent implements OnInit {
   getEmploymentTypes() {
     this.authService.getEmploymentTypes().subscribe((employmentTypes) => {
       console.log('employment types: ', employmentTypes);
-      if(employmentTypes.data?.length) {
+      if (employmentTypes.data?.length) {
         this.employmentTypes = employmentTypes.data;
       }
       console.log('employment types: ', this.employmentTypes);
     });
   }
   getRoles() {
-    this.roleService.getRoles().subscribe((roles) => {
-      console.log('found roles: ', roles);
-      this.roles = roles.data??[];
-    },((error) => {
-      console.error('Error fetching roles:', error);
-    }));
+    this.roleService.getRoles().subscribe(
+      (roles) => {
+        console.log('found roles: ', roles);
+        this.roles = roles.data ?? [];
+      },
+      (error) => {
+        console.error('Error fetching roles:', error);
+      }
+    );
   }
   getDepartments() {
     this.departmentService.getDepartments().subscribe((depts) => {
       console.log('depts: ', depts);
-      this.departments = depts;
+      this.departments = depts.data ?? [];
     });
   }
   getUserTypes() {
-    this.authService.getUserTypes().subscribe((userTypes) => {
+    this.userTypeService.getUserTypes().subscribe((userTypes) => {
       console.log('user types: ', userTypes);
       this.userTypes = userTypes.data;
     });
-  } private updateFullName() {
+  }
+  private updateFullName() {
     const firstName = this.userForm.get('firstName')?.value || '';
     const lastName = this.userForm.get('lastName')?.value || '';
     const fullName = `${firstName} ${lastName}`.trim();
-    this.userForm.get('fullName')?.setValue(fullName); 
+    this.userForm.get('fullName')?.setValue(fullName);
   }
   onSubmit() {
     this.isProcessing = true;
-     const value = this.userForm.value;
+    const value = this.userForm.value;
 
     value.userName = value.fullName;
-    value.dateCreated = value.dateCreated ??new Date();
-   
+    value.dateCreated = value.dateCreated ?? new Date();
+
     value.password = (Math.random() * 10).toString(32).substring(0, 10);
 
     this.authService.addStaff(value).subscribe(

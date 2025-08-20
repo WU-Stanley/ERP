@@ -4,7 +4,13 @@ export * from './lib/components/leave/leave-dashboard/leave-dashboard.component'
 export * from './lib/components/leave/leave-request/leave-request.component';
 export * from './lib/components/leave/leave-type/leave-type.component';
 export * from './lib/components/leave/leave-policies/leave-policies.component';
-export * from './lib/components/leave/leave-approval/leave-approval.component'; 
+export * from './lib/components/leave/leave-approval/leave-approval.component';
 export * from './lib/components/leave/leave-reports/leave-reports.component';
 export * from './lib/components/leave/approval-workflow/approval-workflow.component';
-export * from './lib/components/leave/leave-type-form/leave-type-form.component';
+export * from './lib/components/forms/leave-type-form/leave-type-form.component';
+export * from './lib/components/forms/leave-policy-form/leave-policy-form.component';
+export * from './lib/components/forms/leave-request-form/leave-request-form.component';
+// export * from './lib/components/forms/approval-workflow-form/approval-workflow-form.component';
+export * from './lib/components/leave/detail-views/leave-policy-detail/leave-policy-detail.component';
+export * from './lib/components/leave/detail-views/leave-type-details/leave-type-details.component';
+export * from './lib/dtos';

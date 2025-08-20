@@ -1,6 +1,8 @@
 import {
   Component,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
   Input,
   OnInit,
   Output,
@@ -29,6 +31,7 @@ import {
   CustomRadioGroupComponent,
   AddButtonComponent,
   FlatButtonComponent,
+  DisableContainerDirective,
 } from '@erp/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
@@ -41,8 +44,16 @@ import {
   DepartmentDto,
   VisibilityTypes,
   EmploymentTypeDto,
+  UserTypeService,
+  HasAnyPermissionDirective,
+  Permissions,
 } from '@erp/auth';
 import { forkJoin } from 'rxjs';
+import { ApprovalWorkflowService } from '../../../services/approval-workflow.service';
+import { CreateApprovalFlowDto, LeaveTypeDto } from '../../../dtos/leave.dto';
+import { LeaveTypeService } from '../../../services/leave-type.service';
+import { LeaveTypeStore } from '../../../state';
+import { EmploymentTypeService } from '../../../services/employment-type.service';
 @Component({
   selector: 'lib-leave-type-form',
   templateUrl: './leave-type-form.component.html',
@@ -50,7 +61,6 @@ import { forkJoin } from 'rxjs';
   imports: [
     FormsModule,
     CommonModule,
-    CustomToggleComponent,
     MatSlideToggleModule,
     ReactiveFormsModule,
     CustomInputComponent,
@@ -61,15 +71,19 @@ import { forkJoin } from 'rxjs';
     FlatButtonComponent,
     CancelButtonComponent,
     CustomCheckboxComponent,
-    CustomRadioComponent,
-    CustomSliderComponent,
-    CustomRadioGroupComponent,
-    CustomSlideToggleComponent,
     AddButtonComponent,
+    HasAnyPermissionDirective,
   ],
+  // providers: [LeaveTypeStore],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LeaveTypeFormComponent implements OnInit {
+  leaveTypeStore = inject(LeaveTypeStore);
+  authService = inject(AuthService);
+  selectedLeaveType = computed(() => this.leaveTypeStore.selectedLeaveType());
+  isEditing = computed(() => this.leaveTypeStore.isEditing());
+  isLoading = computed(() => this.leaveTypeStore.isLoading());
+
   visibilityTypes = [
     { label: 'ROLE', id: 'ROLE' },
     { label: 'DEPARTMENT', id: 'DEPARTMENT' },
@@ -80,8 +94,6 @@ export class LeaveTypeFormComponent implements OnInit {
   leaveTypeForm!: FormGroup;
   @Output() emitToggleForm: EventEmitter<boolean> = new EventEmitter();
   @Input() toggleStatus!: boolean;
-  backDateEnabled: any;
-  selected: any;
 
   genders = [
     { id: 'male', label: 'Male' },
@@ -89,19 +101,26 @@ export class LeaveTypeFormComponent implements OnInit {
     { id: 'other', label: 'Other' },
   ];
 
-  selectedCountries: any;
   userTypes: UserTypeDto[] = [];
   departments: DepartmentDto[] = [];
   roles: RoleDto[] = [];
   employmentTypes: EmploymentTypeDto[] = [];
+  approvalWorkflows: CreateApprovalFlowDto[] = [];
+  isProcessing = false;
+  @Input() readonly = false;
+  hrAdminPermissions: string[] = [Permissions.ManageLeave];
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,
     private departmentService: DepartmentService,
-    private userTypeService: AuthService
+    private userTypeService: UserTypeService,
+    private employmentTypeService: EmploymentTypeService,
+    private approvalWorkflowService: ApprovalWorkflowService,
+    private leaveTypeService: LeaveTypeService
   ) {}
 
   ngOnInit() {
+    console.log('selected leave type: ', this.selectedLeaveType());
     this.leaveTypeForm = this.fb.group({
       gender: [''],
       name: ['', [Validators.required]], // e.g., "Annual Leave"
@@ -113,35 +132,70 @@ export class LeaveTypeFormComponent implements OnInit {
       approvalFlowId: [''],
       colorTag: [''],
       visibilityRules: this.fb.array([]),
+      id: [''],
       // policy
-      maxCarryOverDays: [''],
-      allowNegativeBalance: [false],
-      includePublicHolidays: [true],
-      allowBackdatedRequest: [false],
+      // maxCarryOverDays: [''],
+      // allowNegativeBalance: [false],
+      // includePublicHolidays: [true],
+      // allowBackdatedRequest: [false],
       maxDaysPerRequest: [10],
-    });
-    this.leaveTypeForm.valueChanges.subscribe((value) => {
-      console.log('form changes: ', value);
     });
 
     const userTypes$ = this.userTypeService.getUserTypes();
     const roles$ = this.roleService.getRoles();
     const departments$ = this.departmentService.getDepartments();
-    const employmentTypes$ = this.userTypeService.getEmploymentTypes();
+    const employmentTypes$ = this.employmentTypeService.getEmploymentTypes();
+    const approvalWorkflows$ =
+      this.approvalWorkflowService.getApprovalWorkflows();
 
-    forkJoin([userTypes$, roles$, departments$, employmentTypes$]).subscribe({
-      next: ([userTypes, roles, departments, employmentTypes]) => {
-        console.log('Users:', userTypes);
+    forkJoin([
+      userTypes$,
+      roles$,
+      departments$,
+      employmentTypes$,
+      approvalWorkflows$,
+    ]).subscribe({
+      next: ([
+        userTypes,
+        roles,
+        departments,
+        employmentTypes,
+        approvalWorkflows,
+      ]) => {
+        console.log('UserTypes:', userTypes);
         console.log('Roles:', roles);
         console.log('Permissions:', departments);
+        console.log('approval flows: ', approvalWorkflows);
         this.userTypes = userTypes.data ?? [];
-        this.departments = departments ?? [];
+        this.departments = departments.data ?? [];
         this.roles = roles.data ?? [];
         this.employmentTypes = employmentTypes.data ?? [];
+        this.approvalWorkflows = approvalWorkflows.data ?? [];
+
+        this.leaveTypeForm.get('approvalFlowId')?.markAsTouched();
       },
       error: (err) => console.error('Error fetching data:', err),
     });
+    setTimeout(() => {
+      if (this.selectedLeaveType()) {
+        this.leaveTypeForm.patchValue(this.selectedLeaveType() as LeaveTypeDto);
+
+        this.selectedLeaveType()?.visibilityRules.forEach((rule) => {
+          console.log('visibility rule: ', rule);
+          this.visibilityRules.push(
+            this.fb.group({
+              visibilityType: [rule.visibilityType, [Validators.required]],
+              value: [rule.value, [Validators.required]],
+            })
+          );
+        });
+      }
+      // if (this.isEditing()) {
+      //   this.leaveTypeForm.get('approvalFlowId')?.updateValueAndValidity();
+      // }
+    }, 1000);
   }
+
   get visibilityRules() {
     return this.leaveTypeForm.get('visibilityRules') as FormArray;
   }
@@ -157,6 +211,9 @@ export class LeaveTypeFormComponent implements OnInit {
     this.visibilityRules.removeAt(index);
   }
   getOptions(i: number) {
+    setTimeout(() => {
+      this.visibilityRules.at(i)?.get('value')?.markAllAsTouched();
+    }, 2000);
     const visibilityType = this.visibilityRules
       .at(i)
       .get('visibilityType')?.value;
@@ -168,29 +225,62 @@ export class LeaveTypeFormComponent implements OnInit {
     } else if (visibilityType === VisibilityTypes['EMPLOYMENT TYPE']) {
       return this.employmentTypes;
     } else if (visibilityType == VisibilityTypes['USER TYPE']) {
+      console.log('user types: ', this.userTypes);
       return this.userTypes;
     }
     return [];
   }
-  cancel(){
+  cancel() {
     this.toggleForm();
     this.leaveTypeForm.reset();
   }
   toggleForm() {
     this.emitToggleForm.emit(true);
   }
-  submit(){
+  submit() {
     const value = this.leaveTypeForm.value;
-    const policyForm = {
+    console.log('form value: ', value);
 
-    }
-    const leaveForm={
-      gender:value.gender,
-      name:value.name,
-      maxDays:value.maxDay,
-      isPaid: value.isPaid,
-      isActive:value.isActive,
-      colorTag: value.colorTag,
+    const visibilityRules = value.visibilityRules.flatMap((rule: any) => {
+      if (Array.isArray(rule.value) && rule.value.length > 1) {
+        return rule.value.map((v: string) => ({
+          visibilityType: rule.visibilityType,
+          value: v,
+        }));
+      }
+      return [
+        {
+          visibilityType: rule.visibilityType,
+          value: Array.isArray(rule.value) ? rule.value[0] : rule.value,
+        },
+      ];
+    });
+    value.visibilityRules = visibilityRules;
+
+    if (this.isEditing()) {
+      this.leaveTypeStore.updateLeaveType(value);
+      if (!this.isLoading()) {
+        this.cancel();
+      }
+    } else {
+      this.leaveTypeStore.createLeaveType(value);
+      this.leaveTypeStore.updateLeaveType(value);
+      if (!this.isLoading()) {
+        this.cancel();
+      }
+      // this.leaveTypeService.createLeaveType(value).subscribe(
+      //   (res) => {
+      //     console.log('Leave type created: ', res);
+      //     this.isProcessing = false;
+      //     this.cancel();
+      //     // add leave type to the state
+      //     this.leaveTypeStore.addLeaveType(res.data as LeaveTypeDto);
+      //   },
+      //   (error) => {
+      //     this.isProcessing = false;
+      //     console.log('Error: ', error);
+      //   }
+      // );
     }
   }
 }
