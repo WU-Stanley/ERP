@@ -1,27 +1,33 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { ApiResponse } from '@erp/auth';
 import { AppEnvironment, ENVIRONMENT } from '@erp/core';
+import { LeaveRequestApproval } from '../dtos';
 
 @Injectable()
 export class LeaveApprovalService {
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
 
-  constructor() {}
+  constructor() {
+    //
+  }
 
   getLeaveApprovals() {
-    return this.http.get(`${this.env.apiUrl}/leave-approvals`);
+    return this.http.get<ApiResponse<LeaveRequestApproval[]>>(
+      `${this.env.apiUrl}/LeaveApprovals`
+    );
   }
 
   getLeaveApprovalByApprovalPersonId(approvalPersonId: string) {
-    return this.http.get(
-      `${this.env.apiUrl}/leave-approvals/${approvalPersonId}`
+    return this.http.get<ApiResponse<LeaveRequestApproval[]>>(
+      `${this.env.apiUrl}/LeaveApprovals/get-by-approver-person/${approvalPersonId}`
     );
   }
 
   getLeaveApprovalByDelegationId(delegationId: string) {
-    return this.http.get(
-      `${this.env.apiUrl}/leave-approvals/delegation/${delegationId}`
+    return this.http.get<ApiResponse<LeaveRequestApproval[]>>(
+      `${this.env.apiUrl}/LeaveApprovals/get-by-approver-delegation/${delegationId}`
     );
   }
 
@@ -29,8 +35,8 @@ export class LeaveApprovalService {
     approvalFlowId: string,
     approvalPersonId: string
   ) {
-    return this.http.get(
-      `${this.env.apiUrl}/leave-approvals/flow/${approvalFlowId}/person/${approvalPersonId}`
+    return this.http.get<ApiResponse<LeaveRequestApproval[]>>(
+      `${this.env.apiUrl}/LeaveApprovals/get-by-approval-flow-and-person/${approvalFlowId}/${approvalPersonId}`
     );
   }
 
@@ -39,7 +45,13 @@ export class LeaveApprovalService {
     approvalFlowId: string
   ) {
     return this.http.get(
-      `${this.env.apiUrl}/leave-approvals/flow/${approvalFlowId}/step/${stepOrder}`
+      `${this.env.apiUrl}/LeaveApprovals/get-by-approval-flow-and-step/${approvalFlowId}/${stepOrder}`
+    );
+  }
+  approveRejectLeaveRequest(leaveRequestId: string, isApproved: boolean) {
+    return this.http.post<ApiResponse<LeaveRequestApproval>>(
+      `${this.env.apiUrl}/LeaveApprovals/approve-reject/${leaveRequestId}`,
+      { isApproved }
     );
   }
 }

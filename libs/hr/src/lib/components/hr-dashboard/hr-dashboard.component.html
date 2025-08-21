@@ -3,15 +3,17 @@
   <div
     [class.w-64]="!isCollapsed"
     [class.w-16]="isCollapsed"
-    class="bg-white border-r transition-all duration-300 overflow-hidden"
+    class="bg-green-900 border-r transition-all duration-300 overflow-hidden"
   >
     <div
-      class="h-16 flex items-center justify-center font-bold text-lg border-b"
+      class="h-16 flex items-center justify-center font-bold text-lg border-b bg-green-900 text-white"
     >
       <button *ngIf="!isCollapsed" (click)="navigateToDashboard()">
-        WuERP
+        <img src="logo.png" alt="WuERP Logo" class="h-12" />
       </button>
-      <button (click)="navigateToDashboard()" *ngIf="isCollapsed">Wu</button>
+      <button (click)="navigateToDashboard()" *ngIf="isCollapsed">
+        <img src="logo.png" alt="WuERP Logo" class="h-12" />
+      </button>
     </div>
     <nav class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)]">
       <div class="flex-1 flex flex-col space-y-2">
@@ -22,8 +24,8 @@
               <a
                 *libHasAnyPermission="item.permissions!"
                 [routerLink]="item.route"
-                routerLinkActive="bg-gray-300"
-                class="hover:bg-gray-200 p-2 rounded"
+                routerLinkActive="bg-green-800 text-white"
+                class="hover:bg-green-800 p-2 rounded text-white"
                 [title]="item.label"
               >
                 <span class="material-symbols-outlined">{{ item.icon }}</span>
@@ -34,7 +36,7 @@
                 *libHasAnyPermission="item.permissions!"
                 tabindex="0"
                 role="button"
-                class="hover:bg-gray-200 p-2 rounded cursor-pointer"
+                class="hover:bg-green-800 p-2 rounded cursor-pointer text-white"
                 [title]="item.label"
                 (click)="toggleMenu(item.label)"
                 (keydown.enter)="toggleMenu(item.label)"
@@ -53,9 +55,9 @@
               <a
                 *libHasAnyPermission="item.permissions!"
                 [routerLink]="item.route"
-                routerLinkActive="bg-gray-300"
+                routerLinkActive="bg-green-800"
                 [routerLinkActiveOptions]="{ exact: true }"
-                class="flex items-center hover:bg-gray-200 p-2 rounded"
+                class="flex items-center hover:bg-green-800 p-2 rounded text-white hover:text-green-900"
               >
                 <span class="material-symbols-outlined">{{ item.icon }}</span>
                 <span class="pl-2">{{ item.label }}</span>
@@ -66,7 +68,7 @@
                 *libHasAnyPermission="item.permissions!"
                 tabindex="0"
                 role="button"
-                class="flex items-center justify-between hover:bg-gray-200 p-2 rounded cursor-pointer"
+                class="flex items-center justify-between hover:bg-green-800 p-2 rounded cursor-pointer text-white"
                 (click)="toggleMenu(item.label)"
                 (keydown.enter)="toggleMenu(item.label)"
                 (keydown.space)="
@@ -96,8 +98,8 @@
                   *ngFor="let sub of item.children"
                   [routerLink]="sub.route"
                   [routerLinkActiveOptions]="{ exact: true }"
-                  routerLinkActive="bg-gray-200 font-medium"
-                  class="block hover:bg-gray-100 p-2 rounded"
+                  routerLinkActive="bg-green-100 font-medium"
+                  class="block hover:bg-green-100 p-2 rounded text-white hover:text-green-900"
                 >
                   {{ sub.label }}
                 </a>
@@ -108,7 +110,7 @@
       </div>
       <button
         (click)="logout()"
-        class="hover:bg-gray-200 p-2 rounded w-full mt-auto text-left"
+        class="hover:bg-green-800 p-2 rounded w-full mt-auto text-left text-white"
       >
         <span class="material-symbols-outlined align-middle mr-2">logout</span>
         Logout
@@ -119,86 +121,88 @@
   <!-- Main Content -->
   <div class="flex-1 flex flex-col">
     <!-- Top Navbar -->
-   <header class="h-14 bg-white shadow flex items-center justify-between px-4">
-  <div class="flex items-center space-x-4">
-    <button
-      (click)="toggleSidebar()"
-      class="text-gray-600 hover:text-black focus:outline-none"
+    <header
+      class="h-14 bg-green-900 shadow flex items-center justify-between px-4 text-white"
     >
-      <svg
-        *ngIf="!isCollapsed"
-        class="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4 6h16M4 12h16M4 18h16"
-        ></path>
-      </svg>
-      <svg
-        *ngIf="isCollapsed"
-        class="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3 12h18M3 6h18M3 18h18"
-        ></path>
-      </svg>
-    </button>
-    <span class="font-semibold text-gray-700 pl-2">HRMS</span>
-  </div>
+      <div class="flex items-center space-x-4">
+        <button
+          (click)="toggleSidebar()"
+          class="text-gray-200 hover:text-white focus:outline-none"
+        >
+          <svg
+            *ngIf="!isCollapsed"
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+          <svg
+            *ngIf="isCollapsed"
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 12h18M3 6h18M3 18h18"
+            ></path>
+          </svg>
+        </button>
+        <span class="font-semibold text-white pl-2">HRMS</span>
+      </div>
 
-  <div class="relative" (clickOutside)="dropdownOpen = false">
-    <button
-      (click)="dropdownOpen = !dropdownOpen"
-      class="flex items-center space-x-2 focus:outline-none"
-      aria-haspopup="true"
-      [attr.aria-expanded]="dropdownOpen"
-    >
-      <span class="font-semibold text-gray-700">{{ user.fullName }}</span>
-      <span class="material-symbols-outlined">expand_more</span>
-    </button>
+      <div class="relative" (clickOutside)="dropdownOpen = false">
+        <button
+          (click)="dropdownOpen = !dropdownOpen"
+          class="flex items-center space-x-2 focus:outline-none"
+          aria-haspopup="true"
+          [attr.aria-expanded]="dropdownOpen"
+        >
+          <span class="font-semibold text-white">{{ user.fullName }}</span>
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
 
-    <div
-      *ngIf="dropdownOpen"
-      class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
-    >
-      <a
-        routerLink="/profile"
-        class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-      >
-        <span class="material-symbols-outlined mr-2">account_circle</span>
-        Profile
-      </a>
-      <a
-        routerLink="/settings"
-        class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-      >
-        <span class="material-symbols-outlined mr-2">settings</span>
-        Settings
-      </a>
-      <button
-        type="button"
-        (click)="logout()"
-        class="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left"
-      >
-        <span class="material-symbols-outlined mr-2">logout</span>
-        Logout
-      </button>
-    </div>
-  </div>
-</header>
+        <div
+          *ngIf="dropdownOpen"
+          class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
+        >
+          <a
+            routerLink="/profile"
+            class="flex items-center px-4 py-2 hover:bg-green-100 cursor-pointer text-green-900"
+          >
+            <span class="material-symbols-outlined mr-2">account_circle</span>
+            Profile
+          </a>
+          <a
+            routerLink="/settings"
+            class="flex items-center px-4 py-2 hover:bg-green-100 cursor-pointer text-green-900"
+          >
+            <span class="material-symbols-outlined mr-2">settings</span>
+            Settings
+          </a>
+          <button
+            type="button"
+            (click)="logout()"
+            class="flex items-center w-full px-4 py-2 hover:bg-green-100 text-left text-green-900"
+          >
+            <span class="material-symbols-outlined mr-2">logout</span>
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
 
     <!-- Page Content -->
     <main class="p-4 overflow-auto">

@@ -133,3 +133,17 @@ export interface LeaveRequestDto {
 
   id?: string;
 }
+
+export interface LeaveRequestApproval {
+  id: string;
+  LeaveRequestId: string;
+  ApprovalStepId: string;
+  ApproverPersonId: string;
+  Status: string;
+  ActedByUserId: string | null;
+  Comment: string | null;
+  DecisionAt: Date | null;
+  LeaveRequest: LeaveRequestDto | null;
+  ApprovalStep: ApprovalStep | null;
+  ApproverPerson: UserDto | null;
+}
