@@ -11,7 +11,7 @@
       (submitAction)="toggleLeaveRequestForm()"
     ></lib-add-button>
   </div>
-  @if(recentLeaveRequestType !==null) {
+  @if(recentLeaveRequest) {
   <div class="flex flex-wrap gap-2 mt-2 mb-2">
     <div class="bg-white shadow-md rounded-lg p-4 mb-4">
       <h3 class="block font-medium">Review Status</h3>
@@ -19,35 +19,31 @@
         <div class="flex flex-col">
           <div>
             Leave Type:<span class="font-medium">
-              {{ recentLeaveRequestType?.leaveType?.name }}</span
+              {{ recentLeaveRequest?.leaveType?.name }}</span
             >
           </div>
           <div>
             <span>Start Date:</span
             ><span class="font-medium">
-              {{
-                recentLeaveRequestType?.startDate | date : 'yyyy-MM-dd'
-              }}</span
+              {{ recentLeaveRequest?.startDate | date : 'yyyy-MM-dd' }}</span
             >
           </div>
           <div>
             <span>End Date:</span
             ><span class="font-medium">
-              {{ recentLeaveRequestType?.endDate | date : 'yyyy-MM-dd' }}</span
+              {{ recentLeaveRequest?.endDate | date : 'yyyy-MM-dd' }}</span
             >
           </div>
 
           <div>
             <span>Total Days:</span
             ><span class="font-medium">
-              {{ recentLeaveRequestType?.totalDays + ' days' }}</span
+              {{ recentLeaveRequest?.totalDays + ' days' }}</span
             >
           </div>
           <div>
             <span>Reason:</span
-            ><span class="font-medium">
-              {{ recentLeaveRequestType?.reason }}</span
-            >
+            ><span class="font-medium"> {{ recentLeaveRequest?.reason }}</span>
           </div>
         </div>
         <div style="width: 1px; height: 130px; background-color: #ccc"></div>
@@ -55,21 +51,20 @@
         <div class="flex flex-col">
           <div>
             Status:<span class="font-medium">
-              {{ recentLeaveRequestType?.status }}</span
+              {{ recentLeaveRequest?.status }}</span
             >
           </div>
           <div>
             <h3 class="text-sm text-gray-500">Approval Flow</h3>
 
-            @if (recentLeaveRequestType?.leaveType?.approvalFlow?.steps?.length)
-            {
+            @if (recentLeaveRequest?.leaveType?.approvalFlow?.steps?.length) {
             <ol
               class="list-inside text-sm space-y-3 flex items-center justify-center"
             >
               <li
                 class="text-gray-700 text-sm mt-1 items-center justify-center"
                 *ngFor="
-                  let step of recentLeaveRequestType?.leaveType?.approvalFlow
+                  let step of recentLeaveRequest?.leaveType?.approvalFlow
                     ?.steps;
                   let i = index
                 "
@@ -86,7 +81,7 @@
                   <span
                     *ngIf="
                       i <
-                      (recentLeaveRequestType?.leaveType?.approvalFlow?.steps
+                      (recentLeaveRequest?.leaveType?.approvalFlow?.steps
                         ?.length || 0) -
                         1
                     "
@@ -103,18 +98,20 @@
           <div>
             <span>Duration:</span
             ><span class="font-medium">
-              {{ recentLeaveRequestType?.totalDays + ' working days' }}</span
+              {{
+                '' + recentLeaveRequest!.totalDays!.toString() + ' working days'
+              }}</span
             >
           </div>
           <div class="flex gap-2 mt-2">
             <lib-flat-button
-              (submitAction)="deleteLeave(recentLeaveRequestType)"
+              (submitAction)="deleteLeave(recentLeaveRequest)"
               label="Withdraw Request"
             >
             </lib-flat-button>
             <lib-submit-rounded-button
               label="Edit Request"
-              (click)="editLeave(recentLeaveRequestType)"
+              (click)="editLeave(recentLeaveRequest)"
             >
             </lib-submit-rounded-button>
           </div>

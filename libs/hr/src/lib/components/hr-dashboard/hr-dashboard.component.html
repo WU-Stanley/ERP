@@ -1,5 +1,4 @@
 <div class="flex h-screen bg-gray-100">
-  <!-- Sidebar -->
   <div
     [class.w-64]="!isCollapsed"
     [class.w-16]="isCollapsed"
@@ -8,29 +7,31 @@
     <div
       class="h-16 flex items-center justify-center font-bold text-lg border-b bg-green-900 text-white"
     >
-      <button *ngIf="!isCollapsed" (click)="navigateToDashboard()">
-        <img src="logo.png" alt="WuERP Logo" class="h-12" />
-      </button>
-      <button (click)="navigateToDashboard()" *ngIf="isCollapsed">
-        <img src="logo.png" alt="WuERP Logo" class="h-12" />
+      <button (click)="navigateToDashboard()">
+        <img src="Logo.png" alt="WuERP Logo" class="h-12" />
       </button>
     </div>
-    <nav class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)]">
+
+    <nav
+      class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)] overflow-y-auto"
+    >
       <div class="flex-1 flex flex-col space-y-2">
         <ng-container *ngFor="let item of menuItems">
-          <!-- Collapsed View -->
           <ng-container *ngIf="isCollapsed">
             <div *ngIf="!item.children">
               <a
                 *libHasAnyPermission="item.permissions!"
                 [routerLink]="item.route"
-                routerLinkActive="bg-green-800 text-white"
+                routerLinkActive="bg-green-800 text-white font-semibold"
                 class="hover:bg-green-800 p-2 rounded text-white"
                 [title]="item.label"
               >
-                <span class="material-symbols-outlined">{{ item.icon }}</span>
+                <span class="material-symbols-outlined text-white">{{
+                  item.icon
+                }}</span>
               </a>
             </div>
+
             <div *ngIf="item.children">
               <div
                 *libHasAnyPermission="item.permissions!"
@@ -49,20 +50,22 @@
             </div>
           </ng-container>
 
-          <!-- Expanded View -->
           <ng-container *ngIf="!isCollapsed">
             <div *ngIf="!item.children">
               <a
                 *libHasAnyPermission="item.permissions!"
                 [routerLink]="item.route"
-                routerLinkActive="bg-green-800"
+                routerLinkActive="bg-green-800 text-white font-semibold"
                 [routerLinkActiveOptions]="{ exact: true }"
-                class="flex items-center hover:bg-green-800 p-2 rounded text-white hover:text-green-900"
+                class="flex items-center hover:bg-green-800 p-2 rounded text-white"
               >
-                <span class="material-symbols-outlined">{{ item.icon }}</span>
-                <span class="pl-2">{{ item.label }}</span>
+                <span class="material-symbols-outlined text-white">{{
+                  item.icon
+                }}</span>
+                <span class="pl-2 text-white">{{ item.label }}</span>
               </a>
             </div>
+
             <div *ngIf="item.children" class="group">
               <div
                 *libHasAnyPermission="item.permissions!"
@@ -77,7 +80,7 @@
               >
                 <div class="flex items-center">
                   <span class="material-symbols-outlined">{{ item.icon }}</span>
-                  <span class="pl-2">{{ item.label }}</span>
+                  <span class="pl-2 text-white">{{ item.label }}</span>
                 </div>
                 <span
                   class="material-symbols-outlined text-sm"
@@ -90,6 +93,7 @@
                   >keyboard_arrow_down</span
                 >
               </div>
+
               <div
                 *ngIf="openedMenus[item.label]"
                 class="ml-8 mt-1 space-y-1 transition-all"
@@ -98,8 +102,8 @@
                   *ngFor="let sub of item.children"
                   [routerLink]="sub.route"
                   [routerLinkActiveOptions]="{ exact: true }"
-                  routerLinkActive="bg-green-100 font-medium"
-                  class="block hover:bg-green-100 p-2 rounded text-white hover:text-green-900"
+                  routerLinkActive="bg-green-800 font-semibold !text-white"
+                  class="block hover:bg-green-800 p-2 rounded text-white"
                 >
                   {{ sub.label }}
                 </a>
@@ -108,6 +112,7 @@
           </ng-container>
         </ng-container>
       </div>
+
       <button
         (click)="logout()"
         class="hover:bg-green-800 p-2 rounded w-full mt-auto text-left text-white"
@@ -118,15 +123,14 @@
     </nav>
   </div>
 
-  <!-- Main Content -->
   <div class="flex-1 flex flex-col">
-    <!-- Top Navbar -->
     <header
       class="h-14 bg-green-900 shadow flex items-center justify-between px-4 text-white"
     >
       <div class="flex items-center space-x-4">
         <button
           (click)="toggleSidebar()"
+          aria-label="Toggle Sidebar"
           class="text-gray-200 hover:text-white focus:outline-none"
         >
           <svg
@@ -204,9 +208,10 @@
       </div>
     </header>
 
-    <!-- Page Content -->
     <main class="p-4 overflow-auto">
       <router-outlet></router-outlet>
     </main>
   </div>
 </div>
+
+<lib-switcher-fab></lib-switcher-fab>

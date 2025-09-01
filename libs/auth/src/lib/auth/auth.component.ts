@@ -102,10 +102,11 @@ export class AuthComponent implements OnInit {
       (tokenRes) => {
         this.isProcessing = false;
         console.log('token response: ', tokenRes);
-        this.authService.setEnv(tokenRes); 
+        this.authService.setEnv(tokenRes);
         if (this.res.data.isDefault) {
           this.router.navigate(['auth/change-password']);
         } else {
+          console.log('navigating to dashboard');
           this.router.navigate(['auth/dashboard']);
         }
       },

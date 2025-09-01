@@ -32,3 +32,4 @@ export * from './lib/enums/index';
 export * from './lib/auth.service';
 export * from './lib/role.service';
 export * from './lib/user-type.service';
+export * from './lib/guards/permission.guard';

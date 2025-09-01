@@ -21,9 +21,7 @@ import { LeaveRequestDto, LeaveTypeDto } from '../../../dtos';
     AddButtonComponent,
     LeaveRequestFormComponent,
     WordSlicePipe,
-    CancelButtonComponent,
     SubmitRoundedButtonComponent,
-    CancelRoundedButtonComponent,
     FlatButtonComponent,
   ],
 })
@@ -38,7 +36,7 @@ export class LeaveRequestComponent implements OnInit {
   user = JSON.parse(localStorage.getItem('user') || '{}');
   activeMenuIndex: number | null = null;
   showRequestForm = false;
-  recentLeaveRequestType!: LeaveRequestDto | null;
+  recentLeaveRequest!: LeaveRequestDto | null;
 
   constructor() {
     // Initialize any necessary data or state
@@ -48,7 +46,8 @@ export class LeaveRequestComponent implements OnInit {
     console.log('user: ', this.user);
     if (this.leaveRequests().length === 0) {
       this.leaveRequestStore.myLeaveRequests(this.user.id).then((res) => {
-        this.recentLeaveRequestType = this.leaveRequests()[0] || null;
+        this.recentLeaveRequest = this.leaveRequests()[0] || null;
+        console.log('recent leave request type: ', this.recentLeaveRequest);
       });
     }
   }

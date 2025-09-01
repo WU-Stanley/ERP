@@ -38,3 +38,25 @@
 .success-snackbar .mat-mdc-button {
   color: #ffffff !important;
 }
+
+/* Target the scrollbar itself */
+::-webkit-scrollbar {
+  width: 8px; /* Set the width of the vertical scrollbar */
+}
+
+/* Style the track (the area behind the scrollbar) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light gray background */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+/* Style the thumb (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+  background: #4a5568; /* A darker gray, a more subtle color */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+/* Change the thumb color on hover for a better user experience */
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3748; /* Slightly darker shade on hover */
+}

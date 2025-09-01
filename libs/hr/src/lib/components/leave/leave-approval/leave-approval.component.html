@@ -1,3 +1,251 @@
-<p>
-  leave-approval works!
-</p>
+<div class="p-6 bg-gray-50 min-h-screen">
+  <!-- Card Container -->
+  <nav class="text-sm text-gray-500 mb-2">
+    Home / HR / Leave /<span class="text-gray-700 font-medium"
+      >Leave Approvals</span
+    >
+  </nav>
+  <div class="bg-white p-6 rounded-xl shadow-sm">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold">Leave Request Management</h2>
+      <div class="flex space-x-2">
+        <lib-flat-button
+          (submitAction)="toggleForm()"
+          label="Delegate Approval"
+        ></lib-flat-button>
+        <input
+          type="text"
+          placeholder="Search by name, ID, department..."
+          class="px-4 py-2 border rounded-lg text-sm w-72 focus:ring-2 focus:ring-green-500"
+        />
+        <button class="px-4 py-2 border rounded-lg text-sm">Filters</button>
+      </div>
+    </div>
+
+    <!-- Filters Row -->
+    <div class="flex space-x-2 mb-4 items-center justify-end">
+      <lib-custom-select
+        [options]="['Pending', 'Approved', 'Rejected']"
+        placeholder="Select Leave Status"
+        label="Leave Status"
+        width="120px"
+      >
+      </lib-custom-select>
+      <lib-custom-select
+        [options]="leaveTypes()"
+        labelKey="name"
+        placeholder="Select Leave Type"
+        label="Leave Type"
+        width="fit-content"
+      >
+      </lib-custom-select>
+      <select class="px-3 py-2 text-sm">
+        <option>Bulk Action</option>
+      </select>
+      <lib-flat-button class="px-3 py-2 text-sm" label="Export"
+        >Export</lib-flat-button
+      >
+      <lib-flat-button class="px-3 py-2 text-sm" label="⟳">⟳</lib-flat-button>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="text-left text-sm text-gray-500">
+            <th class="py-2 px-4">Approver Person</th>
+            <th class="py-2 px-4">Approval Step</th>
+            <th class="py-2 px-4">Leave Type</th>
+            <th class="py-2 px-4">Start Date</th>
+            <th class="py-2 px-4">End Date</th>
+            <th class="py-2 px-4">Duration</th>
+            <th class="py-2 px-4">Status</th>
+            <th class="py-2 px-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm text-gray-700">
+          <!-- Row 1 -->
+          @for (request of approvals; track request.id) {
+          <tr class="border-t">
+            <td class="py-3 px-4">
+              {{ request.approverPerson?.fullName }}
+            </td>
+            <td class="py-3 px-4">
+              {{ request.approvalStep?.stepOrder }}
+            </td>
+            <td class="py-3 px-4">
+              {{ request.leaveRequest?.leaveType?.name }}
+            </td>
+            <td class="py-3 px-4">
+              {{ request.leaveRequest?.startDate | date : 'dd-MMM-yy' }}
+            </td>
+            <td class="py-3 px-4">
+              {{ request.leaveRequest?.endDate | date : 'dd-MMM-yy' }}
+            </td>
+            <td class="py-3 px-4">3 days</td>
+            <td class="py-3 px-4">
+              <span
+                [ngClass]="{
+                  'bg-green-100 text-green-700': request.status === 'Approved',
+                  'bg-red-100 text-red-700': request.status === 'Rejected',
+                  'bg-yellow-100 text-yellow-700': request.status === 'Pending'
+                }"
+                class="px-2 py-1 rounded text-xs"
+              >
+                {{ request.status }}
+              </span>
+            </td>
+            <td class="py-3 px-4 flex space-x-2">
+              <button class="text-black text-orange-500">👁</button>
+              @if(request.status === 'Pending') {
+              <button
+                (click)="openDialog(request.id, 'approve')"
+                class="text-green-900"
+              >
+                ✔
+              </button>
+              <button
+                (click)="openDialog(request.id, 'reject')"
+                class="text-red-600"
+              >
+                ✖
+              </button>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mt-4 text-sm text-gray-600">
+      <div>Page 1 of 3</div>
+      <div class="flex space-x-2">
+        <button class="px-2 py-1 border rounded">1</button>
+        <button class="px-2 py-1 border rounded">2</button>
+        <button class="px-2 py-1 border rounded">3</button>
+        <button class="px-2 py-1">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Approve/Reject Dialog -->
+<div
+  *ngIf="dialogVisible"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-xl shadow-lg p-6 w-96">
+    <h3 class="text-lg font-semibold mb-2">
+      {{
+        dialogType === 'approve'
+          ? 'Approve Leave Request'
+          : 'Reject Leave Request'
+      }}
+    </h3>
+    <p class="text-sm text-gray-600 mb-4">
+      {{
+        dialogType === 'approve'
+          ? 'Are you sure you want to approve this leave request?'
+          : 'Are you sure you want to reject this leave request?'
+      }}
+    </p>
+
+    <!-- Comment Input -->
+    <textarea
+      [(ngModel)]="dialogComment"
+      placeholder="Enter comment (optional)"
+      rows="3"
+      class="w-full px-3 py-2 border rounded-lg text-sm mb-4 focus:ring-2 focus:ring-green-500"
+    ></textarea>
+
+    <!-- Actions -->
+    <div class="flex justify-end space-x-2">
+      <button
+        (click)="closeDialog()"
+        class="px-4 py-2 border rounded-lg text-sm"
+      >
+        No
+      </button>
+
+      <button
+        (click)="confirmDialog()"
+        class="px-4 py-2 rounded-lg text-sm text-white"
+        [ngClass]="
+          dialogType === 'approve'
+            ? 'bg-green-600 hover:bg-green-700'
+            : 'bg-red-600 hover:bg-red-700'
+        "
+      >
+        @if(isLoading()){
+
+        <lib-spinner [size]="32" color="#10b981"></lib-spinner>
+        } @if(!isLoading()){
+        <span> Yes, {{ dialogType === 'approve' ? 'Approve' : 'Reject' }}</span
+        >}
+      </button>
+    </div>
+  </div>
+</div>
+<!-- The right side delegation form -->
+@if(showDelegationForm){
+<div
+  class="fixed top-10 right-0 w-[500px] h-full bg-white shadow-lg z-50 flex flex-col transform transition-transform duration-300 ease-in-out"
+>
+  <!-- Form Container -->
+  <div class="p-6 overflow-y-auto flex-1" [formGroup]="delegationForm">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Leave Request Form</h2>
+      <button (click)="toggleForm()" class="text-gray-500 hover:text-red-500">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Form Fields -->
+    <lib-custom-select
+      width="full"
+      formControlName="delegatePersonId"
+      [options]="users"
+      [labelKey]="'fullName'"
+      type="text"
+      label="Staff"
+      placeholder="Select Staff"
+    ></lib-custom-select>
+    <lib-custom-textarea
+      label="Note"
+      type="text"
+      formControlName="note"
+      placeholder="Enter note for your delegation"
+    ></lib-custom-textarea>
+    <lib-custom-input
+      type="date"
+      label="Start Date"
+      placeholder="Select Start date"
+      formControlName="startDate"
+    ></lib-custom-input>
+    <lib-custom-input
+      label="End date"
+      placeholder="Select end date"
+      type="date"
+      formControlName="endDate"
+    >
+    </lib-custom-input>
+    <div
+      *ngIf="delegationForm.valid"
+      class="flex gap-6 items-center justify-center p-4 border-t"
+    >
+      <lib-flat-button
+        label="Reset Form"
+        (submitAction)="resetForm()"
+      ></lib-flat-button>
+      <lib-submit-rounded-button
+        class="items-center"
+        (submitAction)="submitDelegation()"
+        label="Submit"
+        [isProcessing]="isLoading()"
+      ></lib-submit-rounded-button>
+    </div>
+  </div>
+</div>
+}

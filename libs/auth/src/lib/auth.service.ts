@@ -242,8 +242,8 @@ export class AuthService {
       .filter((p) => !!p); // filter out empty
     const isAdmin = userPerms.includes(Permissions.AdminAccess.toLowerCase());
 
-    const hasMatch = permissions.some(
-      (required) => userPerms.includes(required.toLowerCase()) || isAdmin
+    const hasMatch = permissions.some((required) =>
+      userPerms.includes(required.toLowerCase())
     );
 
     return hasMatch;

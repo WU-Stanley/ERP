@@ -1,4 +1,6 @@
 import { Route } from '@angular/router';
+import { UnAuthorizedComponent } from './un-authorized/un-authorized.component';
+import { PermissionGuard, Permissions } from '@erp/auth';
 
 export const appRoutes: Route[] = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -7,6 +9,7 @@ export const appRoutes: Route[] = [
 
     loadComponent: () => import('@erp/auth').then((m) => m.AuthComponent),
   },
+  { path: 'unauthorized', component: UnAuthorizedComponent },
   {
     path: 'auth/forgot-password',
     loadComponent: () =>
@@ -83,14 +86,66 @@ export const appRoutes: Route[] = [
     path: 'hr',
     loadComponent: () => import('@erp/hr').then((m) => m.HrDashboardComponent),
     children: [
-      { path: 'dashboard', loadComponent: () => import('@erp/hr').then(m => m.HrHomeComponent) },
-      { path: 'leave', loadComponent: () => import('@erp/hr').then(m => m.LeaveDashboardComponent) },
-      { path: 'leave/requests', loadComponent: () => import('@erp/hr').then(m => m.LeaveRequestComponent) },
-      { path: 'leave/types', loadComponent: () => import('@erp/hr').then(m => m.LeaveTypeComponent) },
-      { path: 'leave/policies', loadComponent: () => import('@erp/hr').then(m => m.LeavePoliciesComponent) },
-      { path: 'leave/approval', loadComponent: () => import('@erp/hr').then(m => m.LeaveApprovalComponent) },
-      { path: 'leave/reports', loadComponent: () => import('@erp/hr').then(m => m.LeaveReportsComponent) },
-      { path: 'leave/approval-workflow', loadComponent: () => import('@erp/hr').then(m => m.ApprovalWorkflowComponent) },
-    ]
-  }
+      {
+        path: 'dashboard',
+        loadComponent: () => import('@erp/hr').then((m) => m.HrHomeComponent),
+      },
+      {
+        path: 'leave',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.LeaveDashboardComponent),
+      },
+      {
+        path: 'leave/requests',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.LeaveRequestComponent),
+      },
+      {
+        path: 'leave/types',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.LeaveTypeComponent),
+      },
+      {
+        path: 'leave/policies',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.LeavePoliciesComponent),
+        canActivate: [PermissionGuard],
+        data: {
+          permissions: [Permissions.AdminAccess, Permissions.ManageLeave],
+        },
+      },
+      {
+        path: 'leave/approval',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.LeaveApprovalComponent),
+        canActivate: [PermissionGuard],
+        data: {
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageLeave,
+            Permissions.RejectLeave,
+            Permissions.ApproveLeave,
+          ],
+        },
+      },
+      {
+        path: 'leave/reports',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.LeaveReportsComponent),
+        canActivate: [PermissionGuard],
+        data: {
+          permissions: [Permissions.AdminAccess, Permissions.ManageLeave],
+        },
+      },
+      {
+        path: 'leave/approval-workflow',
+        loadComponent: () =>
+          import('@erp/hr').then((m) => m.ApprovalWorkflowComponent),
+        canActivate: [PermissionGuard],
+        data: {
+          permissions: [Permissions.AdminAccess, Permissions.ManageLeave],
+        },
+      },
+    ],
+  },
 ];

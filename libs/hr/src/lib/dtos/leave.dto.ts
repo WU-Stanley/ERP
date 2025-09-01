@@ -136,14 +136,16 @@ export interface LeaveRequestDto {
 
 export interface LeaveRequestApproval {
   id: string;
-  LeaveRequestId: string;
-  ApprovalStepId: string;
-  ApproverPersonId: string;
-  Status: string;
-  ActedByUserId: string | null;
-  Comment: string | null;
-  DecisionAt: Date | null;
-  LeaveRequest: LeaveRequestDto | null;
-  ApprovalStep: ApprovalStep | null;
-  ApproverPerson: UserDto | null;
+  leaveRequestId: string;
+  approvalStepId: string;
+  approverPersonId: string;
+  status: string;
+  actedByUserId: string | null;
+  comment: string | null;
+  decisionAt: Date | null;
+  leaveRequest: LeaveRequestDto | null;
+  approvalStep: ApprovalStep | null;
+  approverPerson: UserDto | null;
 }
+
+//
