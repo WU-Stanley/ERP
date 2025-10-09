@@ -24,6 +24,7 @@ export interface CreateLeaveTypeDto {
 }
 
 export interface CreateApprovalFlowDto {
+  id?: string;
   name: string;
   isActive: boolean;
   createdBy: string; // Guid

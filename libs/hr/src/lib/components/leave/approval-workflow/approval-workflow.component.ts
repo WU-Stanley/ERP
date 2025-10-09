@@ -46,6 +46,8 @@ export class ApprovalWorkflowComponent implements OnInit {
   approvalWorkflows: CreateApprovalFlowDto[] = [];
   isShow = false;
   activeMenuIndex: any;
+  isEditting = false;
+  selectedWorkflow!: CreateApprovalFlowDto;
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,
@@ -58,6 +60,7 @@ export class ApprovalWorkflowComponent implements OnInit {
     this.getUsers();
     this.getApprovalWorkflows();
     this.approvalWorkflowForm = this.fb.group({
+      id: [''],
       name: ['', [Validators.required]],
       createdAt: [''],
       createdBy: [''],
@@ -73,9 +76,11 @@ export class ApprovalWorkflowComponent implements OnInit {
     this.activeMenuIndex = this.activeMenuIndex === index ? null : index;
   }
   editWorkflow(index: number) {
-    const workflow = this.approvalWorkflows[index];
-    this.approvalWorkflowForm.patchValue(workflow);
-    workflow.steps?.forEach((step) => {
+    this.isEditting = true;
+    this.selectedWorkflow = this.approvalWorkflows[index];
+    console.log('selected: ', this.selectedWorkflow);
+    this.approvalWorkflowForm.patchValue(this.selectedWorkflow);
+    this.selectedWorkflow.steps?.forEach((step) => {
       this.steps.push(
         this.fb.group({
           stepOrder: [step.stepOrder],
@@ -198,20 +203,41 @@ export class ApprovalWorkflowComponent implements OnInit {
     formData.createdBy = this.authService.user()?.id || '';
     formData.createdAt = new Date().toISOString();
     if (this.approvalWorkflowForm.valid) {
-      this.approvalWorkflowService.createApprovalWorkflow(formData).subscribe(
-        (res) => {
-          console.log('res: ', res);
-          if (res.data) {
-            this.approvalWorkflows.push(res.data);
+      if (!this.isEditting) {
+        this.approvalWorkflowService.createApprovalWorkflow(formData).subscribe(
+          (res) => {
+            console.log('res: ', res);
+            if (res.data) {
+              this.approvalWorkflows.push(res.data);
+            }
+            this.isProcessing = false;
+            this.toggleForm();
+          },
+          (error) => {
+            this.isProcessing = false;
+            console.log('Error creating approval flow: ', error);
           }
-          this.isProcessing = false;
-          this.toggleForm();
-        },
-        (error) => {
-          this.isProcessing = false;
-          console.log('Error creating approval flow: ', error);
-        }
-      );
+        );
+      } else {
+        console.log('workflow form: ', this.approvalWorkflowForm.value);
+        formData.createdBy = this.selectedWorkflow.createdBy;
+        formData.createdAt = this.selectedWorkflow.createdAt;
+        console.log('updateVal: ', formData);
+
+        this.approvalWorkflowService
+          .updateApprovalWorkflow(this.selectedWorkflow.id!, formData)
+          .subscribe(
+            (res) => {
+              console.log('workflow update: ', res);
+              this.isProcessing = false;
+              this.getApprovalWorkflows();
+            },
+            (error) => {
+              this.isProcessing = false;
+              console.log('Error creating approval flow: ', error);
+            }
+          );
+      }
     } else {
       console.log('Form not valid: ', this.approvalWorkflowForm.errors);
     }

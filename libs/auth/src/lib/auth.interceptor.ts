@@ -1,11 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import {
-  HttpInterceptor,
   HttpRequest,
-  HttpHandler,
+  HttpHandlerFn,
   HttpEvent,
   HttpErrorResponse,
-  HttpHandlerFn,
   HttpInterceptorFn,
 } from '@angular/common/http';
 import { Observable, throwError, from, timer } from 'rxjs';
@@ -18,7 +16,20 @@ export const AuthInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<any>> => {
   const authService = inject(AuthService);
 
-  return next(req).pipe(
+  // Always include access token if available
+  const token = authService.getAccessToken();
+
+  // Decide if withCredentials should be applied
+  const requiresCredentials =
+    !req.url.includes('/auth/login') || !req.url.includes('/auth/verify');
+
+  // Clone request accordingly
+  const authReq = req.clone({
+    setHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+    withCredentials: requiresCredentials,
+  });
+
+  return next(authReq).pipe(
     retry(
       genericRetryStrategy({
         maxRetryAttempts: 2,
@@ -27,22 +38,25 @@ export const AuthInterceptor: HttpInterceptorFn = (
     ),
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !req.url.includes('/auth/login')) {
-        // Attempt token refresh
-        return from(authService.refreshAccessToken()).pipe(
-          switchMap((success) => {
-            if (success) {
-              const newReq = req.clone({
-                setHeaders: {
-                  Authorization: `Bearer ${authService.getAccessToken()}`,
-                },
-              });
-              return next(newReq);
-            } else {
-              authService.logout();
-              return throwError(() => error);
-            }
-          })
-        );
+        // Attempt token refresh (avoid looping on refresh itself)
+        if (!req.url.includes('/auth/refresh')) {
+          return from(authService.refreshAccessToken()).pipe(
+            switchMap((success) => {
+              if (success) {
+                const newReq = req.clone({
+                  setHeaders: {
+                    Authorization: `Bearer ${authService.getAccessToken()}`,
+                  },
+                  withCredentials: requiresCredentials,
+                });
+                return next(newReq);
+              } else {
+                // authService.logout();
+                return throwError(() => error);
+              }
+            })
+          );
+        }
       }
       return throwError(() => error);
     })

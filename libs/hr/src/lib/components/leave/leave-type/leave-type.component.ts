@@ -39,7 +39,7 @@ import { LeaveTypeDetailsComponent } from '../detail-views/leave-type-details/le
 export class LeaveTypeComponent implements OnInit {
   showForm = false;
   private readonly leaveTypeStore = inject(LeaveTypeStore);
-  hrAdminPermissions = [Permissions.ManageLeave];
+  hrAdminPermissions = [Permissions.ManageLeave, Permissions.AdminAccess];
   authService = inject(AuthService);
 
   // Reactive signals for view binding

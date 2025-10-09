@@ -103,6 +103,7 @@
               }}</span
             >
           </div>
+          @if (recentLeaveRequest.status !=='Approved') {
           <div class="flex gap-2 mt-2">
             <lib-flat-button
               (submitAction)="deleteLeave(recentLeaveRequest)"
@@ -115,6 +116,7 @@
             >
             </lib-submit-rounded-button>
           </div>
+          }
         </div>
       </div>
     </div>

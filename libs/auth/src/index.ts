@@ -33,3 +33,4 @@ export * from './lib/auth.service';
 export * from './lib/role.service';
 export * from './lib/user-type.service';
 export * from './lib/guards/permission.guard';
+export * from './lib/reset-password/reset-password.component';

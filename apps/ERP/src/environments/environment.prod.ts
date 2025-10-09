@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http:10.255.255.44:8080/api'
+  // apiUrl: 'http:10.255.255.44:8080/api'
+  apiUrl: 'https://erp.uat.wigweuniversity.edu.ng/api',
 };

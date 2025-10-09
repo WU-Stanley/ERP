@@ -3,7 +3,9 @@
     style="min-width: 70vw; max-width: 80vw"
     class="flex flex-row justify-start mb-6"
   >
-    <h2 class="text-2xl font-bold text-gray-800 gap-[10px] mr-2">Departments</h2>
+    <h2 class="text-2xl font-bold text-gray-800 gap-[10px] mr-2">
+      Departments
+    </h2>
   </div>
   <div class="flex flex-row justify-end items-center">
     <lib-custom-input
@@ -25,7 +27,7 @@
 
   <!-- Role list -->
 
-  <div class="overflow-auto rounded-lg border border-gray-200">
+  <div class="overflow-hidden rounded-lg border border-gray-200">
     <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
       <thead class="bg-gray-100 text-gray-700 font-medium">
         <tr>
@@ -36,7 +38,8 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100 bg-white">
-        @for (department of filteredDepartments;let index=$index; track department.id) {
+        @for (department of filteredDepartments;let index=$index; track
+        department.id) {
         <tr class="hover:bg-gray-50 transition">
           <td class="px-4 py-3 font-medium text-gray-800">
             {{ department.name }}
@@ -48,50 +51,53 @@
             <span
               class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold text-green-700"
             >
-               Active
+              Active
             </span>
           </td>
           <td class="px-4 py-3">
-            
+            <lib-flat-button
+              label="Edit"
+              (submitAction)="editDepartment(department)"
+            ></lib-flat-button>
           </td>
         </tr>
         }
       </tbody>
     </table>
   </div>
-<!-- Slide-in Form Overlay -->
-<div
-  class="fixed top-0 right-0 h-full w-full z-50 bg-black bg-opacity-40 transition-opacity duration-300"
-  *ngIf="isDialogOpen"
->
-  <!-- Form Panel -->
+  <!-- Slide-in Form Overlay -->
   <div
-    class="absolute right-0 top-0 h-full w-full sm:w-[400px] bg-white shadow-xl p-6 flex flex-col transition-transform duration-500 transform translate-x-0"
+    class="fixed top-0 right-0 h-full w-full z-50 bg-black bg-opacity-40 transition-opacity duration-300"
+    *ngIf="isDialogOpen"
   >
-    <!-- Close Button -->
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-semibold text-gray-800">Add New Department</h3>
-      <button
-        class="text-gray-500 hover:text-gray-700 text-2xl"
-        (click)="handleDialogClose(null)"
-        aria-label="Close"
-      >
-        &times;
-      </button>
-    </div>
-
-    <!-- Form Content -->
-    <div [formGroup]="departmentForm">
-      <div class="mb-4">
-        <lib-custom-input
-          formControlName="name"
-          id="name"
-          name="name"
-          type="text"
-          label="Department Name"
-          placeholder="Enter department name"
-        />  
+    <!-- Form Panel -->
+    <div
+      class="absolute right-0 top-0 h-full w-full sm:w-[400px] bg-white shadow-xl p-6 flex flex-col transition-transform duration-500 transform translate-x-0"
+    >
+      <!-- Close Button -->
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Add New Department</h3>
+        <button
+          class="text-gray-500 hover:text-gray-700 text-2xl"
+          (click)="handleDialogClose(null)"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
+
+      <!-- Form Content -->
+      <div [formGroup]="departmentForm">
+        <div class="mb-4">
+          <lib-custom-input
+            formControlName="name"
+            id="name"
+            name="name"
+            type="text"
+            label="Department Name"
+            placeholder="Enter department name"
+          />
+        </div>
         <div class="mb-4">
           <lib-custom-textarea
             width="100%"
@@ -102,15 +108,24 @@
             placeholder="Enter department description"
           ></lib-custom-textarea>
         </div>
+        <div class="mb-4">
+          <lib-custom-select
+            formControlName="headOfDepartmentId"
+            label="Head of Department"
+            placeholder="Assign Head of Department"
+            [options]="users"
+            labelKey="fullName"
+          ></lib-custom-select>
+        </div>
 
-      <div class="flex justify-end">
-        <lib-submit-rounded-button
-          label="Submit"
-          [isProcessing]="isProcessing"
-          (submitAction)="onAddDepartment()"
-        ></lib-submit-rounded-button>
+        <div class="flex justify-end">
+          <lib-submit-rounded-button
+            label="Submit"
+            [isProcessing]="isProcessing"
+            (submitAction)="onAddDepartment()"
+          ></lib-submit-rounded-button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </div>

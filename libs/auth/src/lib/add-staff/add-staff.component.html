@@ -1,4 +1,4 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100 ">
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
   <div
     [formGroup]="userForm"
     class="max-w-md w-full p-6 bg-white rounded shadow justify-center items-center"
@@ -23,7 +23,7 @@
         label="First Name"
         placeholder="Enter staff first name"
       ></lib-custom-input>
-       <lib-custom-input
+      <lib-custom-input
         formControlName="lastName"
         id="lastName"
         name="lastName"
@@ -42,6 +42,7 @@
         [placeholder]="'Select department'"
         [options]="departments"
         labelKey="name"
+        [width]="'89%'"
       ></lib-custom-select>
     </div>
     <div class="mb-6">
@@ -53,6 +54,7 @@
         labelKey="name"
         label="User Type"
         placeholder="Select user type"
+        [width]="'89%'"
       >
       </lib-custom-select>
     </div>
@@ -65,6 +67,7 @@
         labelKey="name"
         label="Employment Type"
         placeholder="Select employment type"
+        [width]="'89%'"
       >
       </lib-custom-select>
     </div>

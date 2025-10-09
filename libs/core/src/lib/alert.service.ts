@@ -5,10 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class AlertService {
   constructor(private matSnackBar: MatSnackBar) {}
 
-  showSuccess(message: string) {
+  showSuccess(
+    message: string,
+    classList: string[] = ['success-snackbar', 'rounded-md']
+  ) {
     this.matSnackBar.open(message, 'Close', {
       duration: 3000,
-      panelClass: ['success-snackbar'],
+      panelClass: classList,
     });
   }
 

@@ -62,26 +62,41 @@ export class HrDashboardComponent implements OnInit {
     {
       label: 'Leave',
       icon: 'home',
-      permissions: ['AccessDashboard', 'AdminAccess', 'SuperAdminAccess'],
       children: [
         {
           label: 'Leave Requests',
           route: '/hr/leave/requests',
+          permissions: [],
         },
         {
           label: 'Leave Types',
           route: '/hr/leave/types',
-          // permissions: [Permissions.ManageLeaveRequests,Permissions.ManageLeave, Permissions.AdminAccess, Permissions.SuperAdminAccess],
+          permissions: [
+            Permissions.ManageLeaveRequests,
+            Permissions.ManageLeave,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
         {
           label: 'Leave Policies',
           route: '/hr/leave/policies',
-          //  permissions: [Permissions.ManageLeaveRequests,Permissions.ManageLeave, Permissions.AdminAccess, Permissions.SuperAdminAccess],
+          permissions: [
+            Permissions.ManageLeaveRequests,
+            Permissions.ManageLeave,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
         {
           label: 'Approval Workflow',
           route: '/hr/leave/approval-workflow',
-          // permissions: [Permissions.ManageLeaveRequests,Permissions.ManageLeave, Permissions.AdminAccess, Permissions.SuperAdminAccess],
+          permissions: [
+            Permissions.ManageLeaveRequests,
+            Permissions.ManageLeave,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
 
         {
@@ -108,11 +123,7 @@ export class HrDashboardComponent implements OnInit {
     {
       label: 'Payroll',
       icon: 'account_balance',
-      permissions: [
-        Permissions.ManagePayroll,
-        Permissions.AdminAccess,
-        Permissions.SuperAdminAccess,
-      ],
+      permissions: [],
       children: [
         {
           label: 'Payroll Dashboard',
@@ -191,6 +202,7 @@ export class HrDashboardComponent implements OnInit {
     {
       label: 'Departments',
       icon: 'business',
+      route: '/hr/departments',
       permissions: [
         Permissions.CreateDepartment,
         Permissions.EditDepartment,
@@ -199,28 +211,6 @@ export class HrDashboardComponent implements OnInit {
         Permissions.ManageDepartmentStructure,
         Permissions.AdminAccess,
         Permissions.SuperAdminAccess,
-      ],
-      children: [
-        {
-          label: 'Create Department',
-          route: '/hr/departments/create',
-        },
-        {
-          label: 'Edit Department',
-          route: '/hr/departments/edit',
-        },
-        {
-          label: 'Delete Department',
-          route: '/hr/departments/delete',
-        },
-        {
-          label: 'Assign Department Head',
-          route: '/hr/departments/assign-head',
-        },
-        {
-          label: 'Manage Department Structure',
-          route: '/hr/departments/manage-structure',
-        },
       ],
     },
     {

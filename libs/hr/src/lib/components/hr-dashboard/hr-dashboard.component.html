@@ -13,9 +13,9 @@
     </div>
 
     <nav
-      class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)] overflow-y-auto"
+      class="flex flex-col p-2 space-y-2 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden"
     >
-      <div class="flex-1 flex flex-col space-y-2">
+      <div class="flex-1 flex flex-col space-y-4">
         <ng-container *ngFor="let item of menuItems">
           <ng-container *ngIf="isCollapsed">
             <div *ngIf="!item.children">
@@ -115,9 +115,12 @@
 
       <button
         (click)="logout()"
-        class="hover:bg-green-800 p-2 rounded w-full mt-auto text-left text-white"
+        class="hover:bg-green-800 p-4 rounded w-full mt-auto text-left text-white"
       >
-        <span class="material-symbols-outlined align-middle mr-2">logout</span>
+        <span
+          class="material-symbols-outlined align-middle mr-4 items-center justify-center"
+          >logout</span
+        >
         Logout
       </button>
     </nav>

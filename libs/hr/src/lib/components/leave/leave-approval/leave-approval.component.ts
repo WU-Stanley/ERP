@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { LeaveRequestApprovalStore } from '../../../state/leave-approval.store';
-import { AuthService, Permissions, User, UserDto } from '@erp/auth';
+import { AuthService, UserDto } from '@erp/auth';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -11,7 +11,6 @@ import {
 } from '@angular/forms';
 import { LeaveTypeStore } from '../../../state';
 import {
-  AddButtonComponent,
   CustomSelectComponent,
   FlatButtonComponent,
   SubmitRoundedButtonComponent,

@@ -4,6 +4,7 @@ import {
   CustomTextareaComponent,
   CustomInputComponent,
   FlatButtonComponent,
+  CustomSelectComponent,
 } from '@erp/core';
 import { DepartmentDto } from '../dtos/department.dto';
 import {
@@ -17,6 +18,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { DepartmentService } from '../department.service';
 import { CommonModule } from '@angular/common';
+import { UserDto } from '../dtos/usertype.dto';
 
 @Component({
   selector: 'lib-department',
@@ -31,6 +33,7 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     RouterModule,
     CommonModule,
+    CustomSelectComponent,
   ],
 })
 export class DepartmentComponent implements OnInit {
@@ -40,6 +43,7 @@ export class DepartmentComponent implements OnInit {
   isProcessing = false;
   isDialogOpen = false;
   departments: DepartmentDto[] = [];
+  users!: UserDto[];
   constructor(
     private authService: AuthService,
     private departmentService: DepartmentService,
@@ -51,7 +55,15 @@ export class DepartmentComponent implements OnInit {
     this.departmentForm = new FormGroup({
       name: new FormControl('', Validators.required),
       description: new FormControl('', Validators.required),
+      headOfDepartmentId: new FormControl(''),
     });
+    this.authService.getAllStaff().subscribe((staffs) => {
+      this.users = staffs.data ?? [];
+    });
+  }
+  editDepartment(department: DepartmentDto) {
+    this.departmentForm.patchValue(department);
+    this.openDialog();
   }
   openDialog() {
     this.isDialogOpen = true;
@@ -72,9 +84,10 @@ export class DepartmentComponent implements OnInit {
   handleDialogClose(data: any | null) {
     this.isDialogOpen = false;
     if (data) {
-      console.log('Role Created:', data);
+      console.log('department Created:', data);
       this.loadDepartments();
     }
+    this.departmentForm.reset();
   }
   get filteredDepartments() {
     const term = this.searchTerm.toLowerCase();

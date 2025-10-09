@@ -1,6 +1,7 @@
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
   NO_ERRORS_SCHEMA,
   OnInit,
 } from '@angular/core';
@@ -20,6 +21,7 @@ import {
   CancelRoundedButtonComponent,
   CancelButtonComponent,
   FlatButtonComponent,
+  AlertService,
 } from '@erp/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -42,6 +44,7 @@ export class AuthComponent implements OnInit {
   disabled = true;
   signInForm!: FormGroup;
   verifyForm!: FormGroup;
+  alertService = inject(AlertService);
   res: any;
   showPassword = false;
   isProcessing = false;
@@ -53,7 +56,7 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
     (() => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('user');
       if (token) {
         this.router.navigate(['/auth/dashboard']);
       }
@@ -80,15 +83,27 @@ export class AuthComponent implements OnInit {
     this.authService.login(value).subscribe(
       (res) => {
         console.log('Login Response: ', res);
-        this.res = res;
-        this.isProcessing = false;
-        if (!res?.data?.twoFactorEnabled) {
-          this.authService.setEnv(res);
-          this.router.navigate(['auth/dashboard']);
+        if (res.status) {
+          this.alertService.showSuccess('Enter the token sent to your email!');
+
+          this.res = res;
+          this.isProcessing = false;
+          if (!res?.data?.twoFactorEnabled) {
+            this.authService.setEnv(res);
+            this.router.navigate(['auth/dashboard']);
+          }
+        } else {
+          this.alertService.showSuccess(res.message, [
+            'bg-red-500',
+            'rounded-md',
+            'text-white',
+          ]);
+          this.isProcessing = false;
         }
       },
       (error) => {
         this.isProcessing = false;
+        this.alertService.showError(error.message ?? 'Login failed!');
       }
     );
   }
@@ -107,11 +122,13 @@ export class AuthComponent implements OnInit {
           this.router.navigate(['auth/change-password']);
         } else {
           console.log('navigating to dashboard');
-          this.router.navigate(['auth/dashboard']);
+          this.router.navigate(['hr/dashboard']);
         }
+        this.alertService.showSuccess('login successful!');
       },
       (error) => {
         this.isProcessing = false;
+        this.alertService.showError(error.message ?? 'Login failed!');
       }
     );
   }

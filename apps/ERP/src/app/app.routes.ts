@@ -16,6 +16,11 @@ export const appRoutes: Route[] = [
       import('@erp/auth').then((m) => m.ForgotPasswordComponent),
   },
   {
+    path: 'auth/reset-password',
+    loadComponent: () =>
+      import('@erp/auth').then((m) => m.ResetPasswordComponent),
+  },
+  {
     path: 'references',
     loadComponent: () =>
       import('@erp/auth').then((m) => m.AuthDashboardComponent),
@@ -111,7 +116,11 @@ export const appRoutes: Route[] = [
           import('@erp/hr').then((m) => m.LeavePoliciesComponent),
         canActivate: [PermissionGuard],
         data: {
-          permissions: [Permissions.AdminAccess, Permissions.ManageLeave],
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageLeave,
+            Permissions.ManageLeaveRequests,
+          ],
         },
       },
       {
@@ -125,6 +134,7 @@ export const appRoutes: Route[] = [
             Permissions.ManageLeave,
             Permissions.RejectLeave,
             Permissions.ApproveLeave,
+            Permissions.ManageLeaveRequests,
           ],
         },
       },
@@ -134,7 +144,11 @@ export const appRoutes: Route[] = [
           import('@erp/hr').then((m) => m.LeaveReportsComponent),
         canActivate: [PermissionGuard],
         data: {
-          permissions: [Permissions.AdminAccess, Permissions.ManageLeave],
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageLeave,
+            Permissions.ManageLeaveRequests,
+          ],
         },
       },
       {
@@ -143,7 +157,22 @@ export const appRoutes: Route[] = [
           import('@erp/hr').then((m) => m.ApprovalWorkflowComponent),
         canActivate: [PermissionGuard],
         data: {
-          permissions: [Permissions.AdminAccess, Permissions.ManageLeave],
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageLeaveRequests,
+          ],
+        },
+      },
+      {
+        path: 'departments',
+        loadComponent: () =>
+          import('@erp/auth').then((c) => c.DepartmentComponent),
+        canActivate: [PermissionGuard],
+        data: {
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageLeaveRequests,
+          ],
         },
       },
     ],

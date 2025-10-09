@@ -108,7 +108,10 @@ export class LeaveTypeFormComponent implements OnInit {
   approvalWorkflows: CreateApprovalFlowDto[] = [];
   isProcessing = false;
   @Input() readonly = false;
-  hrAdminPermissions: string[] = [Permissions.ManageLeave];
+  hrAdminPermissions: string[] = [
+    Permissions.ManageLeave,
+    Permissions.AdminAccess,
+  ];
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,

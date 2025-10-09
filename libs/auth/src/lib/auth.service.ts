@@ -41,7 +41,25 @@ export class AuthService {
       { withCredentials: true }
     );
   }
-
+  resetPassword(value: any) {
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/reset-password',
+      value,
+      { withCredentials: true }
+    );
+  }
+  forgotPassword(value: any) {
+    this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/forgot-password',
+      value,
+      { withCredentials: true }
+    );
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/forgot-password',
+      value
+      // { withCredentials: true }
+    );
+  }
   getEmploymentTypes() {
     return this.http.get<ApiResponse<any[]>>(
       this.env.apiUrl + '/auth/get-employment-types',
@@ -58,14 +76,14 @@ export class AuthService {
     return this.http.post<ApiResponse<User>>(
       this.env.apiUrl + '/auth/login',
       formValue,
-      { withCredentials: true }
+      { withCredentials: false }
     );
   }
   verifyLoginToken(value: { token: string }) {
     return this.http.post<ApiResponse<{ valid: boolean }>>(
       this.env.apiUrl + '/auth/verify-login-token',
       value,
-      { withCredentials: true }
+      { withCredentials: false }
     );
   }
   assignRoleToUser(value: { userId: string; roleId: string }) {
@@ -158,7 +176,7 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    return this.accessToken;
+    return this.accessToken ?? localStorage.getItem('token');
   }
 
   clearAccessToken() {
@@ -215,9 +233,9 @@ export class AuthService {
       this.router.navigate(['/auth/login']);
     });
     this.clearRefreshTimer();
-    localStorage.removeItem('token');
-    localStorage.removeItem('refToken');
+    localStorage.clear();
     this.router.navigate(['/auth/login']);
+    document.cookie = `refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   }
 
   clearRefreshTimer() {
@@ -230,22 +248,47 @@ export class AuthService {
   }
   hasAnyPermission(permissions: string[]): boolean {
     const storedUser = localStorage.getItem('user');
+    // console.log('stored user: ', storedUser);
     const user: User | null =
       this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
-
-    if (!user || !user.userPermissions?.length) {
+    console.log('stored user: ', user);
+    if (!user) {
       return false;
     }
+    if (!permissions || permissions.length == 0) return true;
 
-    const userPerms = user.userPermissions
+    let userPerms = (user.userPermissions ?? [])
       .map((up) => up.permission?.name?.toLowerCase() || '')
-      .filter((p) => !!p); // filter out empty
-    const isAdmin = userPerms.includes(Permissions.AdminAccess.toLowerCase());
+      .filter(Boolean);
+    const rolePerms =
+      user.userRoles
+        ?.flatMap(
+          (ur) =>
+            ur.role?.rolePermissions?.map((rp) =>
+              rp.permission?.name.toLowerCase()
+            ) ?? []
+        )
+        .filter(Boolean) ?? [];
 
-    const hasMatch = permissions.some((required) =>
+    userPerms = Array.from(
+      new Set([...userPerms, ...rolePerms.map((a) => a)])
+    ).filter(Boolean);
+
+    // console.log('user perm: ', userPerms);
+
+    const isAdmin =
+      userPerms.includes(Permissions.AdminAccess.toLowerCase()) ||
+      (user.userRoles ?? []).some(
+        (role) => role.role?.name?.toLowerCase() === 'admin'
+      );
+
+    if (isAdmin) {
+      return true;
+    }
+
+    const has = permissions.some((required) =>
       userPerms.includes(required.toLowerCase())
     );
-
-    return hasMatch;
+    return has;
   }
 }

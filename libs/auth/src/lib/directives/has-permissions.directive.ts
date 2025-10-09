@@ -3,13 +3,13 @@ import {
   Input,
   TemplateRef,
   ViewContainerRef,
-  OnInit
-} from '@angular/core'; 
+  OnInit,
+} from '@angular/core';
 import { AuthService } from '../auth.service';
 
 @Directive({
   selector: '[libHasAnyPermission]',
-  standalone: true
+  standalone: true,
 })
 export class HasAnyPermissionDirective implements OnInit {
   @Input('libHasAnyPermission') permissions: string[] = [];
@@ -21,8 +21,9 @@ export class HasAnyPermissionDirective implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('shared permissions: ', this.permissions);
     const hasAny = this.auth.hasAnyPermission(this.permissions);
-     if (hasAny || !this.permissions || this.permissions.length === 0) {
+    if (hasAny || !this.permissions || this.permissions.length === 0) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainer.clear();

@@ -217,6 +217,9 @@ export const LeaveRequestApprovalStore = signalStore(
             leaveApprovals: store
               .leaveApprovals()
               .map((a) => (a.id === body.approvalId ? updated ?? a : a)),
+            myLeaveRequestApprovals: store
+              .myLeaveRequestApprovals()
+              .map((a) => (a.id === body.approvalId ? updated ?? a : a)),
             isLoading: false,
             error: null,
           });
