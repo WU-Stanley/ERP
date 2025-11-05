@@ -10,6 +10,7 @@ import { UserPermissionDto } from './dtos/permission.dto';
 import { User } from './dtos/user.dto';
 import { RoleDto } from './dtos/role.dto';
 import { Permissions } from './enums/permissions.enum';
+import { JobCategoryDto } from './dtos/jobcategory.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +26,12 @@ export class AuthService {
   private http = inject(HttpClient);
   private env = inject<AppEnvironment>(ENVIRONMENT);
   constructor(private router: Router) {}
-
+  getJobCategories() {
+    return this.http.get<ApiResponse<JobCategoryDto[]>>(
+      this.env.apiUrl + '/Employees/GetJobCategories',
+      { withCredentials: true }
+    );
+  }
   addEmploymentType(value: any) {
     return this.http.post<ApiResponse<EmploymentTypeDto>>(
       this.env.apiUrl + '/auth/create-employment-type',
@@ -160,9 +166,13 @@ export class AuthService {
   }
 
   addStaff(value: CreateStaffDto) {
-    return this.http.post<object>(this.env.apiUrl + '/auth/register', value, {
-      withCredentials: true,
-    });
+    return this.http.post<object>(
+      this.env.apiUrl + '/employees/create',
+      value,
+      {
+        withCredentials: true,
+      }
+    );
   }
   setEnv(tokenRes: any) {
     localStorage.setItem('token', tokenRes.token);

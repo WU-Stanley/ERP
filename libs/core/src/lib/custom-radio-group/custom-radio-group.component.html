@@ -1,3 +1,19 @@
-<div class="custom-radio-group">
-  <ng-content></ng-content>
+<div class="radio-group-container">
+  <span *ngIf="label" class="block font-semibold mb-2">{{ label }}</span>
+
+  <div class="flex flex-col gap-2">
+    <label
+      *ngFor="let option of options"
+      class="flex items-center gap-2 cursor-pointer"
+    >
+      <input
+        type="radio"
+        [disabled]="disabled"
+        [value]="option[valueKey]"
+        [checked]="value === option[valueKey]"
+        (change)="selectOption(option[valueKey])"
+      />
+      <span>{{ option[labelKey] }}</span>
+    </label>
+  </div>
 </div>

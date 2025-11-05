@@ -32,6 +32,7 @@
       color: #999;
       pointer-events: none;
       transition: 0.2s ease all;
+      background-color: transparent;
     }
 
     &.focused label,
@@ -39,9 +40,10 @@
       top: -6px;
       left: 6px;
       font-size: 12px;
-      background: white;
+      background: transparent;
       padding: 0 4px;
-      color: #13461c;;
+      color: #13461c;
+      font-size: large;
     }
 
     .input-field {
@@ -69,4 +71,3 @@
     margin-top: 2px;
   }
 }
-

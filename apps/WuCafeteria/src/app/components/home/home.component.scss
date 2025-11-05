@@ -1,0 +1,35 @@
+.login-selection-container {
+  @apply relative h-screen w-screen bg-cover bg-center;
+  background-image: url('/images/BackImg.jpg');
+}
+
+.overlay {
+  @apply absolute inset-0 bg-black/60 flex items-center justify-center;
+}
+
+.content {
+  @apply text-center text-white space-y-6;
+}
+.title {
+  @apply text-4xl md:text-5xl font-bold;
+}
+
+.subtitle {
+  @apply text-lg md:text-xl opacity-90;
+}
+
+.button-group {
+  @apply flex flex-col md:flex-row justify-center gap-6;
+}
+
+.btn {
+  @apply px-8 py-3 rounded-xl text-lg font-semibold transition-all duration-300;
+}
+
+.vendor {
+  @apply bg-yellow-500 hover:bg-yellow-600;
+}
+
+.student {
+  @apply bg-green-600 hover:bg-green-700;
+}

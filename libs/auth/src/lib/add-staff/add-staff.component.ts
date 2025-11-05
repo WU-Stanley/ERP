@@ -3,6 +3,8 @@ import {
   CustomInputComponent,
   CustomSelectComponent,
   SubmitRoundedButtonComponent,
+  CustomRadioGroupComponent,
+  CustomRadioComponent,
 } from '@erp/core';
 import { RoleService } from '../role.service';
 import { DepartmentService } from '../department.service';
@@ -19,6 +21,9 @@ import { AuthService } from '../auth.service';
 import { UserTypeDto } from '../dtos/usertype.dto';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserTypeService } from '../user-type.service';
+import { JobCategoryDto } from '../dtos/jobcategory.dto';
+import { CommonModule } from '@angular/common';
+import { CdkObserveContent } from '@angular/cdk/observers';
 
 @Component({
   selector: 'lib-add-staff',
@@ -29,8 +34,12 @@ import { UserTypeService } from '../user-type.service';
     SubmitRoundedButtonComponent,
     CustomSelectComponent,
     FormsModule,
+    CommonModule,
     ReactiveFormsModule,
     MatSnackBarModule,
+    CdkObserveContent,
+    CustomRadioGroupComponent,
+    CustomRadioComponent,
   ],
 })
 export class AddStaffComponent implements OnInit {
@@ -40,6 +49,7 @@ export class AddStaffComponent implements OnInit {
   userTypes: UserTypeDto[] = [];
   employmentTypes: any[] = [];
   isProcessing = false;
+  jobCategories: JobCategoryDto[] = [];
 
   constructor(
     private roleService: RoleService,
@@ -55,6 +65,7 @@ export class AddStaffComponent implements OnInit {
     this.getDepartments();
     this.getUserTypes();
     this.getEmploymentTypes();
+    this.getJobCategories();
 
     this.userForm = this.fb.group({
       userEmail: ['', [Validators.required, Validators.email]],
@@ -62,8 +73,10 @@ export class AddStaffComponent implements OnInit {
       lastName: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
       userName: [''],
+      jobTitle: ['', [Validators.required]],
       userTypeId: ['', [Validators.required]],
       departmentId: ['', [Validators.required]],
+      jobCategoryId: ['', [Validators.required]],
       dateCreated: [new Date()],
       password: ['', [Validators.required]],
       employmentTypeId: ['', [Validators.required]],
@@ -86,6 +99,12 @@ export class AddStaffComponent implements OnInit {
         this.employmentTypes = employmentTypes.data;
       }
       console.log('employment types: ', this.employmentTypes);
+    });
+  }
+  getJobCategories() {
+    this.authService.getJobCategories().subscribe((jobCategories) => {
+      console.log('job categories: ', jobCategories);
+      this.jobCategories = jobCategories.data ?? [];
     });
   }
   getRoles() {

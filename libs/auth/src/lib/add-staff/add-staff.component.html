@@ -12,7 +12,7 @@
         type="email"
         label="Email"
         placeholder="Enter staff email"
-      />
+      ></lib-custom-input>
     </div>
     <div class="mb-4">
       <lib-custom-input
@@ -31,6 +31,25 @@
         label="Last Name"
         placeholder="Enter staff lastname"
       ></lib-custom-input>
+      <lib-custom-input
+        formControlName="jobTitle"
+        id="jobTitle"
+        name="jobTitle"
+        type="text"
+        label="Job Title"
+        placeholder="Enter staff job title"
+      ></lib-custom-input>
+      <!-- JobCategory -->
+    </div>
+    <div class="mb-4 ml-6">
+      <lib-custom-radio-group
+        [options]="jobCategories"
+        label="Job Category"
+        formControlName="jobCategoryId"
+        valueKey="id"
+        labelKey="name"
+      >
+      </lib-custom-radio-group>
     </div>
     <div class="mb-4">
       <lib-custom-select

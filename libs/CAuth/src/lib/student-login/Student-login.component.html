@@ -1,0 +1,37 @@
+<div class="student-login-container">
+  <div class="overlay">
+    <div class="login-card">
+      <h2 class="title">Student Login</h2>
+      <p class="subtitle">Sign in with your JAMB Number or Email</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <lib-custom-input
+          formControlName="email"
+          [label]="'Email'"
+          [id]="'email'"
+          [name]="'email'"
+          placeholder="Enter your JAMB No or Email"
+          [type]="'text'"
+          (focused)="(true)"
+        ></lib-custom-input>
+        <lib-custom-input
+          formControlName="password"
+          [label]="'Password'"
+          [id]="'password'"
+          [name]="'password'"
+          placeholder="Enter your portal password"
+          [type]="showPassword ? 'text' : 'password'"
+          (hidePasswordAction)="showPassword = !showPassword"
+        ></lib-custom-input>
+
+        <button type="submit" [disabled]="loading">
+          {{ loading ? 'Authenticating...' : 'Login' }}
+        </button>
+      </form>
+
+      <p class="footer">
+        <a href="#">Forgot password?</a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -3,3 +3,13 @@
   flex-direction: column; // Radios usually stacked vertically
   gap: 8px; // Spacing between individual radio buttons
 }
+.radio-group-container {
+  display: flex;
+  flex-direction: column;
+}
+
+input[type='radio'] {
+  accent-color: #2563eb; // Tailwind blue-600 style
+  width: 20px;
+  height: 20px;
+}
