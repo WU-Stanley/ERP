@@ -12,7 +12,12 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { CustomInputComponent, SubmitButtonComponent } from '@erp/core';
+import {
+  CustomInputComponent,
+  SubmitButtonComponent,
+  SubmitRoundedButtonComponent,
+} from '@erp/core';
+import { AuthService } from '../auth.service';
 @Component({
   selector: 'lib-student-login',
   templateUrl: './student-login.component.html',
@@ -22,6 +27,7 @@ import { CustomInputComponent, SubmitButtonComponent } from '@erp/core';
     ReactiveFormsModule,
     CustomInputComponent,
     SubmitButtonComponent,
+    SubmitRoundedButtonComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   standalone: true,
@@ -32,9 +38,13 @@ export class StudentLoginComponent {
   loading = false;
   showPassword = false;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.loginForm = this.fb.group({
-      identifier: ['', [Validators.required]], // JAMB No or Email
+      userName: ['', [Validators.required]], // JAMB No or Email
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
@@ -53,10 +63,15 @@ export class StudentLoginComponent {
     this.loading = true;
 
     // Simulate API authentication
-    setTimeout(() => {
-      this.loading = false;
-      alert('Login successful! Redirecting...');
-      this.router.navigate(['/student-dashboard']);
-    }, 1500);
+    this.authService.loginStudent(this.loginForm.value).subscribe(
+      (res) => {
+        console.log('student login response: ', res);
+        this.router.navigate(['/student/dashboard']);
+      },
+      (error) => {
+        console.log('Error in login: ', error);
+        this.loading = false;
+      }
+    );
   }
 }

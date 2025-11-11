@@ -1,36 +1,54 @@
 <div class="student-login-container">
-  <div class="overlay">
-    <div class="login-card">
-      <h2 class="title">Student Login</h2>
-      <p class="subtitle">Sign in with your JAMB Number or Email</p>
+  <div class="overlay flex justify-center items-center">
+    <div
+      class="login-card flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-[90%] max-w-md"
+    >
+      <h2 class="title text-3xl font-bold text-green-800 mb-2">
+        Student Login
+      </h2>
+      <p class="subtitle text-gray-600 mb-6 text-center">
+        Sign in with your JAMB Number or Email
+      </p>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        class="w-full flex flex-col"
+      >
         <lib-custom-input
-          formControlName="email"
+          formControlName="userName"
           [label]="'Email'"
-          [id]="'email'"
+          [id]="'userName'"
           [name]="'email'"
           placeholder="Enter your JAMB No or Email"
           [type]="'text'"
-          (focused)="(true)"
         ></lib-custom-input>
+
         <lib-custom-input
           formControlName="password"
           [label]="'Password'"
           [id]="'password'"
           [name]="'password'"
+          customClass="w-full"
           placeholder="Enter your portal password"
           [type]="showPassword ? 'text' : 'password'"
           (hidePasswordAction)="showPassword = !showPassword"
         ></lib-custom-input>
 
-        <button type="submit" [disabled]="loading">
-          {{ loading ? 'Authenticating...' : 'Login' }}
-        </button>
+        <div class="flex justify-center mt-4 w">
+          <lib-submit-rounded-button
+            type="submit"
+            label="Login"
+            [disabled]="loading"
+            [isProcessing]="loading"
+            customClass="w-full uppercase"
+            size="lg"
+          ></lib-submit-rounded-button>
+        </div>
       </form>
 
-      <p class="footer">
-        <a href="#">Forgot password?</a>
+      <p class="footer text-center mt-6">
+        <a href="#" class="text-green-700 hover:underline">Forgot password?</a>
       </p>
     </div>
   </div>

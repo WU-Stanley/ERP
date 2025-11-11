@@ -31,22 +31,23 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() readonly = false;
   @Input() required = false;
   @Input() autocomplete = 'off';
-  @Input() width='300px';
-  @Input() height='2rem';
-  oldType = ''
+  @Input() width = '300px';
+  @Input() height = '2rem';
+  @Input() customClass = '';
+  oldType = '';
   value = '';
   focused = false;
   hidePassword = true;
-  @Output() hidePasswordAction=new EventEmitter(false);
+
+  @Output() hidePasswordAction = new EventEmitter(false);
 
   private _ngControl: NgControl | null = null;
-
 
   constructor(private injector: Injector) {}
 
   ngOnInit() {
     try {
-      this.oldType=this.type;
+      this.oldType = this.type;
       this._ngControl = this.injector.get(NgControl, null);
       if (this._ngControl) {
         this._ngControl.valueAccessor = this;
@@ -65,10 +66,10 @@ export class CustomInputComponent implements ControlValueAccessor {
   }
 
   onChange: (val: any) => void = () => {
-    // 
+    //
   };
   onTouched: () => void = () => {
-    // 
+    //
   };
 
   registerOnChange(fn: any): void {
@@ -90,16 +91,22 @@ export class CustomInputComponent implements ControlValueAccessor {
   }
 
   get inputType(): string {
-    return this.type === 'password' && this.hidePassword ? 'password' : this.type;
+    return this.type === 'password' && this.hidePassword
+      ? 'password'
+      : this.type;
   }
 
-  togglePasswordVisibility() { 
+  togglePasswordVisibility() {
     this.hidePassword = !this.hidePassword;
     this.hidePasswordAction.emit(this.hidePassword);
   }
 
   hasError(): boolean {
-    return !!this.formControl && this.formControl.invalid && (this.formControl.touched || this.formControl.dirty);
+    return (
+      !!this.formControl &&
+      this.formControl.invalid &&
+      (this.formControl.touched || this.formControl.dirty)
+    );
   }
 
   get errorMessage(): string {
