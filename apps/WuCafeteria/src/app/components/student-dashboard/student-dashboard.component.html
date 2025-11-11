@@ -1,13 +1,101 @@
-<div class="meal-container">
-  <div class="meal-card" *ngFor="let meal of menuItems">
-    <img [src]="meal.imageUrl" alt="{{ meal.name }}" class="meal-image" />
-    <h3>{{ meal.name }}</h3>
-    <p>{{ meal.description }}</p>
-    <p><strong>Price:</strong> ₦{{ meal.price }}</p>
-    <p><strong>Vendor:</strong> {{ meal.vendor.businessName }}</p>
-    <div class="button-group">
-      <button (click)="apply(meal.id)">Apply</button>
-      <button (click)="viewDetail(meal.id)">View Detail</button>
+<div class="flex flex-col min-h-screen bg-slate-50 text-slate-800 font-sans">
+  <!-- ====== TOP NAVBAR ====== -->
+  <header
+    class="flex items-center justify-between bg-white shadow-md px-6 py-3 sticky top-0 z-50 border-b border-slate-200"
+  >
+    <!-- Brand -->
+    <div class="flex items-center gap-2">
+      <img src="/images/Logo.png" alt="MWU Logo" class="w-8 h-8" />
+      <h2 class="text-xl font-bold text-emerald-700">WU Cafeteria</h2>
     </div>
+
+    <!-- Right Section -->
+    <div class="flex items-center gap-4">
+      <!-- Profile -->
+      <div class="flex items-center gap-2">
+        <!-- <img
+          src="assets/images/profile.png"
+          alt="User Profile"
+          class="w-9 h-9 rounded-full object-cover"
+        /> -->
+        <span class="hidden sm:inline text-sm font-medium text-slate-600"
+          >Welcome, {{ userName }}</span
+        >
+      </div>
+
+      <!-- Logout Button -->
+      <button
+        (click)="logout()"
+        class="flex items-center gap-2 bg-emerald-700 text-white text-sm font-medium px-3 py-2 rounded-md hover:bg-emerald-800 transition"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
+          />
+        </svg>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- ====== MAIN AREA ====== -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- ====== SIDEBAR ====== -->
+    <aside
+      class="w-56 bg-white border-r border-slate-200 shadow-sm p-4 flex flex-col justify-between"
+    >
+      <nav class="flex flex-col gap-3 mt-4">
+        <a
+          routerLink="/student/dashboard"
+          routerLinkActive="bg-emerald-700 !text-white"
+          class="px-4 py-2 rounded-md text-slate-700 hover:bg-emerald-100 hover:text-emerald-800 transition"
+        >
+          Dashboard
+        </a>
+
+        <a
+          routerLink="/student/order-history"
+          routerLinkActive="bg-emerald-700 !text-white"
+          class="px-4 py-2 rounded-md text-slate-700 hover:bg-emerald-100 hover:text-emerald-800 transition"
+        >
+          Order History
+        </a>
+
+        <a
+          routerLink="/student/purchase-behavior"
+          routerLinkActive="bg-emerald-700 !text-white"
+          class="px-4 py-2 rounded-md text-slate-700 hover:bg-emerald-100 hover:text-emerald-800 transition"
+        >
+          Purchase Behavior
+        </a>
+
+        <a
+          routerLink="/student/dashboard/menu"
+          routerLinkActive="bg-emerald-700 !text-white"
+          class="px-4 py-2 rounded-md text-slate-700 hover:bg-emerald-100 hover:text-emerald-800 transition"
+        >
+          Meal Menu
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="border-t border-slate-200 pt-4 text-sm text-slate-500">
+        © 2025 MWU Cafeteria
+      </div>
+    </aside>
+
+    <!-- ====== CONTENT AREA ====== -->
+    <main class="flex-1 p-6 overflow-y-auto bg-slate-50">
+      <router-outlet></router-outlet>
+    </main>
   </div>
 </div>

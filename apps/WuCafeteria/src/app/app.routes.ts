@@ -29,5 +29,21 @@ export const appRoutes: Route[] = [
       import('./components/student-dashboard/student-dashboard.component').then(
         (s) => s.StudentDashboardComponent
       ),
+    children: [
+      {
+        path: 'menu',
+        loadComponent: () =>
+          import('./components/menu-items/Menu-Items.component').then(
+            (m) => m.MenuItemsComponent
+          ),
+      },
+      {
+        path: 'menu/:id',
+        loadComponent: () =>
+          import(
+            './components/Menu-Item-detail/Menu-Item-detail.component'
+          ).then((m) => m.MenuItemDetailComponent),
+      },
+    ],
   },
 ];
