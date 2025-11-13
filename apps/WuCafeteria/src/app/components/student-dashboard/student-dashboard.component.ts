@@ -9,6 +9,7 @@ import {
   withDefaultRegisterables,
 } from 'ng2-charts';
 import { MenuItemsComponent } from '../menu-items/Menu-Items.component';
+import { AlertService } from 'libs/core/src/lib/alert.service';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -19,41 +20,16 @@ import { MenuItemsComponent } from '../menu-items/Menu-Items.component';
   providers: [provideCharts(withDefaultRegisterables())],
 })
 export class StudentDashboardComponent implements OnInit {
-  logout() {
-    throw new Error('Method not implemented.');
-  }
-  userName = localStorage.getItem('WUName') || 'Student';
-  orders = [
-    { id: '001', item: 'Ukasi Soup', date: '2025-11-03', amount: 1500 },
-    { id: '002', item: 'Jollof Rice', date: '2025-10-31', amount: 2500 },
-    { id: '003', item: 'Ukasi Soup', date: '2025-10-31', amount: 1500 },
-  ];
-
-  chartData = {
-    labels: ['August', 'September', 'October', 'November'],
-    datasets: [
-      {
-        label: 'Purchase Amount (₦)',
-        data: [3000, 4500, 6000, 4000],
-        backgroundColor: 'rgba(0, 120, 212, 0.6)',
-      },
-    ],
-  };
-  menuOpen = false;
-  toggleMenu() {
-    this.menuOpen = !this.menuOpen;
-  }
-  apply(arg0: string) {
-    throw new Error('Method not implemented.');
-  }
-  viewDetail(arg0: string) {
-    throw new Error('Method not implemented.');
-  }
   menuItems: MenuItem[] = [];
   constructor(
     private router: Router,
-    private menuItemService: MenuItemService
+    private menuItemService: MenuItemService,
+    private alertService: AlertService
   ) {}
+  closeSidebar() {
+    this.showSidebar = false;
+  }
+  showSidebar = true;
 
   ngOnInit() {
     console.log('student dashboard: ');
@@ -63,6 +39,25 @@ export class StudentDashboardComponent implements OnInit {
     this.menuItemService.getMenuItems().subscribe((res) => {
       console.log('Menu Items: ', res);
       this.menuItems = res.data ?? [];
+    });
+  }
+  toggleSidebar() {
+    this.showSidebar = !this.showSidebar;
+  }
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/auth/student']);
+  }
+  userName = localStorage.getItem('WUName') || 'Student';
+
+  menuOpen = false;
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+  apply(mealId: string) {
+    const studentId = localStorage.getItem('WUStudentId') || '';
+    this.menuItemService.orderMeal(studentId, mealId).subscribe((res) => {
+      console.log('Order response: ', res);
     });
   }
 }

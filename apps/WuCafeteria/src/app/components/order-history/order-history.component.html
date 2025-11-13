@@ -1,0 +1,87 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  <!-- Loading & Error States -->
+  <div *ngIf="isLoading" class="text-center text-gray-500 py-10 text-lg">
+    Loading meal order history...
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="text-center text-red-600 py-6">
+    {{ errorMessage }}
+  </div>
+
+  <!-- No Orders -->
+  <div
+    *ngIf="!isLoading && !errorMessage && mealOrders.length === 0"
+    class="text-center text-gray-500 italic py-10"
+  >
+    No meal orders found.
+  </div>
+
+  <!-- Orders Grid -->
+  <div
+    *ngIf="mealOrders.length > 0"
+    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6"
+  >
+    <div
+      *ngFor="let order of mealOrders"
+      class="bg-white rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden"
+    >
+      <!-- Image -->
+      <div class="relative">
+        <img
+          [src]="order.imageUrl"
+          alt="{{ order.menuItemName }}"
+          class="w-full h-48 object-cover"
+        />
+        <span
+          class="absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full"
+          [ngClass]="
+            order.isRedeemed
+              ? 'bg-green-500 text-white'
+              : 'bg-yellow-400 text-gray-800'
+          "
+        >
+          {{ order.isRedeemed ? 'Redeemed' : 'Pending' }}
+        </span>
+      </div>
+
+      <!-- Content -->
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 truncate">
+          {{ order.menuItemName }}
+        </h3>
+        <p class="text-gray-600 text-sm mt-1 line-clamp-2">
+          {{ order.description }}
+        </p>
+
+        <div
+          class="flex items-center justify-between mt-4 text-sm text-gray-500"
+        >
+          <div class="flex items-center space-x-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-blue-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 4h10a2 2 0 012 2v9a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2zm3 5h4"
+              />
+            </svg>
+            <span>{{ order.claimTime | date : 'mediumDate' }}</span>
+          </div>
+
+          <button
+            class="text-blue-600 hover:text-blue-800 font-medium"
+            (click)="viewDetails(order)"
+          >
+            Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

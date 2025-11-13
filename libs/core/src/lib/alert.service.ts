@@ -15,10 +15,13 @@ export class AlertService {
     });
   }
 
-  showError(message: string) {
+  showError(
+    message: string,
+    classList: string[] = ['error-snackbar', 'rounded-md']
+  ) {
     this.matSnackBar.open(message, 'Close', {
       duration: 3000,
-      panelClass: ['error-snackbar'],
+      panelClass: classList,
     });
   }
 }

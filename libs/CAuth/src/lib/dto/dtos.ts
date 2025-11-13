@@ -1,3 +1,4 @@
+import { get } from 'https';
 import { FeedingTimeLst, User } from './user.dto';
 
 // 🔹 Enum equivalent for MealOrderStatus
@@ -96,4 +97,24 @@ export interface Student {
   hasFreeMealEntitlement: boolean;
   mealOrders: MealOrder[];
   verifiedMealRedemptions: MealRedemption[];
+}
+export interface MealOrderDTO {
+  menuItemId: string;
+  id: string;
+  menuItemName: string;
+  description: string;
+  claimTime: string;
+  isRedeemed: boolean;
+  imageUrl: string;
+  status: string;
+  price: number;
+  vendorName: string;
+}
+export interface FavoriteMenu {
+  id: string; // Guid
+  userId: number;
+  menuItemId: string;
+  savedAt: string; // DateTime
+  menuItem: MenuItem;
+  user: User;
 }

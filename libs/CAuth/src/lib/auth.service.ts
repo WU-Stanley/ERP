@@ -46,7 +46,7 @@ export class AuthService {
     return this.accessToken ?? localStorage.getItem('token');
   }
   loginStudent(formValue: { email: string; password: string }) {
-    return this.http.post<ApiResponse<User>>(
+    return this.http.post<any>(
       this.env.apiUrl + '/auth/login/student',
       formValue,
       { withCredentials: false }

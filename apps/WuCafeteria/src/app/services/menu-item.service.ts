@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { MenuItem } from 'libs/CAuth/src/lib/dto/dtos';
+import { FavoriteMenu, MenuItem } from 'libs/CAuth/src/lib/dto/dtos';
 import { ApiResponse } from 'libs/CAuth/src/lib/ApiResponse';
 import { A } from '@angular/cdk/activedescendant-key-manager.d-Bjic5obv';
 
@@ -17,12 +17,21 @@ export class MenuItemService {
       this.baseUrl + '/GetAvailableMenuItems'
     );
   }
-  orderMeal(id: string) {
-    return this.http.post(`${this.baseUrl}/OrderMeal`, { id });
+  orderMeal(studentId: string, mealId: string) {
+    return this.http.post(`${this.baseUrl}/Order`, { studentId, mealId });
   }
   getById(id: string) {
     return this.http.get<ApiResponse<MenuItem>>(
       `${this.baseUrl}/GetMenuById?id=${id}`
+    );
+  }
+  saveFavoriteMeal(menuItemId: string, userId: number) {
+    return this.http.post<ApiResponse<FavoriteMenu>>(
+      `${this.baseUrl}/SaveFavoriteMeal`,
+      {
+        menuItemId,
+        userId,
+      }
     );
   }
 }

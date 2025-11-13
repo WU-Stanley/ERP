@@ -66,6 +66,7 @@ export class StudentLoginComponent {
     this.authService.loginStudent(this.loginForm.value).subscribe(
       (res) => {
         console.log('student login response: ', res);
+        localStorage.setItem('token', res.token || '');
         this.router.navigate(['/student/dashboard']);
       },
       (error) => {

@@ -44,6 +44,13 @@ export const appRoutes: Route[] = [
             './components/Menu-Item-detail/Menu-Item-detail.component'
           ).then((m) => m.MenuItemDetailComponent),
       },
+      {
+        path: 'order-history',
+        loadComponent: () =>
+          import('./components/order-history/order-history.component').then(
+            (m) => m.OrderHistoryComponent
+          ),
+      },
     ],
   },
 ];

@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrl: './Menu-Items.component.scss',
 })
 export class MenuItemsComponent {
-  apply(arg0: string) {
+  apply(menuItemId: string) {
     throw new Error('Method not implemented.');
   }
   viewDetail(menuId: string) {
