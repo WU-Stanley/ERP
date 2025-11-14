@@ -67,7 +67,8 @@ export class StudentLoginComponent {
       (res) => {
         console.log('student login response: ', res);
         localStorage.setItem('token', res.token || '');
-        this.router.navigate(['/student/dashboard']);
+        localStorage.setItem('WUName', res.username || '');
+        this.router.navigate(['/student/dashboard/menu']);
       },
       (error) => {
         console.log('Error in login: ', error);

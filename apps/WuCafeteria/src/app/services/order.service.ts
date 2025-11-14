@@ -12,6 +12,10 @@ export class OrderService {
   route = environment.apiUrl + '/order';
   constructor(private http: HttpClient) {}
 
+  confirmOrderReceived(id: string, userId: number) {
+    const url = `${this.route}/ConfirmMealReceived/${id}?userId=${userId}`;
+    return this.http.post<ApiResponse<any>>(url, {});
+  }
   placeOrder(studentId: string, mealId: string) {
     const url = `${this.route}/`;
     const body = { studentId, menuItemId: mealId };

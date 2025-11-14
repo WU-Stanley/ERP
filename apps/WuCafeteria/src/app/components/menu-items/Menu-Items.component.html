@@ -1,3 +1,8 @@
+<nav class="text-sm text-gray-500 mb-2">
+  Home / Student / Dashboard /<span class="text-gray-700 font-medium"
+    >Menu Items</span
+  >
+</nav>
 <div class="flex flex-wrap gap-6 justify-center p-6 bg-gray-50">
   <div
     class="bg-white rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden w-64 flex flex-col"
@@ -33,7 +38,7 @@
       <!-- Action Buttons -->
       <div class="flex justify-between items-center mt-4">
         <button
-          (click)="apply(meal.id)"
+          (click)="orderMeal(meal.id)"
           class="px-3 py-2 rounded-lg bg-emerald-800 text-white text-sm font-medium hover:bg-emerald-700 transition"
         >
           Order Now

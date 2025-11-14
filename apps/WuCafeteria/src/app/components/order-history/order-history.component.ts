@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { MealOrderDTO } from 'libs/CAuth/src/lib/dto/dtos';
 import { Router } from '@angular/router';
+import { SpinnerComponent } from '@erp/core';
 
 @Component({
   selector: 'app-order-history',
-  imports: [CommonModule],
+  imports: [CommonModule, SpinnerComponent],
   templateUrl: './order-history.component.html',
   styleUrl: './order-history.component.scss',
 })
@@ -26,7 +27,8 @@ export class OrderHistoryComponent {
     this.mealOrderService.getStudentOrderHistory(userId).subscribe({
       next: (res) => {
         console.log('order history', res);
-        this.mealOrders = res.data ?? [];
+        this.mealOrders =
+          res.data?.map((order) => ({ ...order, isProcessing: false })) ?? [];
         this.isLoading = false;
       },
       error: (error) => {
@@ -38,5 +40,24 @@ export class OrderHistoryComponent {
   }
   viewDetails(order: MealOrderDTO) {
     this.router.navigate(['/student/dashboard/menu', order.menuItemId]);
+  }
+  confirmReceived(order: MealOrderDTO) {
+    const userId = localStorage.getItem('WUStudentId');
+    order.isProcessing = true;
+    this.mealOrderService
+      .confirmOrderReceived(order.id, Number(userId))
+      .subscribe({
+        next: (res) => {
+          order.isProcessing = false;
+          console.log('Order confirmed received:', res);
+          alert('Order marked as received.');
+          this.loadMealOrders(); // Refresh the order list
+        },
+        error: (error) => {
+          order.isProcessing = false;
+          console.error('Error confirming order received:', error);
+          alert('Failed to confirm order received.');
+        },
+      });
   }
 }

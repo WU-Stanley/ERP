@@ -12,8 +12,12 @@ import { Router } from '@angular/router';
   styleUrl: './Menu-Items.component.scss',
 })
 export class MenuItemsComponent {
-  apply(menuItemId: string) {
-    throw new Error('Method not implemented.');
+  orderMeal(menuItemId: string) {
+    const studentId = localStorage.getItem('WUStudentId') || '';
+    this.menuItemService.orderMeal(studentId, menuItemId).subscribe((res) => {
+      console.log('Order response: ', res);
+      alert('Order placed successfully!');
+    });
   }
   viewDetail(menuId: string) {
     this.router.navigate(['/student/dashboard/menu', menuId]);

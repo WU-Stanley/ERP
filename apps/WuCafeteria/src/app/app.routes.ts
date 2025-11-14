@@ -51,6 +51,13 @@ export const appRoutes: Route[] = [
             (m) => m.OrderHistoryComponent
           ),
       },
+      {
+        path: 'favorite-meals',
+        loadComponent: () =>
+          import('./components/favorite-meal/favorite-meal.component').then(
+            (m) => m.FavoriteMealComponent
+          ),
+      },
     ],
   },
 ];

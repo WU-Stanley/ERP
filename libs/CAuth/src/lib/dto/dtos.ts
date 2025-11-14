@@ -109,6 +109,7 @@ export interface MealOrderDTO {
   status: string;
   price: number;
   vendorName: string;
+  isProcessing?: boolean;
 }
 export interface FavoriteMenu {
   id: string; // Guid

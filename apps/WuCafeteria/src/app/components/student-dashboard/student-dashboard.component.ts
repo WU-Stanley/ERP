@@ -3,11 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MenuItemService } from '../../services/menu-item.service';
 import { MenuItem } from 'libs/CAuth/src/lib/dto/dtos';
-import {
-  BaseChartDirective,
-  provideCharts,
-  withDefaultRegisterables,
-} from 'ng2-charts';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { MenuItemsComponent } from '../menu-items/Menu-Items.component';
 import { AlertService } from 'libs/core/src/lib/alert.service';
 
@@ -20,6 +16,7 @@ import { AlertService } from 'libs/core/src/lib/alert.service';
   providers: [provideCharts(withDefaultRegisterables())],
 })
 export class StudentDashboardComponent implements OnInit {
+  userName = localStorage.getItem('WUName') || 'Student';
   menuItems: MenuItem[] = [];
   constructor(
     private router: Router,
@@ -48,7 +45,6 @@ export class StudentDashboardComponent implements OnInit {
     localStorage.clear();
     this.router.navigate(['/auth/student']);
   }
-  userName = localStorage.getItem('WUName') || 'Student';
 
   menuOpen = false;
   toggleMenu() {
