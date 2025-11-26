@@ -1,0 +1,53 @@
+<div class="student-login-container">
+  <div class="overlay flex justify-center items-center">
+    <div
+      class="flex flex-col items-center justify-center bg-transparent/30 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-[90%] max-w-md"
+    >
+      <h2 class="title text-3xl font-bold text-green-800 mb-2">Vendor Login</h2>
+      <p class="subtitle text-green-800 mb-6 text-center">
+        Sign in with your Email and Password
+      </p>
+
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        class="w-full flex flex-col"
+      >
+        <lib-custom-input
+          formControlName="userName"
+          [label]="'Email'"
+          [id]="'userName'"
+          [name]="'email'"
+          placeholder="Enter your JAMB No or Email"
+          [type]="'text'"
+        ></lib-custom-input>
+
+        <lib-custom-input
+          formControlName="password"
+          [label]="'Password'"
+          [id]="'password'"
+          [name]="'password'"
+          customClass="w-full"
+          placeholder="Enter your portal password"
+          [type]="showPassword ? 'text' : 'password'"
+          (hidePasswordAction)="showPassword = !showPassword"
+        ></lib-custom-input>
+
+        <div class="flex justify-center mt-4 w">
+          <lib-submit-rounded-button
+            type="submit"
+            label="Login"
+            [disabled]="loading"
+            [isProcessing]="loading"
+            customClass="w-full uppercase"
+            size="lg"
+          ></lib-submit-rounded-button>
+        </div>
+      </form>
+
+      <p class="footer text-center mt-6">
+        <a href="#" class="text-green-700 hover:underline">Forgot password?</a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -80,7 +80,11 @@
           </div>
 
           <button
-            *ngIf="order.isRedeemed === false && !order.isProcessing"
+            *ngIf="
+              order.isRedeemed === false &&
+              order.isApproved &&
+              !order.isProcessing
+            "
             class="text-blue-600 hover:text-blue-800 font-medium"
             (click)="confirmReceived(order)"
           >

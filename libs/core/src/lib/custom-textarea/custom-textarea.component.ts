@@ -32,6 +32,7 @@ export class CustomTextareaComponent implements ControlValueAccessor {
 
   private _ngControl: NgControl | null = null;
   @Input() row = 1;
+  @Input() cols = 40;
 
   constructor(private injector: Injector) {}
 

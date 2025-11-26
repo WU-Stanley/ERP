@@ -99,14 +99,20 @@ export interface Student {
   verifiedMealRedemptions: MealRedemption[];
 }
 export interface MealOrderDTO {
+  orderCode: any;
   menuItemId: string;
   id: string;
   menuItemName: string;
   description: string;
   claimTime: string;
+  isApproved: boolean;
+  requestTime: string;
+  approvalTime: string;
+  userId: number;
+  vendorId: string;
+  status: MealOrderStatus;
   isRedeemed: boolean;
   imageUrl: string;
-  status: string;
   price: number;
   vendorName: string;
   isProcessing?: boolean;
@@ -118,4 +124,22 @@ export interface FavoriteMenu {
   savedAt: string; // DateTime
   menuItem: MenuItem;
   user: User;
+}
+export interface RevenueStats {
+  totalRevenue: number;
+  currentMonthRevenue: number;
+}
+
+export interface MenuItemStats {
+  id: string;
+  name: string;
+  price: number;
+  totalOrders: number;
+  revenueGenerated: number;
+}
+
+export interface BestSeller {
+  name: string;
+  orders: number;
+  revenue: number;
 }

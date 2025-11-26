@@ -16,6 +16,10 @@ export class OrderService {
     const url = `${this.route}/ConfirmMealReceived/${id}?userId=${userId}`;
     return this.http.post<ApiResponse<any>>(url, {});
   }
+  approveOrder(orderId: string, vendorId?: string) {
+    const url = `${this.route}/Approve/${orderId}/Vendor/${vendorId}`;
+    return this.http.put<ApiResponse<any>>(url, {});
+  }
   placeOrder(studentId: string, mealId: string) {
     const url = `${this.route}/`;
     const body = { studentId, menuItemId: mealId };

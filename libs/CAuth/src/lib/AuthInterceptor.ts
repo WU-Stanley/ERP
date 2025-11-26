@@ -18,7 +18,7 @@ export const AuthInterceptor: HttpInterceptorFn = (
 
   // Always include access token if available
   const token = authService.getAccessToken();
-  console.log('AuthInterceptor - token: ', token);
+  // console.log('AuthInterceptor - token: ', token);
   // Decide if withCredentials should be applied
   const requiresCredentials =
     !req.url.includes('/auth/login') || !req.url.includes('/auth/verify');

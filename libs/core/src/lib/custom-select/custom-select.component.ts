@@ -43,6 +43,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() disabled = false;
   @Input() options: string[] | object[] = [];
   @Input() labelKey = '';
+  @Input() valueKey = 'id';
   @Input() fieldValue = '';
   @Output() valueChange = new EventEmitter<any>();
   @Input() readonly = false;
@@ -171,14 +172,14 @@ export class CustomSelectComponent implements ControlValueAccessor {
         .map((v: any) => this.getLabel(v))
         .join(', ');
       const emitVal = this.labelKey
-        ? this._value.map((v: any) => v['id'])
+        ? this._value.map((v: any) => v[this.valueKey])
         : this._value;
       this.onChange(emitVal);
       this.valueChange.emit(emitVal);
     } else {
       this._value = option;
       this.searchTerm = this.getLabel(option);
-      const emitVal = this.labelKey ? option['id'] : option;
+      const emitVal = this.labelKey ? option[this.valueKey] : option;
       this.onChange(emitVal);
       this.valueChange.emit(emitVal);
       this.showDropdown = false;
@@ -204,7 +205,10 @@ export class CustomSelectComponent implements ControlValueAccessor {
   compareValues(a: any, b: any): boolean {
     if (!a || !b) return false;
     if (this.labelKey)
-      return a[this.labelKey] === b[this.labelKey] || a['id'] === b['id'];
+      return (
+        a[this.labelKey] === b[this.labelKey] ||
+        a[this.valueKey] === b[this.valueKey]
+      );
     return a === b;
   }
   getLabel(option: any): string {
@@ -215,7 +219,9 @@ export class CustomSelectComponent implements ControlValueAccessor {
 
     // fallback: find object in options by id
     if (this.labelKey && this.options && Array.isArray(this.options)) {
-      const found = (this.options as any[]).find((o) => o['id'] == option);
+      const found = (this.options as any[]).find(
+        (o) => o[this.valueKey] == option
+      );
       return found ? found[this.labelKey] : option;
     }
 
@@ -228,7 +234,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
     );
     this.searchTerm = this._value.map((v: any) => this.getLabel(v)).join(', ');
     const emitVal = this.labelKey
-      ? this._value.map((v: any) => v['id'])
+      ? this._value.map((v: any) => v[this.valueKey])
       : this._value;
     this.onChange(emitVal);
     this.valueChange.emit(emitVal);

@@ -1,1 +1,68 @@
-<p>vendor-dashboard works!</p>
+<div class="w-full p-6 space-y-10">
+  <!-- ===== Revenue Summary Cards ===== -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <app-revenue-card
+      title="Total Revenue"
+      [value]="revenueStats?.totalRevenue | currency : 'NGN'"
+    >
+      <span class="material-icons text-4xl text-green-500"> </span>
+    </app-revenue-card>
+
+    <app-revenue-card
+      title="Current Month Revenue"
+      [value]="revenueStats?.currentMonthRevenue | currency : 'NGN'"
+    >
+    </app-revenue-card>
+
+    <app-revenue-card title="Total Orders" [value]="totalOrders">
+    </app-revenue-card>
+  </div>
+
+  <!-- ===== Menu Items Table ===== -->
+  <div class="bg-white rounded-2xl shadow p-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Menu Performance</h2>
+
+    <table class="w-full text-sm">
+      <thead class="text-gray-600 bg-gray-100 border-b">
+        <tr>
+          <th class="p-3 text-left">Menu Item</th>
+          <th class="p-3 text-left">Price (NGN)</th>
+          <th class="p-3 text-left">Orders</th>
+          <th class="p-3 text-left">Revenue (NGN)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let item of menuStats"
+          class="border-b hover:bg-gray-50 transition"
+        >
+          <td class="p-3 font-medium">{{ item.name }}</td>
+          <td class="p-3">{{ item.price | number }}</td>
+          <td class="p-3">{{ item.totalOrders }}</td>
+          <td class="p-3">{{ item.revenueGenerated | number }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== Best Selling Items ===== -->
+  <div class="bg-white rounded-2xl shadow p-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+      Best Selling Items
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        *ngFor="let item of bestSellers"
+        class="p-4 rounded-xl shadow bg-green-50 border border-green-200"
+      >
+        <p class="text-lg font-semibold">{{ item.name }}</p>
+        <p class="text-gray-600 mt-1">Orders: {{ item.orders }}</p>
+        <p class="font-semibold text-gray-800">
+          Revenue: {{ item.revenue | currency : 'NGN' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

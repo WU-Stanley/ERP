@@ -70,3 +70,13 @@ export interface FeedingTimeLst {
   createdBy: User; // reference to creator
   modifiedBy?: User | null; // reference to modifier
 }
+export interface CreateMenuItemRequest {
+  mealName: string;
+  mealDescription: string;
+  mealPrice: number;
+  availableDate: Date;
+  feedingTimeId: number;
+  vendorId: string;
+  mealImage?: File | null;
+  imageUrl?: string;
+}

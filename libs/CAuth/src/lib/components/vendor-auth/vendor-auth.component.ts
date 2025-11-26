@@ -4,35 +4,34 @@ import {
   NO_ERRORS_SCHEMA,
 } from '@angular/core';
 import {
-  FormBuilder,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  FormGroup,
+  FormBuilder,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
-
 import {
   CustomInputComponent,
   SubmitButtonComponent,
   SubmitRoundedButtonComponent,
 } from '@erp/core';
-import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../auth.service';
+
 @Component({
-  selector: 'lib-student-login',
-  templateUrl: './student-login.component.html',
-  styleUrls: ['./student-login.component.scss'],
+  selector: 'lib-vendor-auth',
+  templateUrl: './vendor-auth.component.html',
+  styleUrls: ['./vendor-auth.component.scss'],
   imports: [
     FormsModule,
     ReactiveFormsModule,
     CustomInputComponent,
-    SubmitButtonComponent,
     SubmitRoundedButtonComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   standalone: true,
 })
-export class StudentLoginComponent {
+export class VendorAuthComponent {
   loginForm: FormGroup;
   submitted = false;
   loading = false;
@@ -63,12 +62,13 @@ export class StudentLoginComponent {
     this.loading = true;
 
     // Simulate API authentication
-    this.authService.loginStudent(this.loginForm.value).subscribe(
+    this.authService.vendorLogin(this.loginForm.value).subscribe(
       (res) => {
-        console.log('student login response: ', res);
+        console.log('vendor login response: ', res);
         localStorage.setItem('token', res.token || '');
         localStorage.setItem('WUName', res.username || '');
-        this.router.navigate(['/student/dashboard/menu']);
+        this.router.navigate(['/vendor/dashboard']);
+        localStorage.setItem('WUVendorId', res.vendorId || '');
       },
       (error) => {
         console.log('Error in login: ', error);

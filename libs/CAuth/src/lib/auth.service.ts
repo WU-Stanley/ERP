@@ -52,6 +52,11 @@ export class AuthService {
       { withCredentials: false }
     );
   }
+  vendorLogin(value: { email: string; password: string }) {
+    return this.http.post<any>(this.env.apiUrl + '/auth/login/vendor', value, {
+      withCredentials: false,
+    });
+  }
   logout() {
     console.log('logout clicked');
     this.http.post(this.env.apiUrl + '/auth/logout', {}).subscribe((res) => {

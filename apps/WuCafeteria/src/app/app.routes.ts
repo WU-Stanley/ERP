@@ -1,10 +1,17 @@
 import { Route } from '@angular/router';
+import { studentAuthGuard, vendorAuthGuard } from '@wucafeteria/CAuth';
+import { VendorDashboardComponent } from './components/vendor-dashboard/vendor-dashboard.component';
 
 export const appRoutes: Route[] = [
   {
     path: '',
     loadComponent: () =>
       import('./components/home/home.component').then((m) => m.HomeComponent),
+  },
+  {
+    path: 'forbidden',
+    loadComponent: () =>
+      import('@wucafeteria/CAuth').then((m) => m.ForbiddenComponent),
   },
   {
     path: 'auth/student',
@@ -18,10 +25,48 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'vendor/dashboard',
+    canActivate: [vendorAuthGuard],
     loadComponent: () =>
-      import('./components/vendor-dashboard/vendor-dashboard.component').then(
-        (m) => m.VendorDashboardComponent
+      import('./components/vendor-nav/vendor-nav.component').then(
+        (m) => m.VendorNavComponent
       ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import(
+            './components/vendor-dashboard/vendor-dashboard.component'
+          ).then((m) => m.VendorDashboardComponent),
+      },
+      {
+        path: 'create-menu-item',
+        loadComponent: () =>
+          import(
+            './components/create-menu-item/create-menu-item.component'
+          ).then((m) => m.CreateMenuItemComponent),
+      },
+      {
+        path: 'edit-menu-item/:id',
+        loadComponent: () =>
+          import('./components/edit-menu-item/edit-menu-item.component').then(
+            (m) => m.EditMenuItemComponent
+          ),
+      },
+      {
+        path: 'my-menus',
+        loadComponent: () =>
+          import('./components/manage-menus/manage-menus.component').then(
+            (m) => m.ManageMenusComponent
+          ),
+      },
+      {
+        path: 'vendor-orders',
+        loadComponent: () =>
+          import('./components/vendor-orders/vendor-orders.component').then(
+            (m) => m.VendorOrdersComponent
+          ),
+      },
+    ],
   },
   {
     path: 'student/dashboard',
@@ -29,6 +74,7 @@ export const appRoutes: Route[] = [
       import('./components/student-dashboard/student-dashboard.component').then(
         (s) => s.StudentDashboardComponent
       ),
+    canActivate: [studentAuthGuard],
     children: [
       {
         path: 'menu',

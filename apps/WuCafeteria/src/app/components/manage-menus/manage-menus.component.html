@@ -1,0 +1,119 @@
+<div class="w-full p-4">
+  <div class="flex justify-between">
+    <h2 class="text-2xl font-semibold mb-4">Menu Items</h2>
+    <a
+      href="/vendor/dashboard/create-menu-item"
+      class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+      routerLink="/vendor/dashboard/create-menu-item"
+    >
+      + Create New Menu Item
+    </a>
+  </div>
+
+  <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+    <table class="min-w-full text-left">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="p-3">Image</th>
+          <th class="p-3">Meal Name</th>
+          <th class="p-3">Description</th>
+          <th class="p-3">Price</th>
+          <th class="p-3">Feeding Time</th>
+          <th class="p-3">Status</th>
+          <th class="p-3 text-right">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of myMenus" class="border-b hover:bg-gray-50">
+          <!-- Image -->
+          <td class="p-3">
+            <img
+              [alt]="item.name"
+              [src]="item.imageUrl"
+              class="w-16 h-16 rounded-md object-cover border"
+            />
+          </td>
+
+          <!-- Name -->
+          <td class="p-3 font-semibold">{{ item.name }}</td>
+
+          <!-- Description -->
+          <td class="p-3">{{ item.description }}</td>
+
+          <!-- Price -->
+          <td class="p-3 font-medium text-green-700">₦{{ item.price }}</td>
+
+          <!-- Feeding Time -->
+          <td class="p-3">
+            {{ item.feedingTime?.feedingTimeName }}
+          </td>
+
+          <!-- Status -->
+          <td class="p-3">
+            <span
+              class="px-2 py-1 rounded-full text-sm font-semibold"
+              [ngClass]="{
+                'bg-green-100 text-green-700': item.isAvailable,
+                'bg-red-100 text-red-700': !item.isAvailable
+              }"
+            >
+              {{ item.isAvailable ? 'Available' : 'Disabled' }}
+            </span>
+          </td>
+
+          <!-- Actions -->
+          <td class="p-3 text-right">
+            <div class="flex justify-end gap-2">
+              <!-- Edit -->
+              <button
+                class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                (click)="edit(item)"
+              >
+                Edit
+              </button>
+
+              <!-- Enable / Disable -->
+              <button
+                class="px-3 py-1 rounded"
+                [ngClass]="{
+                  'bg-yellow-600 text-white hover:bg-yellow-700':
+                    item.isAvailable,
+                  'bg-green-600 text-white hover:bg-green-700':
+                    !item.isAvailable
+                }"
+                (click)="toggleAvailability(item)"
+              >
+                {{ item.isAvailable ? 'Disable' : 'Enable' }}
+              </button>
+
+              <!-- Delete -->
+              <button
+                class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+                (click)="delete(item)"
+              >
+                Delete
+              </button>
+
+              <!-- View Orders -->
+              <button
+                class="px-3 py-1 rounded bg-purple-600 text-white hover:bg-purple-700"
+                (click)="viewOrders(item)"
+              >
+                Orders
+              </button>
+
+              <!-- View Fulfilled Orders -->
+              <button
+                class="px-3 py-1 rounded bg-gray-700 text-white hover:bg-gray-800"
+                (click)="viewFulfilledOrders(item)"
+              >
+                Fulfilled
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
