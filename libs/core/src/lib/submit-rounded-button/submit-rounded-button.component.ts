@@ -20,11 +20,11 @@ export class SubmitRoundedButtonComponent {
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
   @Input() customClass = ''; // ✅ user-defined extra CSS classes
 
-  @Output() buttonClick = new EventEmitter<void>();
+  @Output() submitAction = new EventEmitter<void>();
 
   onClick(): void {
     if (!this.disabled && !this.isProcessing) {
-      this.buttonClick.emit();
+      this.submitAction.emit();
     }
   }
 

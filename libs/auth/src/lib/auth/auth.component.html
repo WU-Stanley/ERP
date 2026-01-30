@@ -1,4 +1,4 @@
-<div 
+<div
   class="header-img"
   style="
     display: flex;
@@ -13,84 +13,104 @@
     class="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto"
     style="width: 700px; padding: 40px"
   >
-<div class="flex flex-col items-center px-4 py-3 text-center" style="display: flex; flex-direction: column; align-items: center;">
-   
-   
-    <!-- <img style="height: 200px;width: 700px;" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA03fZk-nvjxiPV_-2Ou_5cnynFu1Aw2r7oaA8SZQP_5Li2hOhKPTLyj3qDWdrZxw0UP_gJnqGAaqSPM8cl3zEqR6-CwNhAA7ze0RjGAgnV6rJCwaqQk1nTXoM3lZsIeu5BkkOHiGxsnnlnJ7kD6_kAJt-EudlfiX6gRhXssHrVp69o8w0QuMwWMBnq0_QMTx0UtOKpfvM83cwyrAdh2CX7DRzYPo-M_6NPytxePEvglKDhg8dsYuOjyy8t8ZPBznnUFmqJDIVcSk" alt=""> -->
-    <img class="mx-auto" style="height: 150px; width: auto;" src="Logo.png" alt="Wigwe University" />
-    <div class="mt-4"></div>
-    <br />
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Welcome back, @if (res) {<span>{{res.data.fullName}}</span> }</h1>
-</div>
-@if(res){
-  <div [formGroup]="verifyForm">
-  <lib-custom-input 
-      formControlName="token"
-      [label]="'Login Token'"
-      [id]="'loginToken'"
-      [name]="'loginToken'"
-      [placeholder]="'Enter your login token sent to your email'"
-      [type]="'text'" 
-      (focused)="true"
+    <div
+      class="flex flex-col items-center px-4 py-3 text-center"
+      style="display: flex; flex-direction: column; align-items: center"
     >
-    </lib-custom-input> 
-      <div class="flex justify-center items-center mt-6 p-4">
-      <lib-submit-rounded-button 
-         [isProcessing]="isProcessing"
-       [disabled]="signInForm.invalid"
-        [label]="'Sign In'"
-        (submitAction)="verifyToken()"
-      >Verify Token</lib-submit-rounded-button>
-    </div></div>
-} @else{
-  <div [formGroup]="signInForm">
-    <lib-custom-input 
-      formControlName="email"
-      [label]="'Email'"
-      [id]="'email'"
-      [name]="'email'"
-      [placeholder]="'Enter your email'"
-      [type]="'email'" 
-      (focused)="true"
-    >
-    </lib-custom-input> 
-     
-    <div class="mt-4"></div>
-    <lib-custom-input 
-      formControlName="password"
-      [label]="'Password'"
-      [id]="'password'"
-      [name]="'password'"
-      [placeholder]="'Enter your password'"
-      
-          [type]="showPassword ? 'text' : 'password'"
-          (hidePasswordAction)="togglePassword()"
-      (focused)="true"
-     
-    >
-    </lib-custom-input>
-    <div class="text-center flex; justify-content: end; align-items: center;" style="margin-top: -20px; display: flex; justify-content: flex-end; align-items: flex-end;">
-      <p class="text-gray-600 text-sm ;flex; ">
-        Forgot password? <a
-        class="text-blue-500 hover:text-blue-700 ml-2" style="text-decoration: none; color: blue; font-weight: bold;cursor: pointer;"
-        [routerLink]="['/auth/forgot-password']"
+      <!-- <img style="height: 200px;width: 700px;" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA03fZk-nvjxiPV_-2Ou_5cnynFu1Aw2r7oaA8SZQP_5Li2hOhKPTLyj3qDWdrZxw0UP_gJnqGAaqSPM8cl3zEqR6-CwNhAA7ze0RjGAgnV6rJCwaqQk1nTXoM3lZsIeu5BkkOHiGxsnnlnJ7kD6_kAJt-EudlfiX6gRhXssHrVp69o8w0QuMwWMBnq0_QMTx0UtOKpfvM83cwyrAdh2CX7DRzYPo-M_6NPytxePEvglKDhg8dsYuOjyy8t8ZPBznnUFmqJDIVcSk" alt=""> -->
+      <img
+        class="mx-auto"
+        style="height: 150px; width: auto"
+        src="Logo.png"
+        alt="Wigwe University"
+      />
+      <div class="mt-4"></div>
+      <br />
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">
+        Welcome back, @if (res) {<span>{{ res.data.fullName }}</span> }
+      </h1>
+    </div>
+    @if(res){
+    <div [formGroup]="verifyForm">
+      <lib-custom-input
+        formControlName="token"
+        [label]="'Login Token'"
+        [id]="'loginToken'"
+        [name]="'loginToken'"
+        [placeholder]="'Enter your login token sent to your email'"
+        [type]="'text'"
+        (focused)="(true)"
       >
-        Reset Password
-      </a>
-         </p> 
-      
-  </div>
-    <div class="flex justify-center items-center mt-6 p-4">
-      <lib-submit-rounded-button 
-      [isProcessing]="isProcessing"
-      label="Log In"
-       [disabled]="signInForm.invalid"
-        [label]="'Sign In'"
-        (submitAction)="submitForm()"
-      ></lib-submit-rounded-button>
-      
+      </lib-custom-input>
+      <div class="flex justify-center items-center mt-6 p-4">
+        <lib-submit-rounded-button
+          [isProcessing]="isProcessing"
+          [disabled]="signInForm.invalid"
+          [label]="'Sign In'"
+          (submitAction)="verifyToken()"
+          >Verify Token</lib-submit-rounded-button
+        >
+      </div>
     </div>
-    </div>
-  }
-</div>
+    } @else{
+    <div [formGroup]="signInForm">
+      <lib-custom-input
+        formControlName="email"
+        [label]="'Email'"
+        [id]="'email'"
+        [name]="'email'"
+        [placeholder]="'Enter your email'"
+        [type]="'email'"
+        (focused)="(true)"
+      >
+      </lib-custom-input>
 
+      <div class="mt-4"></div>
+      <lib-custom-input
+        formControlName="password"
+        [label]="'Password'"
+        [id]="'password'"
+        [name]="'password'"
+        [placeholder]="'Enter your password'"
+        [type]="showPassword ? 'text' : 'password'"
+        (hidePasswordAction)="togglePassword()"
+        (focused)="(true)"
+      >
+      </lib-custom-input>
+      <div
+        class="text-center flex; justify-content: end; align-items: center;"
+        style="
+          margin-top: -20px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: flex-end;
+        "
+      >
+        <p class="text-gray-600 text-sm ;flex;">
+          Forgot password?
+          <a
+            class="text-blue-500 hover:text-blue-700 ml-2"
+            style="
+              text-decoration: none;
+              color: blue;
+              font-weight: bold;
+              cursor: pointer;
+            "
+            [routerLink]="['/auth/forgot-password']"
+          >
+            Reset Password
+          </a>
+        </p>
+      </div>
+      <div class="flex justify-center items-center mt-6 p-4">
+        <lib-submit-rounded-button
+          [isProcessing]="isProcessing"
+          label="Log In"
+          [label]="'Sign In'"
+          (submitAction)="submitForm()"
+        ></lib-submit-rounded-button>
+      </div>
+    </div>
+    }
+  </div>
+</div>

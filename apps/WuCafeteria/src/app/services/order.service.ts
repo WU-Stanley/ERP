@@ -1,8 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { ApiResponse } from 'libs/CAuth/src/lib/ApiResponse';
-import { MealOrder, MealOrderDTO } from 'libs/CAuth/src/lib/dto/dtos';
+import {
+  MealOrder,
+  MealOrderDTO,
+  VendorRevenueDTO,
+} from 'libs/CAuth/src/lib/dto/dtos';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -12,6 +16,10 @@ export class OrderService {
   route = environment.apiUrl + '/order';
   constructor(private http: HttpClient) {}
 
+  getVendorRevenueAndOrder() {
+    const url = `${this.route}/Vendor/RevenueAndOrders`;
+    return this.http.get<ApiResponse<VendorRevenueDTO>>(url);
+  }
   confirmOrderReceived(id: string, userId: number) {
     const url = `${this.route}/ConfirmMealReceived/${id}?userId=${userId}`;
     return this.http.post<ApiResponse<any>>(url, {});

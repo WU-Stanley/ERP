@@ -1,7 +1,11 @@
 import { Route } from '@angular/router';
-import { studentAuthGuard, vendorAuthGuard } from '@wucafeteria/CAuth';
+import {
+  adminAuthGuard,
+  studentAuthGuard,
+  vendorAuthGuard,
+} from '@wucafeteria/CAuth';
 import { VendorDashboardComponent } from './components/vendor-dashboard/vendor-dashboard.component';
-
+import { AdminAuthComponent } from './components/admin-auth/admin-auth.component';
 export const appRoutes: Route[] = [
   {
     path: '',
@@ -22,6 +26,13 @@ export const appRoutes: Route[] = [
     path: 'auth/vendor',
     loadComponent: () =>
       import('@wucafeteria/CAuth').then((m) => m.VendorAuthComponent),
+  },
+  {
+    path: 'auth/admin',
+    loadComponent: () =>
+      import('./components/admin-auth/admin-auth.component').then(
+        (m) => m.AdminAuthComponent
+      ),
   },
   {
     path: 'vendor/dashboard',
@@ -68,6 +79,24 @@ export const appRoutes: Route[] = [
       },
     ],
   },
+  {
+    path: 'admin/dashboard',
+    loadComponent: () =>
+      import(
+        './components/admin/admin-dashboard/admin-dashboard.component'
+      ).then((s) => s.AdminDashboardComponent),
+    canActivate: [adminAuthGuard],
+    children: [
+      {
+        path: 'vendor-revenue',
+        loadComponent: () =>
+          import(
+            './components/admin/vendor-revenue/vendor-revenue.component'
+          ).then((s) => s.VendorRevenueComponent),
+      },
+    ],
+  },
+
   {
     path: 'student/dashboard',
     loadComponent: () =>

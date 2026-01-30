@@ -143,3 +143,12 @@ export interface BestSeller {
   orders: number;
   revenue: number;
 }
+
+export interface VendorRevenueDTO {
+  totalRevenue: number;
+  monthlyRevenue: number;
+  totalOrder: number;
+  totalCurrentMonthOrder: number;
+  vendorId: string;
+  vendorName: string;
+}

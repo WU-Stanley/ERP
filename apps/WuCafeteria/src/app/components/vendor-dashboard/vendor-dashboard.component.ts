@@ -3,10 +3,14 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NO_ERRORS_SCHEMA,
+  OnInit,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { RevenueCardComponent } from '../revenue-card/revenue-card.component';
+import { OrderService } from '../../services/order.service';
+import { VendorRevenueDTO } from 'libs/CAuth/src/lib/dto/dtos';
+import { ApiResponse } from '@erp/auth';
 
 @Component({
   selector: 'app-vendor-dashboard',
@@ -16,14 +20,18 @@ import { RevenueCardComponent } from '../revenue-card/revenue-card.component';
   schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA],
   standalone: true,
 })
-export class VendorDashboardComponent {
+export class VendorDashboardComponent implements OnInit {
   showSidebar = true;
   userName = localStorage.getItem('WUName') || 'Vendor';
   revenueStats = { totalRevenue: 30000000, currentMonthRevenue: 1000000 };
   totalOrders = 100;
   menuStats: any;
   bestSellers: any;
-  constructor(private router: Router) {}
+  totalCurrentMonthOrder = 0;
+  constructor(private router: Router, private orderService: OrderService) {}
+  ngOnInit(): void {
+    this.getVendorRevenueAndOrder();
+  }
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('WUName');
@@ -32,5 +40,16 @@ export class VendorDashboardComponent {
   closeSidebar() {
     this.showSidebar = false;
   }
-  getVendorRevenueAndOrder() {}
+  getVendorRevenueAndOrder() {
+    console.log('Fetching vendor revenue and order data');
+    this.orderService.getVendorRevenueAndOrder().subscribe((response: any) => {
+      console.log('Vendor revenue and order data received:', response);
+      this.revenueStats = {
+        totalRevenue: response.data.totalRevenue,
+        currentMonthRevenue: response.data.monthlyRevenue,
+      };
+      this.totalOrders = response.data.totalOrder;
+      this.totalCurrentMonthOrder = response.data.totalCurrentMonthOrder;
+    });
+  }
 }
