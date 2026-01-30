@@ -1,0 +1,64 @@
+<div
+  class="vendors-revenue-container"
+  *ngIf="vendors && vendors.length; else noVendors"
+>
+  <div class="revenue-header">
+    <h2>Vendors Revenue</h2>
+  </div>
+
+  <div class="revenue-stats">
+    <div class="stat-card">
+      <h3>Total Revenue</h3>
+      <p class="stat-value">{{ totalRevenue | currency }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Active Vendors</h3>
+      <p class="stat-value">{{ activeVendorsCount }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Average Revenue</h3>
+      <p class="stat-value">{{ averageRevenue | currency }}</p>
+    </div>
+  </div>
+
+  <div class="revenue-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Vendor Name</th>
+          <th>Revenue</th>
+          <th>Orders</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let vendor of vendors">
+          <td>{{ vendor.name }}</td>
+          <td>{{ vendor.revenue | currency }}</td>
+          <td>{{ vendor.orderCount }}</td>
+          <td>
+            <span
+              class="status-badge"
+              [class.active]="vendor.status === 'active'"
+            >
+              {{ vendor.status }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-view" (click)="viewDetails(vendor)">
+              View Details
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<ng-template #noVendors>
+  <div class="no-vendors">
+    <h3>No vendors available</h3>
+    <p>Add vendors or load data to see revenue stats.</p>
+  </div>
+</ng-template>
