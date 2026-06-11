@@ -1,0 +1,108 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div
+    [formGroup]="userForm"
+    class="max-w-md w-full p-6 bg-white rounded shadow justify-center items-center"
+  >
+    <h2 class="text-2xl font-bold mb-6">Create New Staff</h2>
+    <div class="mb-4">
+      <lib-custom-input
+        formControlName="userEmail"
+        id="email"
+        name="email"
+        type="email"
+        label="Email"
+        placeholder="Enter staff email"
+      ></lib-custom-input>
+    </div>
+    <div class="mb-4">
+      <lib-custom-input
+        formControlName="firstName"
+        id="firstName"
+        name="firstName"
+        type="text"
+        label="First Name"
+        placeholder="Enter staff first name"
+      ></lib-custom-input>
+      <lib-custom-input
+        formControlName="lastName"
+        id="lastName"
+        name="lastName"
+        type="text"
+        label="Last Name"
+        placeholder="Enter staff lastname"
+      ></lib-custom-input>
+      <lib-custom-input
+        formControlName="jobTitle"
+        id="jobTitle"
+        name="jobTitle"
+        type="text"
+        label="Job Title"
+        placeholder="Enter staff job title"
+      ></lib-custom-input>
+      <!-- JobCategory -->
+    </div>
+    <div class="mb-4 ml-6">
+      <lib-custom-radio-group
+        [options]="jobCategories"
+        label="Job Category"
+        formControlName="jobCategoryId"
+        valueKey="id"
+        labelKey="name"
+      >
+      </lib-custom-radio-group>
+    </div>
+    <div class="mb-4">
+      <lib-custom-select
+        formControlName="departmentId"
+        id="department"
+        name="department"
+        type="text"
+        label="Department"
+        [placeholder]="'Select department'"
+        [options]="departments"
+        labelKey="name"
+        [width]="'89%'"
+      ></lib-custom-select>
+    </div>
+    <div class="mb-6">
+      <lib-custom-select
+        formControlName="userTypeId"
+        id="userType"
+        name="userType"
+        [options]="userTypes"
+        labelKey="name"
+        label="User Type"
+        placeholder="Select user type"
+        [width]="'89%'"
+      >
+      </lib-custom-select>
+    </div>
+    <div class="mb-6">
+      <lib-custom-select
+        formControlName="employmentTypeId"
+        id="employmentType"
+        name="employmentType"
+        [options]="employmentTypes"
+        labelKey="name"
+        label="Employment Type"
+        placeholder="Select employment type"
+        [width]="'89%'"
+      >
+      </lib-custom-select>
+    </div>
+    <label class="mb-6 flex items-center gap-3 text-sm font-medium text-gray-700">
+      <input
+        type="checkbox"
+        formControlName="singleSignOnEnabled"
+        class="h-4 w-4 rounded border-gray-300"
+      />
+      Enable Microsoft single sign-on for this staff account
+    </label>
+    <lib-submit-rounded-button
+      (submitAction)="onSubmit()"
+      class="flex justify-center"
+      label="Add Staff"
+      [isProcessing]="isProcessing"
+    ></lib-submit-rounded-button>
+  </div>
+</div>

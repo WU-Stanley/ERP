@@ -1,0 +1,34 @@
+# ===== Stage 1: Build the Angular app =====
+FROM node:20-alpine AS build
+WORKDIR /app
+
+RUN npm config set registry https://registry.npmjs.org/
+
+COPY package.json package-lock.json ./
+RUN npm install --legacy-peer-deps || npm install --legacy-peer-deps --registry https://registry.npmjs.org/
+
+COPY nx.json tsconfig.base.json ./
+COPY apps/ERP/project.json apps/ERP/
+COPY libs/ libs/
+COPY . .
+
+RUN npx nx build ERP --configuration=production
+
+# ===== Stage 2: Nginx serving =====
+FROM nginx:alpine AS production
+
+RUN apk add --no-cache wget && rm /etc/nginx/conf.d/default.conf
+
+COPY deploy/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist/apps/ERP/browser /usr/share/nginx/html
+
+RUN mkdir -p /var/cache/nginx /var/log/nginx /tmp/nginx && \
+    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /tmp/nginx
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,143 @@
+<section
+  class="header-img min-h-screen bg-cover bg-center bg-no-repeat px-6 py-10 flex items-center justify-center"
+>
+  <div
+    class="w-full max-w-[460px] rounded-[2.5rem] border border-slate-200 bg-white/95 p-8 shadow-2xl shadow-slate-900/10 backdrop-blur-md md:p-10"
+  >
+    <div class="mb-8 text-center">
+      <div
+        class="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full border border-slate-100 bg-slate-50 p-3 shadow-inner"
+      >
+        <img
+          class="h-full w-full rounded-full object-contain"
+          src="/logo1.png"
+          alt="Wigwe University"
+        />
+      </div>
+
+      <h1 class="text-4xl font-black leading-tight text-wigwe-green">
+        ERP Portal
+      </h1>
+      <p class="mt-2 text-sm font-medium italic text-slate-500">
+        Fearless Thinking, Endless Possibilities
+      </p>
+    </div>
+
+    @if(res){
+    <div class="space-y-6">
+      <div class="border-b border-slate-100 pb-5">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">
+          Two-factor authentication
+        </p>
+        <h2 class="mt-2 text-2xl font-black text-slate-900">
+          Welcome back, {{ res.data.fullName }}
+        </h2>
+        <p class="mt-2 text-sm font-medium text-slate-500">
+          Enter the login token sent to your university email.
+        </p>
+      </div>
+
+      <div [formGroup]="verifyForm" class="space-y-6">
+        <lib-custom-input
+          formControlName="token"
+          [label]="'Login Token'"
+          [id]="'loginToken'"
+          [name]="'loginToken'"
+          [placeholder]="'Enter your login token'"
+          [type]="'text'"
+          (focused)="(true)"
+        >
+        </lib-custom-input>
+
+        <button
+          type="button"
+          (click)="verifyToken()"
+          [disabled]="isProcessing || verifyForm.invalid"
+          class="h-14 w-full rounded-2xl bg-wigwe-green text-lg font-black text-white shadow-xl shadow-wigwe-green/20 transition-all hover:bg-wigwe-teal active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ isProcessing ? 'Verifying...' : 'Verify Token' }}
+        </button>
+      </div>
+    </div>
+    } @else{
+    <div class="space-y-6" [formGroup]="signInForm">
+      <h2 class="border-b border-slate-100 pb-4 text-2xl font-black text-slate-900">
+        Sign In
+      </h2>
+
+      <lib-custom-input
+        formControlName="email"
+        [label]="'University Email'"
+        [id]="'email'"
+        [name]="'email'"
+        [placeholder]="'j.doe@wigweuniversity.edu.ng'"
+        [type]="'email'"
+        (focused)="(true)"
+      >
+      </lib-custom-input>
+
+      <lib-custom-input
+        formControlName="password"
+        [label]="'Password'"
+        [id]="'password'"
+        [name]="'password'"
+        [placeholder]="'Enter your password'"
+        [type]="showPassword ? 'text' : 'password'"
+        (hidePasswordAction)="togglePassword()"
+        (focused)="(true)"
+      >
+      </lib-custom-input>
+
+      <div class="flex justify-end">
+        <a
+          class="text-xs font-black text-wigwe-green underline decoration-wigwe-green/20 underline-offset-4 transition hover:text-wigwe-teal"
+          [routerLink]="['/auth/forgot-password']"
+        >
+          Reset Password
+        </a>
+      </div>
+
+      <button
+        type="button"
+        (click)="submitForm()"
+        [disabled]="isProcessing || signInForm.invalid"
+        class="h-14 w-full rounded-2xl bg-wigwe-green text-lg font-black text-white shadow-xl shadow-wigwe-green/20 transition-all hover:bg-wigwe-teal active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ isProcessing ? 'Signing in...' : 'Login' }}
+      </button>
+
+      <div class="my-8 flex items-center gap-4">
+        <div class="h-px flex-1 bg-slate-100"></div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          OR
+        </span>
+        <div class="h-px flex-1 bg-slate-100"></div>
+      </div>
+
+      <button
+        type="button"
+        (click)="signInWithMicrosoft()"
+        [disabled]="isProcessing"
+        class="flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <span class="inline-flex h-5 w-5 overflow-hidden rounded-sm" aria-hidden="true">
+          <svg viewBox="0 0 16 16" class="h-5 w-5">
+            <rect x="0" y="0" width="7.25" height="7.25" fill="#f25022"></rect>
+            <rect x="8.75" y="0" width="7.25" height="7.25" fill="#7fba00"></rect>
+            <rect x="0" y="8.75" width="7.25" height="7.25" fill="#00a4ef"></rect>
+            <rect x="8.75" y="8.75" width="7.25" height="7.25" fill="#ffb900"></rect>
+          </svg>
+        </span>
+        Continue with Microsoft
+      </button>
+
+      <p class="pt-4 text-center text-xs font-medium text-slate-500">
+        Having trouble accessing your account?
+        <a class="font-black text-wigwe-green hover:underline" href="#">
+          Contact Support
+        </a>
+      </p>
+    </div>
+    }
+  </div>
+</section>

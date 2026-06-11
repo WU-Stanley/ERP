@@ -1,0 +1,62 @@
+<div
+  class="fixed top-10 right-0 w-[500px] h-full bg-white shadow-lg z-50 flex flex-col transform transition-transform duration-300 ease-in-out"
+>
+  <!-- Form Container -->
+  <div class="p-6 overflow-y-auto flex-1" [formGroup]="leaveRequestForm">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Leave Request Form</h2>
+      <button (click)="toggleForm()" class="text-gray-500 hover:text-red-500">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Form Fields -->
+    <lib-custom-select
+      width="full"
+      formControlName="leaveTypeId"
+      [options]="leaveTypes()"
+      [labelKey]="'name'"
+      type="text"
+      label="Leave Type"
+      placeholder="Select Leave type"
+    ></lib-custom-select>
+
+    <lib-custom-input
+      type="date"
+      formControlName="startDate"
+      label="Start Date"
+      placeholder="Select Start Date"
+    ></lib-custom-input>
+
+    <lib-custom-input
+      type="date"
+      formControlName="endDate"
+      label="End Date"
+      placeholder="Select End Date"
+    ></lib-custom-input>
+
+    <lib-custom-textarea
+      type="text"
+      formControlName="reason"
+      label="Reason"
+      placeholder="Enter Reason"
+    ></lib-custom-textarea>
+    <div
+      *ngIf="leaveRequestForm.valid"
+      class="flex gap-6 items-center justify-center p-4 border-t"
+    >
+      <lib-flat-button
+        label="Reset Form"
+        (submitAction)="resetForm()"
+      ></lib-flat-button>
+      <lib-submit-rounded-button
+        class="items-center"
+        (submitAction)="onSubmit()"
+        label="Submit"
+        [isProcessing]="isLoading()"
+      ></lib-submit-rounded-button>
+    </div>
+  </div>
+
+  <!-- Button Container -->
+</div>

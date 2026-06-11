@@ -1,0 +1,89 @@
+<nav class="text-sm text-gray-500 mb-2">
+  Home / Student / Dashboard /<span class="text-gray-700 font-medium"
+    >Favorite Meals</span
+  >
+</nav>
+<div class="p-6 bg-gray-50 min-h-screen">
+  <!-- Loading & Error States -->
+  <div *ngIf="isLoading" class="text-center text-gray-500 py-10 text-lg">
+    Loading favorite meals...
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="text-center text-red-600 py-6">
+    {{ errorMessage }}
+  </div>
+
+  <!-- No Favorites -->
+  <div
+    *ngIf="!isLoading && !errorMessage && favorites.length === 0"
+    class="text-center text-gray-500 italic py-10"
+  >
+    No favorite meals added yet.
+  </div>
+
+  <!-- Favorites Grid -->
+  <div
+    *ngIf="favorites.length > 0"
+    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6"
+  >
+    <div
+      *ngFor="let fav of favorites"
+      class="bg-white rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden"
+    >
+      <!-- Image -->
+      <div class="relative">
+        <img
+          [src]="fav.menuItem.imageUrl"
+          alt="{{ fav.menuItem.name }}"
+          class="w-full h-48 object-cover"
+        />
+
+        <!-- Availability Badge -->
+        <span
+          class="absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full"
+          [ngClass]="
+            fav.menuItem.isAvailable
+              ? 'bg-green-500 text-white'
+              : 'bg-red-400 text-white'
+          "
+        >
+          {{ fav.menuItem.isAvailable ? 'Available' : 'Unavailable' }}
+        </span>
+      </div>
+
+      <!-- Content -->
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 truncate">
+          {{ fav.menuItem.name }}
+        </h3>
+
+        <p class="text-gray-600 text-sm mt-1 line-clamp-2">
+          {{ fav.menuItem.description }}
+        </p>
+
+        <div class="mt-3 font-semibold text-gray-700 text-sm">
+          ₦{{ fav.menuItem.price | number }}
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-4">
+          <lib-submit-rounded-button
+            [isProcessing]="isLoading"
+            *ngIf="fav.menuItem.isAvailable; else notAvailableBtn"
+            label=" Order Now"
+            (click)="orderNow(fav.menuItem.id)"
+          >
+          </lib-submit-rounded-button>
+
+          <ng-template #notAvailableBtn>
+            <div
+              class="w-full bg-gray-200 text-gray-600 py-2 rounded-lg font-medium text-center cursor-not-allowed"
+            >
+              Not Available
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

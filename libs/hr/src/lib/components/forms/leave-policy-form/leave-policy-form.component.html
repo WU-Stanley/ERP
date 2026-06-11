@@ -1,0 +1,104 @@
+<div
+  class="fixed top-10 right-0 w-[500px] h-full bg-white shadow-lg z-50 overflow-y-auto shadow-lg transform transition-transform duration-300 ease-in-out scroll p-4"
+>
+  <div class="p-6 overflow-y-auto h-full" [formGroup]="leavePolicyForm">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Leave Policy Form</h2>
+      <button (click)="toggleForm()" class="text-gray-500 hover:text-red-500">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Form Content (reuse your form code here) -->
+    <lib-custom-select
+      [readonly]="readonly"
+      width="full"
+      formControlName="leaveTypeId"
+      [options]="leaveTypes()"
+      [labelKey]="'name'"
+      type="text"
+      label="Leave Type"
+      placeholder="Select Leave type"
+    ></lib-custom-select>
+    <lib-custom-select
+      [readonly]="readonly"
+      width="full"
+      formControlName="employmentTypeId"
+      [options]="employmentTypes()"
+      [labelKey]="'name'"
+      type="text"
+      label="Employment Type"
+      placeholder="Select Employment type"
+    ></lib-custom-select>
+    <lib-custom-input
+      [readonly]="readonly"
+      type="number"
+      formControlName="annualEntitlement"
+      label="Annual Entitlement"
+      placeholder="Enter Annual Entitlement"
+    ></lib-custom-input>
+    @if(isAccrualBased){
+    <lib-custom-input
+      type="number"
+      formControlName="accrualRatePerMonth"
+      label="Accrual Rate Per Month"
+      placeholder="Enter Accrual Rate Per Month"
+    ></lib-custom-input>
+    }<lib-custom-input
+      [readonly]="readonly"
+      type="number"
+      formControlName="maxCarryOverDays"
+      label="Max Carry Over Days"
+      placeholder="Enter Max Carry Over Days"
+    ></lib-custom-input>
+    <lib-custom-input
+      [readonly]="readonly"
+      type="number"
+      formControlName="maxDaysPerRequest"
+      label="Max Days Per Request"
+      placeholder="Enter Max Days Per Request"
+    ></lib-custom-input>
+    <div class="flex flex-col gap-4">
+      <lib-custom-checkbox
+        class="ml-4"
+        formControlName="allowNegativeBalance"
+        label="Allow Negative Balance"
+      ></lib-custom-checkbox>
+      <lib-custom-checkbox
+        class="ml-4"
+        formControlName="isAccrualBased"
+        label="Is Accrual Based"
+      ></lib-custom-checkbox>
+
+      <lib-custom-checkbox
+        class="ml-4"
+        formControlName="allowBackdatedRequest"
+        label="Allow Backdated Request"
+      ></lib-custom-checkbox>
+      <lib-custom-checkbox
+        class="ml-4"
+        formControlName="includePublicHolidays"
+        label="Include Public Holidays"
+      ></lib-custom-checkbox>
+    </div>
+    <div class="mt-4 flex justify-end">
+      <!-- <lib-flat-button (click)="addStep()" label="Add Step"></lib-flat-button> -->
+    </div>
+
+    @if(leavePolicyForm.valid){
+    <div class="flex gap-6 mt-6 items-center justify-center">
+      <lib-flat-button
+        [disabled]="readonly"
+        label="Reset Form"
+        (submitAction)="resetForm()"
+      ></lib-flat-button>
+      <lib-submit-rounded-button
+        class="items-center"
+        (submitAction)="onSubmit()"
+        label="Submit"
+        [isProcessing]="isLoading()"
+      ></lib-submit-rounded-button>
+    </div>
+    }
+  </div>
+</div>

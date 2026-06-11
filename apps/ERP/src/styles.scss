@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
+:root {
+  --color-wigwe-yellow: #ffad00;
+  --color-wigwe-gold: #d9af59;
+  --color-wigwe-green: #004b44;
+  --color-wigwe-teal: #006b62;
+  --color-wigwe-navy: #001d3d;
+  --font-wigwe: 'Outfit', 'Inter', sans-serif;
+
+  @include mat.snack-bar-overrides(
+    // (
+    //   button-color: rgb(119, 255, 0),
+    //   container-color: #7d2e2e,
+    // )
+  );
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add global styles to this file, and also import other style files */
+html,
+body {
+  min-height: 100%;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: var(--font-wigwe);
+}
+
+::ng-deep .custom-snackbar-success {
+  background-color: var(--color-wigwe-green); /* dark green */
+  color: #ffffff; /* white text */
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.container {
+  // max-width: 1200px;
+  width: 1000px;
+  margin: 0 auto;
+}
+// Global override for success snackbar
+.success-snackbar {
+  background-color: var(--color-wigwe-green) !important; /* Dark green */
+  color: #ffffff !important;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Style the "Close" action text */
+.success-snackbar .mat-mdc-button {
+  color: #ffffff !important;
+}
+
+/* Target the scrollbar itself */
+::-webkit-scrollbar {
+  width: 8px; /* Set the width of the vertical scrollbar */
+}
+
+/* Style the track (the area behind the scrollbar) */
+::-webkit-scrollbar-track {
+  background: #f8fafc; /* Light gray background */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+/* Style the thumb (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* A darker gray, a more subtle color */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+/* Change the thumb color on hover for a better user experience */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wigwe-teal); /* Slightly darker shade on hover */
+}

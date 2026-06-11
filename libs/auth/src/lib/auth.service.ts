@@ -1,0 +1,358 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { AppEnvironment, ENVIRONMENT } from '@erp/core';
+import { firstValueFrom, Subscription, timer } from 'rxjs';
+import { EmploymentTypeDto, UserDto, UserTypeDto } from './dtos/usertype.dto';
+import { CreateStaffDto } from './dtos/CreateStaff.dto';
+import { ApiResponse } from './dtos/api.response';
+import { UserPermissionDto } from './dtos/permission.dto';
+import { User } from './dtos/user.dto';
+import { RoleDto } from './dtos/role.dto';
+import { Permissions } from './enums/permissions.enum';
+import { JobCategoryDto } from './dtos/jobcategory.dto';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private accessToken: string | null = null;
+  user = signal<User | null>(null);
+  refToken = signal('');
+
+  tokenExpires = signal(0);
+  private refreshSubscription?: Subscription;
+
+  private http = inject(HttpClient);
+  private env = inject<AppEnvironment>(ENVIRONMENT);
+  constructor(private router: Router) {}
+  getJobCategories() {
+    return this.http.get<ApiResponse<JobCategoryDto[]>>(
+      this.env.apiUrl + '/Employees/GetJobCategories',
+      { withCredentials: true }
+    );
+  }
+  addEmploymentType(value: any) {
+    return this.http.post<ApiResponse<EmploymentTypeDto>>(
+      this.env.apiUrl + '/auth/create-employment-type',
+      value,
+      { withCredentials: true }
+    );
+  }
+
+  addUserType(data: UserTypeDto) {
+    return this.http.post<ApiResponse<UserTypeDto>>(
+      this.env.apiUrl + '/auth/create-user-type',
+      data,
+      { withCredentials: true }
+    );
+  }
+  resetPassword(value: any) {
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/reset-password',
+      value,
+      { withCredentials: true }
+    );
+  }
+  forgotPassword(value: any) {
+    this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/forgot-password',
+      value,
+      { withCredentials: true }
+    );
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/forgot-password',
+      value
+      // { withCredentials: true }
+    );
+  }
+  getEmploymentTypes() {
+    return this.http.get<ApiResponse<any[]>>(
+      this.env.apiUrl + '/auth/get-employment-types',
+      { withCredentials: true }
+    );
+  }
+
+  getAllRoles() {
+    return this.http.get<ApiResponse<RoleDto[]>>(this.env.apiUrl + '/Role', {
+      withCredentials: true,
+    });
+  }
+  login(formValue: { email: string; password: string }) {
+    return this.http.post<ApiResponse<User>>(
+      this.env.apiUrl + '/auth/login',
+      formValue,
+      { withCredentials: false }
+    );
+  }
+  startMicrosoftLogin() {
+    const config = this.env.microsoftAuth;
+    if (!config?.tenantId || !config?.clientId || !config?.redirectUri) {
+      throw new Error('Microsoft SSO is not configured.');
+    }
+
+    const state = this.createRandomValue();
+    const nonce = this.createRandomValue();
+    sessionStorage.setItem('microsoft_auth_state', state);
+    sessionStorage.setItem('microsoft_auth_nonce', nonce);
+
+    const params = new URLSearchParams({
+      client_id: config.clientId,
+      response_type: 'id_token',
+      redirect_uri: config.redirectUri,
+      response_mode: 'fragment',
+      scope: 'openid profile email',
+      state,
+      nonce,
+      prompt: 'select_account',
+    });
+
+    window.location.assign(
+      `https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/authorize?${params.toString()}`
+    );
+  }
+  completeMicrosoftLogin() {
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const idToken = params.get('id_token');
+    const state = params.get('state');
+    const expectedState = sessionStorage.getItem('microsoft_auth_state');
+
+    sessionStorage.removeItem('microsoft_auth_state');
+    sessionStorage.removeItem('microsoft_auth_nonce');
+
+    if (!idToken || !state || state !== expectedState) {
+      throw new Error('Invalid Microsoft sign-in response.');
+    }
+
+    return this.http.post<ApiResponse<any>>(
+      this.env.apiUrl + '/auth/microsoft-login',
+      { idToken },
+      { withCredentials: false }
+    );
+  }
+  verifyLoginToken(value: { token: string }) {
+    return this.http.post<ApiResponse<{ valid: boolean }>>(
+      this.env.apiUrl + '/auth/verify-login-token',
+      value,
+      { withCredentials: false }
+    );
+  }
+  assignRoleToUser(value: { userId: string; roleId: string }) {
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + `/Role/assign/${value.userId}/${value.roleId}`,
+      value,
+      { withCredentials: true }
+    );
+  }
+  removeRoleFromUser(selectedStaffId: string, roleId: string) {
+    return this.http.delete<ApiResponse<RoleDto>>(
+      this.env.apiUrl + `/Role/remove/${selectedStaffId}/${roleId}`,
+      { withCredentials: true }
+    );
+  }
+  getUserRoles(selectedStaffId: string) {
+    return this.http.get<ApiResponse<RoleDto[]>>(
+      this.env.apiUrl + '/Role/user/' + selectedStaffId,
+      { withCredentials: true }
+    );
+  }
+  getPermissions() {
+    return this.http.get<ApiResponse<UserPermissionDto[]>>(
+      this.env.apiUrl + '/Permission',
+      { withCredentials: true }
+    );
+  }
+
+  getAllStaff() {
+    return this.http.get<ApiResponse<UserDto[]>>(
+      this.env.apiUrl + '/auth/users',
+      { withCredentials: true }
+    );
+  }
+  changePassword(json: { oldPassword: string; newPassword: string }) {
+    return this.http.post<ApiResponse<unknown>>(
+      this.env.apiUrl + '/auth/change-password',
+      json,
+      { withCredentials: true }
+    );
+  }
+  getTokenExpiration(): number {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return 0;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      const exp = payload.exp * 1000; // convert to milliseconds
+      console.log('exp: ', exp);
+      return exp;
+    } catch (e) {
+      console.error('Invalid token format');
+      return Date.now();
+    }
+  }
+
+  scheduleTokenRefresh() {
+    this.clearRefreshTimer();
+    const now = Date.now();
+    const expiration = this.getTokenExpiration();
+    const refreshIn = expiration - now - 60_000; // refresh 1 minute before expiry
+
+    if (refreshIn <= 0) {
+      console.warn('Token already expired or near expiry, refreshing now...');
+      // this.refreshToken();
+      return;
+    }
+
+    this.refreshSubscription = timer(expiration).subscribe(() => {
+      // this.refreshToken();
+    });
+  }
+
+  addStaff(value: CreateStaffDto) {
+    return this.http.post<object>(
+      this.env.apiUrl + '/employees/create',
+      value,
+      {
+        withCredentials: true,
+      }
+    );
+  }
+  setEnv(tokenRes: any) {
+    const authPayload = tokenRes?.data?.token ? tokenRes.data : tokenRes;
+
+    localStorage.setItem('token', authPayload.token);
+    this.setAccessToken(authPayload.token);
+    localStorage.setItem('user', JSON.stringify(authPayload.data));
+    // localStorage.setItem('refToken', tokenRes.refreshToken);
+    this.user.set(authPayload.data);
+  }
+  setAccessToken(token: string) {
+    this.accessToken = token;
+  }
+
+  getAccessToken(): string | null {
+    return this.accessToken ?? localStorage.getItem('token');
+  }
+
+  clearAccessToken() {
+    this.accessToken = null;
+  }
+  async refreshAccessToken(): Promise<boolean> {
+    try {
+      const response: any = await firstValueFrom(
+        this.http.post(
+          this.env.apiUrl + '/auth/refresh-token',
+          {},
+          { withCredentials: true }
+        )
+      );
+      console.log('access token: ', response);
+      this.setAccessToken(response.token);
+      return true;
+    } catch (error) {
+      this.clearAccessToken();
+      return false;
+    }
+  }
+  refreshToken() {
+    const refreshToken = localStorage.getItem('refToken');
+    if (!refreshToken) {
+      this.logout();
+      return;
+    }
+
+    this.http
+      .post<{ token: string; data: UserDto; refreshToken: string }>(
+        this.env.apiUrl + '/auth/refresh-token',
+        { refreshToken: refreshToken },
+        { withCredentials: true }
+      )
+      .subscribe({
+        next: (res) => {
+          console.log('setting new tokens: ', res);
+          this.setEnv(res);
+          this.scheduleTokenRefresh(); // ⏰ Reschedule
+        },
+        error: () => {
+          this.logout();
+        },
+      });
+  }
+
+  logout() {
+    console.log('logout clicked');
+    this.http.post(this.env.apiUrl + '/auth/logout', {}).subscribe((res) => {
+      this.clearRefreshTimer();
+      localStorage.removeItem('token');
+      localStorage.removeItem('refToken');
+      this.router.navigate(['/auth/login']);
+    });
+    this.clearRefreshTimer();
+    localStorage.clear();
+    this.router.navigate(['/auth/login']);
+    document.cookie = `refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  }
+
+  clearRefreshTimer() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
+  }
+  private createRandomValue(): string {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes)
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
+  hasRole(role: string) {
+    return this.user()?.userRoles?.find((a) => a.role.name.includes(role));
+  }
+  hasAnyPermission(permissions: string[]): boolean {
+    const storedUser = localStorage.getItem('user');
+    // console.log('stored user: ', storedUser);
+    const user: User | null =
+      this.user() ?? (storedUser ? JSON.parse(storedUser) : null);
+    console.log('stored user: ', user);
+    if (!user) {
+      return false;
+    }
+    if (!permissions || permissions.length == 0) return true;
+
+    let userPerms = (user.userPermissions ?? [])
+      .map((up) => up.permission?.name?.toLowerCase() || '')
+      .filter(Boolean);
+    const rolePerms =
+      user.userRoles
+        ?.flatMap(
+          (ur) =>
+            ur.role?.rolePermissions?.map((rp) =>
+              rp.permission?.name.toLowerCase()
+            ) ?? []
+        )
+        .filter(Boolean) ?? [];
+
+    userPerms = Array.from(
+      new Set([...userPerms, ...rolePerms.map((a) => a)])
+    ).filter(Boolean);
+
+    // console.log('user perm: ', userPerms);
+
+    const isAdmin =
+      userPerms.includes(Permissions.AdminAccess.toLowerCase()) ||
+      (user.userRoles ?? []).some(
+        (role) => role.role?.name?.toLowerCase() === 'admin'
+      );
+
+    if (isAdmin) {
+      return true;
+    }
+
+    const has = permissions.some((required) =>
+      userPerms.includes(required.toLowerCase())
+    );
+    return has;
+  }
+}

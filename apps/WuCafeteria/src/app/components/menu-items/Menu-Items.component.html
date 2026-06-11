@@ -1,0 +1,53 @@
+<nav class="text-sm text-gray-500 mb-2">
+  Home / Student / Dashboard /<span class="text-gray-700 font-medium"
+    >Menu Items</span
+  >
+</nav>
+<div class="flex flex-wrap gap-6 p-6 bg-gray-50">
+  <div
+    class="bg-white rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden w-64 flex flex-col"
+    *ngFor="let meal of menuItems"
+  >
+    <!-- Image Section -->
+    <div class="relative">
+      <img
+        [src]="meal.imageUrl"
+        alt="{{ meal.name }}"
+        class="w-full h-44 object-cover"
+      />
+      <span
+        class="absolute top-3 left-3 bg-emerald-700 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm"
+      >
+        ₦{{ meal.price }}
+      </span>
+    </div>
+
+    <!-- Content Section -->
+    <div class="p-4 flex flex-col flex-grow">
+      <h3 class="text-lg font-semibold text-gray-800 truncate">
+        {{ meal.name }}
+      </h3>
+      <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+        {{ meal.description }}
+      </p>
+
+      <p class="text-sm text-gray-700 mt-3">
+        <strong>Vendor:</strong> {{ meal.vendor.businessName }}
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center mt-4">
+        <lib-submit-rounded-button
+          label="Order Now"
+          [isProcessing]="isProcessing"
+          (buttonClick)="orderMeal(meal.id)"
+        >
+        </lib-submit-rounded-button>
+
+        <lib-flat-button (click)="viewDetail(meal.id)" label="View Detail"
+          >View Detail
+        </lib-flat-button>
+      </div>
+    </div>
+  </div>
+</div>

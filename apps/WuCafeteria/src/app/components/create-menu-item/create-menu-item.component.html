@@ -1,0 +1,113 @@
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+  <h2 class="text-2xl font-semibold mb-6">Create New Menu Item</h2>
+  <form [formGroup]="mealMenuForm">
+    <!-- Meal Name -->
+    <lib-custom-input
+      multiple="true"
+      formControlName="mealName"
+      label="Meal Name"
+      type="text"
+      placeholder="Enter meal name"
+    ></lib-custom-input>
+
+    <!-- Description -->
+    <lib-custom-textarea
+      formControlName="mealDescription"
+      label="Meal Description"
+      rows="3"
+      [cols]="100"
+      placeholder="Enter meal description"
+    ></lib-custom-textarea>
+
+    <!-- Meal Price -->
+    <lib-custom-input
+      formControlName="mealPrice"
+      type="number"
+      label="Meal Price"
+      class="w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      placeholder="0.00"
+      step="0.01"
+    ></lib-custom-input>
+
+    <!-- Feeding Time -->
+    <lib-custom-select
+      formControlName="feedingTimeId"
+      label="Feeding Time"
+      classList="w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      [options]="feedingTimes"
+      placeholder="Select Feeding Time"
+      labelKey="feedingTimeName"
+      valueKey="feedingTimeID"
+    ></lib-custom-select>
+
+    <!-- VendorId -->
+    <!-- <lib-custom-input
+      formControlName="vendorId"
+      type="text"
+      label="Vendor ID"
+      class="w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      placeholder="Enter vendor ID"
+    ></lib-custom-input> -->
+
+    <!-- ImageUrl -->
+    <!-- <lib-custom-input
+      formControlName="imageUrl"
+      type="text"
+      label="Image URL"
+      class="w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      placeholder="Enter image URL or leave empty if uploading"
+    ></lib-custom-input> -->
+
+    <!-- Meal Image File Upload -->
+    <div class="mt-2 flex flex justify-between items-center">
+      <input
+        hidden
+        #fileInput
+        type="file"
+        (change)="onFileSelected($event)"
+        class="w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        accept="image/*"
+      />
+      <div *ngIf="!selectedImageString()">
+        <label class="block font-medium mb-1">Meal Image</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          class="w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          accept="image/*"
+        />
+      </div>
+      <img
+        *ngIf="selectedImageString()"
+        title="Click to change image"
+        role="button"
+        tabindex="0"
+        (click)="fileInput.click()"
+        (keydown.enter)="fileInput.click()"
+        (keydown.space)="fileInput.click()"
+        [src]="
+          selectedImageString()
+            ? selectedImageString()
+            : mealMenuForm.value.mealImage
+        "
+        alt="Meal Image Preview"
+        class="mt-2 max-h-48 object-contain rounded-lg cursor-pointer"
+      />
+    </div>
+
+    <!-- Buttons -->
+    <div class="items-center justify-end mt-6 flex gap-4">
+      <lib-submit-rounded-button
+        [isProcessing]="isProcessing"
+        (buttonClick)="submit()"
+        type="submit"
+        label="Create Menu Item"
+      >
+      </lib-submit-rounded-button>
+
+      <lib-cancel-rounded-button (buttonClick)="clear()">
+        Clear
+      </lib-cancel-rounded-button>
+    </div>
+  </form>
+</div>

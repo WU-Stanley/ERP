@@ -1,0 +1,13 @@
+<button
+  [type]="type"
+  [disabled]="disabled || isProcessing"
+  (click)="onClick()"
+  [ngClass]="baseClasses"
+>
+  <div class="flex items-center justify-center gap-2">
+    @if (isProcessing) {
+    <lib-spinner [size]="32" [color]="spinnerColor"></lib-spinner>
+    }
+    <span>{{ label }}</span>
+  </div>
+</button>

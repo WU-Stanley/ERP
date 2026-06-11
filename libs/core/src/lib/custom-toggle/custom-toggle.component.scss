@@ -1,0 +1,14 @@
+.peer:checked + span {
+  background-color: #1ee5b7;
+  border-color: #1ee5b7;
+}
+
+.peer:checked + span::after {
+  transform: scale(1);
+}
+:host {
+  display: block;
+  margin: 10px 0;
+}
+
+  

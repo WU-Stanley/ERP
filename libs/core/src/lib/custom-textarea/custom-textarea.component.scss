@@ -1,0 +1,12 @@
+.input-field {
+  width: 100%;           // ← ensures full width
+  resize: none;          // optional: disables manual resize
+  overflow: hidden;      // hides scrollbars
+  min-height: 2rem;      // adjust as needed
+  transition: height 0.2s ease;
+  box-sizing: border-box; // ensures padding doesn’t cause overflow
+}
+.input-wrapper,
+.input-field-wrapper {
+  width: 100%;
+}

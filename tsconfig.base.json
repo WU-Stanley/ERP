@@ -1,0 +1,26 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@erp/auth": ["libs/auth/src/index.ts"],
+      "@erp/core": ["libs/core/src/index.ts"],
+      "@erp/hr": ["libs/hr/src/index.ts"],
+      "@erp/shared": ["libs/shared/src/index.ts"],
+      "@wucafeteria/CAuth": ["libs/CAuth/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

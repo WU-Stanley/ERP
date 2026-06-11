@@ -1,0 +1,24 @@
+.student-login-container {
+  @apply relative h-screen w-screen bg-cover bg-center;
+  background-image: url('https://www.wigweuniversity.edu.ng/wp-content/uploads/2025/05/1G1A9472-scaled.jpg');
+}
+
+.overlay {
+  @apply absolute inset-0 bg-black/40 flex justify-center items-center;
+}
+
+.login-card {
+  @apply bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8;
+}
+
+.title {
+  @apply text-2xl font-semibold text-green-800 text-center;
+}
+
+.subtitle {
+  @apply text-gray-600 text-center mb-4;
+}
+
+.footer {
+  @apply text-center mt-4;
+}

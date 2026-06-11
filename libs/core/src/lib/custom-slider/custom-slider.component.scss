@@ -1,0 +1,20 @@
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: var(--slider-fill, #064e3b);
+  cursor: pointer;
+  border: none;
+  margin-top: -7px;
+}
+
+input[type='range']::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: var(--slider-fill, #064e3b);
+  cursor: pointer;
+  border: none;
+}

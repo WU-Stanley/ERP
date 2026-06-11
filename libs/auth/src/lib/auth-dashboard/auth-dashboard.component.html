@@ -1,0 +1,184 @@
+<div class="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-900">
+  <aside
+    [class.w-72]="!isCollapsed"
+    [class.w-20]="isCollapsed"
+    class="relative z-50 flex flex-col overflow-hidden bg-wigwe-navy text-white transition-all duration-300 ease-in-out"
+  >
+    <div class="relative mb-4 flex min-h-[120px] flex-col p-8">
+      <button
+        (click)="navigateToDashboard()"
+        class="flex items-center gap-3 text-left"
+        [class.hidden]="isCollapsed"
+      >
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-wigwe-yellow p-1 text-xl font-black text-slate-900 shadow-lg"
+        >
+          <img src="/logo1.png" alt="WuERP Logo" class="h-full w-full object-contain" />
+        </div>
+        <div class="flex min-w-0 flex-col">
+          <span class="truncate text-xs font-black uppercase tracking-widest">
+            WIGWE UNIVERSITY
+          </span>
+          <span class="truncate text-[9px] font-bold uppercase tracking-widest text-wigwe-gold/80">
+            ERP Admin Portal
+          </span>
+        </div>
+      </button>
+
+      <button
+        (click)="toggleSidebar()"
+        aria-label="Toggle Sidebar"
+        class="absolute right-4 top-8 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+      >
+        <span class="material-symbols-outlined text-lg">
+          {{ isCollapsed ? 'chevron_right' : 'chevron_left' }}
+        </span>
+      </button>
+    </div>
+
+    <nav class="flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-4 py-2">
+      <div class="flex flex-1 flex-col gap-1">
+        <ng-container *ngFor="let item of menuItems">
+          <ng-container *ngIf="isCollapsed">
+            <ng-container *libHasAnyPermission="item.permissions!">
+              <a
+                *ngIf="!item.children"
+                [routerLink]="item.route"
+                routerLinkActive="bg-wigwe-yellow text-slate-900 shadow-xl shadow-wigwe-yellow/20"
+                class="group flex items-center justify-center rounded-2xl px-4 py-4 text-slate-400 transition-all hover:bg-white/5 hover:text-white"
+                [title]="item.label"
+              >
+                <span class="material-symbols-outlined text-xl">{{ item.icon }}</span>
+              </a>
+
+              <button
+                *ngIf="item.children"
+                type="button"
+                class="group flex items-center justify-center rounded-2xl px-4 py-4 text-slate-400 transition-all hover:bg-white/5 hover:text-white"
+                [title]="item.label"
+                (click)="toggleMenu(item.label)"
+              >
+                <span class="material-symbols-outlined text-xl">{{ item.icon }}</span>
+              </button>
+            </ng-container>
+          </ng-container>
+
+          <ng-container *ngIf="!isCollapsed">
+            <ng-container *libHasAnyPermission="item.permissions!">
+              <a
+                *ngIf="!item.children"
+                [routerLink]="item.route"
+                routerLinkActive="bg-wigwe-yellow text-slate-900 shadow-xl shadow-wigwe-yellow/20"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="group flex items-center rounded-2xl px-4 py-4 text-slate-400 transition-all hover:bg-white/5 hover:text-white"
+              >
+                <span class="material-symbols-outlined w-8 text-xl">{{ item.icon }}</span>
+                <span class="ml-3 text-sm font-bold">{{ item.label }}</span>
+              </a>
+
+              <div *ngIf="item.children" class="space-y-1">
+                <button
+                  type="button"
+                  class="group flex w-full items-center justify-between rounded-2xl px-4 py-4 text-slate-400 transition-all hover:bg-white/5 hover:text-white"
+                  (click)="toggleMenu(item.label)"
+                >
+                  <span class="flex items-center">
+                    <span class="material-symbols-outlined w-8 text-xl">{{ item.icon }}</span>
+                    <span class="ml-3 text-sm font-bold">{{ item.label }}</span>
+                  </span>
+                  <span class="material-symbols-outlined text-sm">
+                    {{ openedMenus[item.label] ? 'keyboard_arrow_down' : 'chevron_right' }}
+                  </span>
+                </button>
+
+                <div *ngIf="openedMenus[item.label]" class="ml-5 space-y-1 border-l border-white/10 pl-3">
+                  <a
+                    *ngFor="let sub of item.children"
+                    [routerLink]="sub.route"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  routerLinkActive="bg-wigwe-yellow text-slate-900 shadow-lg shadow-wigwe-yellow/10"
+                    class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-bold text-slate-400 transition-all hover:bg-white/5 hover:text-white"
+                  >
+                    <span class="material-symbols-outlined text-base">{{ sub.icon }}</span>
+                    {{ sub.label }}
+                  </a>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <button
+        (click)="logout()"
+        class="mt-4 flex w-full items-center rounded-2xl px-4 py-4 text-left text-slate-400 transition-all hover:bg-white/5 hover:text-white"
+      >
+        <span class="material-symbols-outlined w-8 text-xl">logout</span>
+        <span class="ml-3 text-sm font-bold" [class.hidden]="isCollapsed">Logout</span>
+      </button>
+    </nav>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="flex h-20 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6">
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">
+          Enterprise Resource Planning
+        </p>
+        <h1 class="mt-1 text-xl font-black tracking-tight text-slate-900">Admin Console</h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <lib-switcher-fab></lib-switcher-fab>
+
+        <div class="relative" (clickOutside)="dropdownOpen = false">
+          <button
+            (click)="dropdownOpen = !dropdownOpen"
+            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-left transition hover:bg-white"
+            aria-haspopup="true"
+            [attr.aria-expanded]="dropdownOpen"
+          >
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-2xl bg-wigwe-green text-sm font-black text-white"
+            >
+              {{ user?.fullName ? user.fullName.charAt(0) : 'U' }}
+            </span>
+            <span class="hidden min-w-0 flex-col md:flex">
+              <span class="truncate text-sm font-black text-slate-900">{{ user?.fullName }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                ERP User
+              </span>
+            </span>
+            <span class="material-symbols-outlined text-slate-400">expand_more</span>
+          </button>
+
+          <div
+            *ngIf="dropdownOpen"
+            class="absolute right-0 z-50 mt-3 w-56 overflow-hidden rounded-2xl border border-slate-100 bg-white p-2 shadow-xl shadow-slate-900/10"
+          >
+            <a routerLink="/profile" class="flex items-center rounded-xl px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">
+              <span class="material-symbols-outlined mr-2 text-wigwe-green">account_circle</span>
+              Profile
+            </a>
+            <a routerLink="/settings" class="flex items-center rounded-xl px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">
+              <span class="material-symbols-outlined mr-2 text-wigwe-green">settings</span>
+              Settings
+            </a>
+            <button
+              type="button"
+              (click)="logout()"
+              class="flex w-full items-center rounded-xl px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50"
+            >
+              <span class="material-symbols-outlined mr-2 text-wigwe-green">logout</span>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="min-h-0 flex-1 overflow-auto p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

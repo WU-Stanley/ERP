@@ -1,0 +1,51 @@
+<div class="custom-input" [ngStyle]="{ width: width, height: height }">
+  <div
+    class="input-wrapper"
+    [class.focused]="focused || searchTerm"
+    [class.has-error]="hasError()"
+  >
+    <label [for]="id">{{ label }}</label>
+    <div *ngIf="multiple && value?.length" class="selected-items">
+      <span class="selected-item" *ngFor="let val of value">
+        {{ getLabel(val) }}
+        <button type="button" (click)="removeSelected(val)">×</button>
+      </span>
+    </div>
+    <div
+      class="input-field-wrapper"
+      [ngStyle]="{ width: width, height: height }"
+    >
+      <input
+        type="text"
+        class="input-field"
+        [ngStyle]="{ width: width, height: height }"
+        [disabled]="disabled"
+        [readOnly]="disabled || readonly"
+        [id]="id"
+        [name]="name"
+        [placeholder]="focused ? placeholder : ''"
+        [value]="multiple ? '' : searchTerm ? searchTerm : fieldValue"
+        (input)="onSearch($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        autocomplete="off"
+        (focus)="onFocus()"
+      />
+      @if(!readonly) {
+      <ul class="dropdown" *ngIf="showDropdown && filteredOptions.length">
+        <li
+          *ngFor="let option of filteredOptions"
+          (mousedown)="selectOption(option)"
+          [class.selected]="isSelected(option)"
+        >
+          {{ getLabel(option) }}
+        </li>
+      </ul>
+      }
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="hasError()" [attr.title]="errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="custom-input">
+  <div
+    class="input-wrapper"
+    [class.focused]="focused || value"
+    [class.has-error]="hasError()"
+  >
+    <label [for]="id">{{ label }}</label>
+
+    <div class="input-field-wrapper">
+      <textarea
+        style="width: 100%"
+        #textAreaRef
+        class="input-field"
+        [disabled]="disabled"
+        [readOnly]="disabled"
+        [placeholder]="focused ? placeholder : ''"
+        (input)="onInputChange($event)"
+        (focus)="focused = true"
+        (blur)="focused = false; onTouched()"
+        [id]="id"
+        [name]="name"
+        [value]="value"
+        [rows]="row"
+        [cols]="cols"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="hasError()" [attr.title]="errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>
