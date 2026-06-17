@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 interface LoginRequest {
   email: string;
@@ -19,6 +20,12 @@ export interface AuthResponse {
   data: AuthUser;
 }
 
+interface ApiResponse<T> {
+  data: T;
+  message: string;
+  status: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -26,11 +33,19 @@ export class LmsAuthService {
   private readonly http = inject(HttpClient);
 
   loginWithEmail(payload: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/login', payload);
+    return this.http
+      .post<ApiResponse<AuthResponse>>('/api/auth/login', payload, {
+        withCredentials: true,
+      })
+      .pipe(map((response) => response.data));
   }
 
   loginWithMicrosoftToken(idToken: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/microsoft/login', { idToken });
+    return this.http.post<AuthResponse>(
+      '/api/auth/microsoft/login',
+      { idToken },
+      { withCredentials: true }
+    );
   }
 
   startMicrosoftLogin(): void {

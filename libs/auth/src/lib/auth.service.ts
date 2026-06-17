@@ -82,7 +82,7 @@ export class AuthService {
     return this.http.post<ApiResponse<User>>(
       this.env.apiUrl + '/auth/login',
       formValue,
-      { withCredentials: false }
+      { withCredentials: true }
     );
   }
   startMicrosoftLogin() {
@@ -127,14 +127,14 @@ export class AuthService {
     return this.http.post<ApiResponse<any>>(
       this.env.apiUrl + '/auth/microsoft-login',
       { idToken },
-      { withCredentials: false }
+      { withCredentials: true }
     );
   }
   verifyLoginToken(value: { token: string }) {
     return this.http.post<ApiResponse<{ valid: boolean }>>(
       this.env.apiUrl + '/auth/verify-login-token',
       value,
-      { withCredentials: false }
+      { withCredentials: true }
     );
   }
   assignRoleToUser(value: { userId: string; roleId: string }) {
@@ -221,12 +221,16 @@ export class AuthService {
   }
   setEnv(tokenRes: any) {
     const authPayload = tokenRes?.data?.token ? tokenRes.data : tokenRes;
+    const user = authPayload?.data ?? tokenRes?.data;
+
+    if (!authPayload?.token) {
+      return;
+    }
 
     localStorage.setItem('token', authPayload.token);
     this.setAccessToken(authPayload.token);
-    localStorage.setItem('user', JSON.stringify(authPayload.data));
-    // localStorage.setItem('refToken', tokenRes.refreshToken);
-    this.user.set(authPayload.data);
+    localStorage.setItem('user', JSON.stringify(user));
+    this.user.set(user);
   }
   setAccessToken(token: string) {
     this.accessToken = token;
@@ -249,7 +253,7 @@ export class AuthService {
         )
       );
       console.log('access token: ', response);
-      this.setAccessToken(response.token);
+      this.setEnv(response);
       return true;
     } catch (error) {
       this.clearAccessToken();
@@ -308,7 +312,11 @@ export class AuthService {
       .join('');
   }
   hasRole(role: string) {
-    return this.user()?.userRoles?.find((a) => a.role.name.includes(role));
+    const normalizedRole = role.toLowerCase();
+    return this.user()?.userRoles?.find((userRole) => {
+      const roleName = userRole.role?.name ?? userRole.name ?? '';
+      return roleName.toLowerCase().includes(normalizedRole);
+    });
   }
   hasAnyPermission(permissions: string[]): boolean {
     const storedUser = localStorage.getItem('user');
@@ -322,15 +330,16 @@ export class AuthService {
     if (!permissions || permissions.length == 0) return true;
 
     let userPerms = (user.userPermissions ?? [])
-      .map((up) => up.permission?.name?.toLowerCase() || '')
+      .map((up) => (up.permission?.name ?? up.name ?? '').toLowerCase())
       .filter(Boolean);
     const rolePerms =
       user.userRoles
         ?.flatMap(
-          (ur) =>
-            ur.role?.rolePermissions?.map((rp) =>
-              rp.permission?.name.toLowerCase()
-            ) ?? []
+          (ur: any) =>
+            (ur.rolePermissions ?? ur.role?.rolePermissions ?? []).map(
+              (rp: any) =>
+                rp.name?.toLowerCase() ?? rp.permission?.name?.toLowerCase()
+            )
         )
         .filter(Boolean) ?? [];
 
@@ -341,9 +350,15 @@ export class AuthService {
     // console.log('user perm: ', userPerms);
 
     const isAdmin =
+      userPerms.includes(Permissions.SuperAdminAccess.toLowerCase()) ||
       userPerms.includes(Permissions.AdminAccess.toLowerCase()) ||
       (user.userRoles ?? []).some(
-        (role) => role.role?.name?.toLowerCase() === 'admin'
+        (role) => {
+          const roleName = role.role?.name ?? role.name ?? '';
+          return ['admin', 'superadmin', 'super admin'].includes(
+            roleName.toLowerCase()
+          );
+        }
       );
 
     if (isAdmin) {

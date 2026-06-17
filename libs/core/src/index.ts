@@ -11,6 +11,7 @@ export * from './lib/custom-textarea/custom-textarea.component';
 export * from './lib/environment.token';
 export * from './lib/spinner/spinner.component';
 export * from './lib/app-switcher-fab/app-switcher-fab.component';
+export * from './lib/module-landing/module-landing.component';
 export * from './lib/add-button/add-button.component';
 export * from './lib/custom-toggle/custom-toggle.component';
 export * from './lib/custom-checkbox/custom-checkbox.component';

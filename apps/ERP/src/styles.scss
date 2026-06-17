@@ -1,5 +1,8 @@
 @use '@angular/material' as mat;
 
+// CKEditor 5 styles
+@import 'ckeditor5/ckeditor5.css';
+
 // Customize the entire app. Change :root to your selector if you want to scope the styles.
 :root {
   --color-wigwe-yellow: #ffad00;

@@ -205,8 +205,21 @@
     </table>
   </ng-container>
   <ng-template #noLeaveRequests>
-    <div class="p-4 text-gray-500 text-2xl">
-      You have no leave requests yet.
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">
+        event_busy
+      </span>
+      <h3 class="text-xl font-bold text-gray-700 mb-2">
+        No leave requests yet
+      </h3>
+      <p class="text-sm text-gray-500 max-w-md mb-6">
+        You haven't submitted any leave requests. Start by creating a new leave
+        request.
+      </p>
+      <lib-add-button
+        label="Request for Leave"
+        (submitAction)="toggleLeaveRequestForm()"
+      ></lib-add-button>
     </div>
   </ng-template>
   <ng-container *ngIf="showRequestForm">

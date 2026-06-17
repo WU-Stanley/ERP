@@ -1,5 +1,5 @@
 export interface UserPermissionDto{
-    permission: any;
+    permission?: any;
     id:string;
     name: string;
     description: string;

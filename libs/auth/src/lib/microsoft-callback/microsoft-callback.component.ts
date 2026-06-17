@@ -29,14 +29,16 @@ export class MicrosoftCallbackComponent implements OnInit {
     try {
       this.authService.completeMicrosoftLogin().subscribe({
         next: (res) => {
-          if (!res.status || !res.data) {
+          const loginPayload = res?.data?.token ? res.data : res;
+
+          if (res?.status === false || !loginPayload?.token) {
             this.handleFailure(res.message || 'Microsoft sign-in failed.');
             return;
           }
 
-          this.authService.setEnv(res.data);
+          this.authService.setEnv(loginPayload);
           this.alertService.showSuccess('Microsoft sign-in successful!');
-          this.router.navigate(['hr/dashboard']);
+          this.router.navigate(['/hr/dashboard']);
         },
         error: (error) => {
           this.handleFailure(error?.error?.message ?? 'Microsoft sign-in failed.');

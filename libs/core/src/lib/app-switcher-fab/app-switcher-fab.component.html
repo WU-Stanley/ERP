@@ -43,22 +43,40 @@
     </div>
 
     <div class="grid grid-cols-3 gap-2">
-      <a
-        *ngFor="let app of apps; trackBy: trackByName"
-        [routerLink]="app.path"
-        (click)="closeMenu()"
-        class="group flex min-h-24 flex-col items-center justify-center rounded-2xl p-3 text-center transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
-      >
-        <span
-          class="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-lg shadow-slate-900/10 transition group-hover:-translate-y-0.5"
-          [ngClass]="app.color"
+      <ng-container *ngFor="let app of apps; trackBy: trackByName">
+        <a
+          *ngIf="app.external; else internalAppLink"
+          [href]="app.path"
+          target="_blank"
+          rel="noopener noreferrer"
+          (click)="closeMenu()"
+          class="group flex min-h-24 flex-col items-center justify-center rounded-2xl p-3 text-center transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
         >
-          <span class="material-symbols-outlined text-xl">{{ app.icon }}</span>
-        </span>
-        <span class="mt-2 max-w-full truncate text-xs font-bold text-slate-600">
-          {{ app.name }}
-        </span>
-      </a>
+          <ng-container *ngTemplateOutlet="appTile; context: { $implicit: app }"></ng-container>
+        </a>
+
+        <ng-template #internalAppLink>
+          <a
+            [routerLink]="app.path"
+            (click)="closeMenu()"
+            class="group flex min-h-24 flex-col items-center justify-center rounded-2xl p-3 text-center transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
+          >
+            <ng-container *ngTemplateOutlet="appTile; context: { $implicit: app }"></ng-container>
+          </a>
+        </ng-template>
+      </ng-container>
     </div>
   </div>
 </div>
+
+<ng-template #appTile let-app>
+  <span
+    class="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-lg shadow-slate-900/10 transition group-hover:-translate-y-0.5"
+    [ngClass]="app.color"
+  >
+    <span class="material-symbols-outlined text-xl">{{ app.icon }}</span>
+  </span>
+  <span class="mt-2 max-w-full truncate text-xs font-bold text-slate-600">
+    {{ app.name }}
+  </span>
+</ng-template>

@@ -1,0 +1,137 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Registry and LMS integration</p>
+      <h2 class="mt-2 text-2xl font-black text-slate-900">Registry Integration Workbench</h2>
+      <p class="mt-2 max-w-3xl text-sm font-semibold text-slate-500">
+        Track registry-facing systems, external portal links, sync status, and ownership notes for academic operations.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <a [href]="wuPortalUrl" target="_blank" rel="noreferrer" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-4 text-xs font-black text-white transition hover:-translate-y-0.5">
+        <span class="material-symbols-outlined text-lg">open_in_new</span>
+        Open WU Portal
+      </a>
+      <button type="button" (click)="loadIntegrations()" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-700 transition hover:border-wigwe-green hover:text-wigwe-green">
+        <span class="material-symbols-outlined text-lg">refresh</span>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="successMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 text-sm font-bold text-emerald-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">check_circle</span>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Integrations</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ summary?.registryIntegrationCount ?? integrations.length }}</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Linked / Synced</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ linkedIntegrations }}</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Needs Attention</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ attentionIntegrations }}</p>
+    </article>
+  </div>
+
+  <div *ngIf="isLoading" class="space-y-3">
+    <div *ngFor="let item of [1, 2, 3]" class="h-24 animate-pulse rounded-[1.5rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+  </div>
+
+  <div *ngIf="!isLoading" class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+    <form [formGroup]="integrationForm" (ngSubmit)="createIntegration()" class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <div class="mb-5">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Integration register</p>
+        <h3 class="mt-1 text-lg font-black text-slate-900">Add Integration</h3>
+      </div>
+
+      <div class="grid gap-4">
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">System Name</span>
+          <input formControlName="systemName" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Integration Type</span>
+            <select formControlName="integrationType" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+              <option>External Link</option>
+              <option>API Sync</option>
+              <option>Manual Import</option>
+              <option>SSO</option>
+            </select>
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Status</span>
+            <select formControlName="status" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+              <option>Planned</option>
+              <option>Linked</option>
+              <option>Testing</option>
+              <option>Synced</option>
+              <option>Paused</option>
+              <option>Failed</option>
+            </select>
+          </label>
+        </div>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">External URL</span>
+          <input formControlName="externalUrl" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Last Synced At</span>
+          <input type="datetime-local" formControlName="lastSyncedAt" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Notes</span>
+          <textarea formControlName="notes" rows="4" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white"></textarea>
+        </label>
+      </div>
+
+      <button type="submit" [disabled]="isSaving" class="mt-5 inline-flex h-11 items-center justify-center rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60">
+        {{ isSaving ? 'Saving...' : 'Add Integration' }}
+      </button>
+    </form>
+
+    <section class="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-sm">
+      <div class="border-b border-slate-100 bg-slate-50 px-5 py-4">
+        <h3 class="text-sm font-black text-slate-900">Registry Integrations</h3>
+      </div>
+
+      <div *ngIf="integrations.length; else noIntegrations" class="divide-y divide-slate-100">
+        <article *ngFor="let integration of integrations; trackBy: trackById" class="grid gap-4 px-5 py-4 lg:grid-cols-[1fr_0.65fr_0.55fr_1fr] lg:items-center">
+          <div class="min-w-0">
+            <p class="truncate text-sm font-black text-slate-900">{{ integration.systemName }}</p>
+            <a [href]="integration.externalUrl" target="_blank" rel="noreferrer" class="truncate text-xs font-bold text-wigwe-green hover:underline">{{ integration.externalUrl }}</a>
+          </div>
+          <p class="text-xs font-black uppercase tracking-wider text-slate-500">{{ integration.integrationType }}</p>
+          <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(integration.status)">
+            {{ integration.status }}
+          </span>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" (click)="updateStatus(integration, 'Testing')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-blue-300 hover:text-blue-700">Testing</button>
+            <button type="button" (click)="updateStatus(integration, 'Synced')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-emerald-300 hover:text-emerald-700">Synced</button>
+            <button type="button" (click)="updateStatus(integration, 'Paused')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-amber-300 hover:text-amber-700">Paused</button>
+            <button type="button" (click)="updateStatus(integration, 'Failed')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-rose-300 hover:text-rose-700">Failed</button>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #noIntegrations>
+        <div class="p-8 text-center">
+          <span class="material-symbols-outlined rounded-2xl bg-slate-100 p-4 text-3xl text-slate-400">sync</span>
+          <p class="mt-4 text-sm font-black text-slate-700">No registry integrations recorded yet</p>
+        </div>
+      </ng-template>
+    </section>
+  </div>
+</section>

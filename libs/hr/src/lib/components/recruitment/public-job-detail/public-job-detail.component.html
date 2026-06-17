@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-slate-50">
+  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <a routerLink="/careers" class="inline-flex items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Back to careers
+    </a>
+
+    <div class="flex justify-end mb-6">
+      <nav class="flex items-center gap-4 text-sm">
+        <a routerLink="/careers/teams" class="inline-flex items-center gap-1 text-slate-600 hover:text-green-600">
+          <span class="material-symbols-outlined text-sm">groups</span>
+          Our Teams
+        </a>
+        <a routerLink="/careers/track" class="inline-flex items-center gap-1 text-slate-600 hover:text-green-600">
+          <span class="material-symbols-outlined text-sm">track_changes</span>
+          Track Application
+        </a>
+      </nav>
+    </div>
+@if(isLoading){
+    <div class="mt-16 flex justify-center">
+      <div class="h-10 w-10 animate-spin rounded-full border-4 border-green-600 border-t-transparent"></div>
+    </div>
+  }
+  @if (errorMessage && !isLoading)  {
+    <div  class="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+  @if (job && !isLoading) {
+    <ng-container>
+      <section class="mt-8 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-wide text-green-700">{{ job.departmentName || 'General' }}</p>
+            <h1 class="mt-2 text-3xl font-bold text-slate-900">{{ job.title }}</h1>
+            <div class="mt-4 flex flex-wrap gap-3 text-sm text-slate-600">
+              <span class="inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">location_on</span>
+                {{ job.location || 'Location not specified' }}
+              </span>
+              <span class="inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">schedule</span>
+                {{ job.employmentType }}
+              </span>
+              <span class="inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">event</span>
+                Deadline: {{ formatDate(job.deadline) }}
+              </span>
+            </div>
+          </div>
+          <span
+            class="rounded-full px-3 py-1 text-xs font-semibold"
+            [ngClass]="isClosed() ? 'bg-slate-100 text-slate-600' : 'bg-green-100 text-green-700'"
+          >
+            {{ isClosed() ? 'Closed' : 'Open' }}
+          </span>
+        </div>
+
+        <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_380px]">
+          <div class="space-y-6">
+            <div>
+              <h2 class="text-lg font-semibold text-slate-900">Role Overview</h2>
+              <p [innerHTML]="job.description" class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700"></p>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold text-slate-900">Requirements</h2>
+              <p [innerHTML]="job.requirements || 'Requirements will be discussed during the recruitment process.'" class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700"></p>
+            </div>
+          </div>
+
+          <aside class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+            <h2 class="text-lg font-semibold text-slate-900">Apply for this role</h2>
+
+            <div *ngIf="successMessage" class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+              <p class="font-semibold">{{ successMessage }}</p>
+              <p class="mt-2">Your application reference is:</p>
+              <p class="mt-1 break-all rounded bg-white px-3 py-2 font-mono text-xs text-slate-900">{{ applicationReference }}</p>
+              <a
+                [routerLink]="['/careers/track']"
+                [queryParams]="{ applicationId: applicationReference, email: applicationForm.email }"
+                class="mt-3 inline-flex text-sm font-semibold text-green-700 hover:text-green-800"
+              >
+                Track application
+              </a>
+            </div>
+
+            <form *ngIf="!successMessage" class="mt-4 space-y-4" (ngSubmit)="submitApplication()">
+              <label class="block">
+                <span class="text-sm font-medium text-slate-700">Full name</span>
+                <input name="applicantName" required [(ngModel)]="applicationForm.applicantName" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100" />
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium text-slate-700">Email</span>
+                <input name="email" type="email" required [(ngModel)]="applicationForm.email" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100" />
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium text-slate-700">Phone</span>
+                <input name="phone" [(ngModel)]="applicationForm.phone" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100" />
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium text-slate-700">Resume</span>
+                <input type="file" accept=".pdf,.doc,.docx" (change)="onResumeSelected($event)" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium text-slate-700">Other documents (optional)</span>
+                <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple (change)="onOtherDocumentsSelected($event)" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+                <p class="mt-1 text-xs text-slate-500">Certificates, transcripts, or other supporting documents</p>
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium text-slate-700">Cover letter</span>
+                <app-rich-text-editor
+                  placeholder="Write your cover letter..."
+                  [(ngModel)]="applicationForm.coverLetter"
+                ></app-rich-text-editor>
+              </label>
+
+              <p *ngIf="errorMessage" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ errorMessage }}</p>
+
+              <button
+                type="submit"
+                [disabled]="isSubmitting || isClosed()"
+                class="w-full rounded-lg bg-green-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                {{ isSubmitting ? 'Submitting...' : 'Submit Application' }}
+              </button>
+            </form>
+          </aside>
+        </div>
+      </section>
+    </ng-container>
+  }
+  </div>
+</div>

@@ -5,7 +5,7 @@ import { LeaveTypeVisibilityPipe } from './LeaveTypeVisibility.pipe';
 
 describe('Pipe: LeaveTypeVisibilitye', () => {
   it('create an instance', () => {
-    let pipe = new LeaveTypeVisibilityPipe();
+    const pipe = new LeaveTypeVisibilityPipe();
     expect(pipe).toBeTruthy();
   });
 });

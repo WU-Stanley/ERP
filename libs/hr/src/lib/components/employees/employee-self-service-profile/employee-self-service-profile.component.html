@@ -1,0 +1,123 @@
+<section class="space-y-6">
+  <header class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Self service</p>
+    <h2 class="mt-2 text-2xl font-black text-slate-900">My Profile</h2>
+    <p class="mt-2 max-w-2xl text-sm font-bold text-slate-400">
+      Submit changes to your contact, emergency contact, and bank details for HR review. HR-managed employment and identity fields stay read-only here.
+    </p>
+  </header>
+
+  <div *ngIf="isLoading" class="space-y-4">
+    <div class="h-28 animate-pulse rounded-[1.75rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+    <div class="h-80 animate-pulse rounded-[1.75rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="successMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 text-sm font-bold text-emerald-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">check_circle</span>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <form *ngIf="!isLoading && employee" [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">Read-only Identity</h3>
+      <div class="mt-5 grid gap-4 md:grid-cols-3">
+        <article class="rounded-2xl bg-slate-50 p-4">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</p>
+          <p class="mt-2 text-sm font-black text-slate-800">{{ employee.firstName }} {{ employee.lastName }}</p>
+        </article>
+        <article class="rounded-2xl bg-slate-50 p-4">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Email</p>
+          <p class="mt-2 break-words text-sm font-black text-slate-800">{{ employee.email }}</p>
+        </article>
+        <article class="rounded-2xl bg-slate-50 p-4">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Employee ID</p>
+          <p class="mt-2 break-words text-sm font-black text-slate-800">{{ employee.employeeId }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">Contact Details</h3>
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Phone Number</span>
+          <input formControlName="phoneNumber" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2 md:col-span-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Address</span>
+          <input formControlName="address" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+      </div>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Next Of Kin</h3>
+        <div class="mt-5 grid gap-4">
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Name</span>
+            <input formControlName="emergencyContactName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</span>
+            <input formControlName="emergencyContactPhone" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Relationship</span>
+            <input formControlName="relationship" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+        </div>
+      </section>
+
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Bank Details</h3>
+        <div class="mt-5 grid gap-4">
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Bank Name</span>
+            <input formControlName="bankName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Account Number</span>
+            <input formControlName="bankAccountNumber" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end">
+      <button
+        type="submit"
+        [disabled]="isSaving"
+        class="inline-flex h-12 items-center justify-center rounded-2xl bg-wigwe-green px-6 text-sm font-black text-white shadow-lg shadow-wigwe-green/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isSaving ? 'Submitting...' : 'Submit For Review' }}
+      </button>
+    </div>
+
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">My Profile Update Requests</h3>
+      <div *ngIf="requests.length; else noRequests" class="mt-5 divide-y divide-slate-100">
+        <article *ngFor="let request of requests" class="grid gap-3 py-4 md:grid-cols-[1fr_0.7fr_0.8fr] md:items-center">
+          <div>
+            <p class="text-sm font-black text-slate-900">Submitted {{ request.requestedAt | date: 'MMM d, y, h:mm a' }}</p>
+            <p class="text-xs font-bold text-slate-400">{{ request.comment || 'No reviewer comment yet' }}</p>
+          </div>
+          <span class="inline-flex w-fit rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(request.status)">
+            {{ request.status }}
+          </span>
+          <p class="text-xs font-bold text-slate-400">
+            {{ request.reviewedAt ? ('Reviewed ' + (request.reviewedAt | date: 'MMM d, y')) : 'Awaiting HR review' }}
+          </p>
+        </article>
+      </div>
+      <ng-template #noRequests>
+        <p class="mt-5 text-sm font-bold text-slate-400">No profile update requests yet.</p>
+      </ng-template>
+    </section>
+  </form>
+</section>

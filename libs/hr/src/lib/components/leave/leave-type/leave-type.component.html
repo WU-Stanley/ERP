@@ -132,6 +132,24 @@
       </div>
       }
     </div>
+    } @else {
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">
+        event_busy
+      </span>
+      <h3 class="text-xl font-bold text-gray-700 mb-2">
+        No leave types configured
+      </h3>
+      <p class="text-sm text-gray-500 max-w-md mb-6">
+        There are no leave types set up yet. Create your first leave type to
+        enable staff to request leave.
+      </p>
+      <lib-add-button
+        *libHasAnyPermission="hrAdminPermissions"
+        label="Create Leave Type"
+        (submitAction)="toggleLeaveTypeForm()"
+      ></lib-add-button>
+    </div>
     } @if(showForm){
     <lib-leave-type-form
       [readonly]="readonly"

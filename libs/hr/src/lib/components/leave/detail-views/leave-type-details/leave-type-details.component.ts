@@ -5,33 +5,28 @@ import {
   EventEmitter,
   inject,
   Input,
-  Output,
+  Output, OnInit,
 } from '@angular/core';
-import { LeaveTypeDto } from 'libs/hr/src/lib/dtos';
+import { LeaveTypeDto } from '../../../../dtos/leave.dto';
 import { FlatButtonComponent, SubmitRoundedButtonComponent } from '@erp/core';
-import { AuthService, UserDto, VisibilityTypes } from '@erp/auth';
-import {
-  DepartmentStore,
-  EmploymentTypeStore,
-  RoleStore,
-  UserTypeStore,
-} from 'libs/hr/src/lib/state';
+import { AuthService, DepartmentDto, EmploymentTypeDto, RoleDto, UserDto, UserTypeDto, VisibilityTypes } from '@erp/auth';
+import { DepartmentStore, EmploymentTypeStore, RoleStore, UserTypeStore } from '../../../../state';
 
 @Component({
   selector: 'lib-leave-type-details',
   templateUrl: './leave-type-details.component.html',
   imports: [CommonModule, FlatButtonComponent, SubmitRoundedButtonComponent],
 })
-export class LeaveTypeDetailsComponent {
+export class LeaveTypeDetailsComponent implements OnInit {
   @Input() leaveType!: LeaveTypeDto | null;
   @Output() emitClose = new EventEmitter<void>();
   @Output() emitEditEvent = new EventEmitter<LeaveTypeDto>();
   VisibilityTypes = VisibilityTypes;
 
-  userTypeStore = inject(UserTypeStore);
-  roleStore = inject(RoleStore);
-  employmentTypeStore = inject(EmploymentTypeStore);
-  departmentStore = inject(DepartmentStore);
+  userTypeStore = inject(UserTypeStore) as any;
+  roleStore = inject(RoleStore) as any;
+  employmentTypeStore = inject(EmploymentTypeStore) as any;
+  departmentStore = inject(DepartmentStore) as any;
 
   userTypes = computed(() => this.userTypeStore.userTypes());
   roles = computed(() => this.roleStore.roles());
@@ -65,31 +60,31 @@ export class LeaveTypeDetailsComponent {
     if (!type) return;
     this.emitEditEvent.emit(type);
   }
-  getDepartment(departmentId: string) {
-    return this.departments().find((a) => a.id === departmentId)?.name || '';
+  getDepartment(departmentId: string): string {
+    return this.departments().find((a: DepartmentDto) => a.id === departmentId)?.name || '';
   }
-  getRoleName(roleId: string) {
-    return this.roles().find((a) => a.id === roleId)?.name || '';
+  getRoleName(roleId: string): string {
+    return this.roles().find((a: RoleDto) => a.id === roleId)?.name || '';
   }
-  getEmploymentTypeName(employmentTypeId: string) {
-    return this.employmentTypes().find((em) => em.id == employmentTypeId);
+  getEmploymentTypeName(employmentTypeId: string): EmploymentTypeDto | undefined {
+    return this.employmentTypes().find((em: EmploymentTypeDto) => em.id == employmentTypeId);
   }
-  getUserTypeName(userTypeId: string) {
-    return this.userTypes().find((a) => (a.id = userTypeId))?.name || '';
+  getUserTypeName(userTypeId: string): string {
+    return this.userTypes().find((a: UserTypeDto) => (a.id = userTypeId))?.name || '';
   }
   getApproverName(type: string, value: string): string {
     switch (type) {
       case 'ROLE':
-        return value; // maps roleId → roleName
+        return value;
       case 'USER':
-        return this.getUserName(value); // maps userId → display name
+        return this.getUserName(value);
       case 'MANAGER':
-        return 'Direct Manager'; // fixed meaning
+        return 'Direct Manager';
       default:
-        return value; // fallback (raw string)
+        return value;
     }
   }
-  getUserName(value: string) {
-    return this.staffs.find((a) => a.id == value)?.fullName || '';
+  getUserName(value: string): string {
+    return this.staffs.find((a: UserDto) => a.id == value)?.fullName || '';
   }
 }

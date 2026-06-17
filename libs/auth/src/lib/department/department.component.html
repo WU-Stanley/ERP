@@ -55,10 +55,18 @@
             </span>
           </td>
           <td class="px-4 py-3">
-            <lib-flat-button
-              label="Edit"
-              (submitAction)="editDepartment(department)"
-            ></lib-flat-button>
+            <div class="flex flex-wrap gap-2">
+              <a
+                [routerLink]="['/hr/departments', department.id, 'employees']"
+                class="inline-flex min-h-10 items-center justify-center rounded-lg bg-[#0f5132] px-4 text-sm font-semibold text-white transition hover:bg-[#0b3f27]"
+              >
+                Staff
+              </a>
+              <lib-flat-button
+                label="Edit"
+                (submitAction)="editDepartment(department)"
+              ></lib-flat-button>
+            </div>
           </td>
         </tr>
         }
@@ -76,7 +84,7 @@
     >
       <!-- Close Button -->
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-semibold text-gray-800">Add New Department</h3>
+        <h3 class="text-xl font-semibold text-gray-800">{{ editingDepartmentId ? 'Edit Department' : 'Add New Department' }}</h3>
         <button
           class="text-gray-500 hover:text-gray-700 text-2xl"
           (click)="handleDialogClose(null)"
@@ -111,10 +119,11 @@
         <div class="mb-4">
           <lib-custom-select
             formControlName="headOfDepartmentId"
-            label="Head of Department"
+            label="Head of Department (Optional)"
             placeholder="Assign Head of Department"
             [options]="users"
             labelKey="fullName"
+            valueKey="employeeId"
           ></lib-custom-select>
         </div>
 

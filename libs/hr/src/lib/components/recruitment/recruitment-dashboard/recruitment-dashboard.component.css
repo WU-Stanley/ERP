@@ -1,0 +1,28 @@
+/* Recruitment Dashboard Styles */
+
+.metric-card {
+  @apply bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-shadow;
+}
+
+.pipeline-bar {
+  @apply h-4 rounded-full transition-all duration-500;
+}
+
+/* AI Score animation */
+@keyframes pulse-score {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.ai-score-pulse {
+  animation: pulse-score 2s ease-in-out infinite;
+}
+
+/* Quick action hover */
+.quick-action {
+  @apply flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl cursor-pointer transition-all;
+}
+
+.quick-action:hover {
+  @apply shadow-md border-wigwe-green/30;
+}

@@ -1,0 +1,219 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Procurement and inventory</p>
+      <h2 class="mt-2 text-2xl font-black text-slate-900">Procurement Workbench</h2>
+      <p class="mt-2 max-w-3xl text-sm font-semibold text-slate-500">
+        Submit purchase requests, track approvals, maintain inventory items, and monitor low-stock thresholds.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <a routerLink="/procurement" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-700 transition hover:border-wigwe-green hover:text-wigwe-green">
+        <span class="material-symbols-outlined text-lg">dashboard</span>
+        Module Home
+      </a>
+      <button type="button" (click)="loadData()" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-4 text-xs font-black text-white transition hover:-translate-y-0.5">
+        <span class="material-symbols-outlined text-lg">refresh</span>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="successMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 text-sm font-bold text-emerald-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">check_circle</span>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Pending Requests</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ summary?.pendingProcurementRequestCount ?? pendingRequests }}</p>
+      <p class="mt-1 text-xs font-bold text-slate-400">Submitted or in review</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Inventory Items</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ inventoryItems.length }}</p>
+      <p class="mt-1 text-xs font-bold text-slate-400">Catalogued stock</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Low Stock</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ summary?.lowStockInventoryItemCount ?? lowStockCount }}</p>
+      <p class="mt-1 text-xs font-bold text-slate-400">At or below reorder level</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Inventory Value</p>
+      <p class="mt-3 text-2xl font-black text-slate-900">{{ formatCurrency(inventoryValue) }}</p>
+      <p class="mt-1 text-xs font-bold text-slate-400">Quantity x unit cost</p>
+    </article>
+  </div>
+
+  <div *ngIf="isLoading" class="space-y-3">
+    <div *ngFor="let item of [1, 2, 3]" class="h-24 animate-pulse rounded-[1.5rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+  </div>
+
+  <div *ngIf="!isLoading" class="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+    <section *ngIf="showRequestsSection" class="space-y-4">
+      <form [formGroup]="requestForm" (ngSubmit)="submitRequest()" class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="mb-5">
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Purchase request</p>
+          <h3 class="mt-1 text-lg font-black text-slate-900">Submit Request</h3>
+        </div>
+
+        <div class="grid gap-4">
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Title</span>
+            <input formControlName="title" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Description</span>
+            <textarea formControlName="description" rows="4" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white"></textarea>
+          </label>
+          <div class="grid gap-4 md:grid-cols-3">
+            <label class="space-y-1">
+              <span class="text-xs font-black uppercase tracking-wider text-slate-400">Amount</span>
+              <input type="number" formControlName="estimatedAmount" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+            </label>
+            <label class="space-y-1">
+              <span class="text-xs font-black uppercase tracking-wider text-slate-400">Priority</span>
+              <select formControlName="priority" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+                <option>Low</option>
+                <option>Normal</option>
+                <option>High</option>
+                <option>Urgent</option>
+              </select>
+            </label>
+            <label class="space-y-1">
+              <span class="text-xs font-black uppercase tracking-wider text-slate-400">Needed By</span>
+              <input type="date" formControlName="neededBy" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" [disabled]="isSavingRequest" class="mt-5 inline-flex h-11 items-center justify-center rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60">
+          {{ isSavingRequest ? 'Submitting...' : 'Submit Request' }}
+        </button>
+      </form>
+
+      <section class="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-sm">
+        <div class="border-b border-slate-100 bg-slate-50 px-5 py-4">
+          <h3 class="text-sm font-black text-slate-900">Purchase Requests</h3>
+        </div>
+        <div *ngIf="procurementRequests.length; else noRequests" class="divide-y divide-slate-100">
+          <article *ngFor="let request of procurementRequests; trackBy: trackById" class="grid gap-4 px-5 py-4 lg:grid-cols-[1fr_0.6fr_0.5fr_0.6fr_0.9fr] lg:items-center">
+            <div>
+              <p class="text-sm font-black text-slate-900">{{ request.title }}</p>
+              <p class="text-xs font-bold text-slate-400">{{ request.requestNumber }} · {{ request.createdAt | date: 'MMM d, y' }}</p>
+            </div>
+            <p class="text-sm font-bold text-slate-700">{{ formatCurrency(request.estimatedAmount) }}</p>
+            <p class="text-xs font-black uppercase tracking-wider text-slate-500">{{ request.priority }}</p>
+            <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(request.status)">
+              {{ request.status }}
+            </span>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" (click)="updateRequestStatus(request, 'In Review')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-blue-300 hover:text-blue-700">Review</button>
+              <button type="button" (click)="updateRequestStatus(request, 'Approved')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-emerald-300 hover:text-emerald-700">Approve</button>
+              <button type="button" (click)="updateRequestStatus(request, 'Cancelled')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-rose-300 hover:text-rose-700">Cancel</button>
+            </div>
+          </article>
+        </div>
+        <ng-template #noRequests>
+          <div class="p-8 text-center text-sm font-bold text-slate-500">No purchase requests submitted yet.</div>
+        </ng-template>
+      </section>
+    </section>
+
+    <section *ngIf="showInventorySection" class="space-y-4">
+      <form [formGroup]="inventoryForm" (ngSubmit)="saveInventoryItem()" class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Inventory catalog</p>
+            <h3 class="mt-1 text-lg font-black text-slate-900">{{ selectedInventoryItem ? 'Edit Inventory Item' : 'New Inventory Item' }}</h3>
+          </div>
+          <button *ngIf="selectedInventoryItem" type="button" (click)="resetInventoryForm()" class="text-xs font-black text-slate-500 hover:text-wigwe-green">Clear</button>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">SKU</span>
+            <input formControlName="sku" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Name</span>
+            <input formControlName="name" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Category</span>
+            <input formControlName="category" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Location</span>
+            <input formControlName="location" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Quantity</span>
+            <input type="number" formControlName="quantityOnHand" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Reorder Level</span>
+            <input type="number" formControlName="reorderLevel" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Unit Cost</span>
+            <input type="number" formControlName="unitCost" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+          </label>
+          <label class="space-y-1">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-400">Status</span>
+            <select formControlName="status" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+              <option>Available</option>
+              <option>Reserved</option>
+              <option>Unavailable</option>
+            </select>
+          </label>
+        </div>
+
+        <button type="submit" [disabled]="isSavingInventory" class="mt-5 inline-flex h-11 items-center justify-center rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60">
+          {{ isSavingInventory ? 'Saving...' : selectedInventoryItem ? 'Update Item' : 'Create Item' }}
+        </button>
+      </form>
+
+      <section class="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-sm">
+        <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <h3 class="text-sm font-black text-slate-900">Inventory Items</h3>
+          <button type="button" (click)="toggleLowStock()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-black text-slate-600 hover:border-wigwe-green hover:text-wigwe-green">
+            {{ lowStockOnly ? 'Show All Stock' : 'Show Low Stock' }}
+          </button>
+        </div>
+        <div *ngIf="inventoryItems.length; else noInventory" class="divide-y divide-slate-100">
+          <button
+            *ngFor="let item of inventoryItems; trackBy: trackById"
+            type="button"
+            (click)="editInventoryItem(item)"
+            class="grid w-full gap-4 px-5 py-4 text-left transition hover:bg-slate-50 lg:grid-cols-[1fr_0.7fr_0.6fr_0.6fr_0.5fr] lg:items-center"
+          >
+            <span>
+              <span class="block text-sm font-black text-slate-900">{{ item.name }}</span>
+              <span class="text-xs font-bold text-slate-400">{{ item.sku }} · {{ item.category }}</span>
+            </span>
+            <span class="text-sm font-bold text-slate-700">{{ item.location || 'No location' }}</span>
+            <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="stockClass(item)">
+              {{ item.quantityOnHand }} / {{ item.reorderLevel }}
+            </span>
+            <span class="text-sm font-bold text-slate-700">{{ formatCurrency(item.unitCost) }}</span>
+            <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(item.status)">
+              {{ item.status }}
+            </span>
+          </button>
+        </div>
+        <ng-template #noInventory>
+          <div class="p-8 text-center text-sm font-bold text-slate-500">No inventory items found.</div>
+        </ng-template>
+      </section>
+    </section>
+  </div>
+</section>

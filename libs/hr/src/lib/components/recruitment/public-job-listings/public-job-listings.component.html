@@ -1,0 +1,145 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Hero Section -->
+  <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Careers at {{ companyName }}</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      Join our team and make a difference. Browse our open positions and apply today.
+    </p>
+    <div *ngIf="stats" class="mt-6 flex items-center justify-center gap-6 text-sm text-gray-500">
+      <span class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-green-500">work</span>
+        {{ stats.openPositions }} Open Positions
+      </span>
+      <span class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-blue-500">people</span>
+        {{ stats.totalApplications }}+ Applications Received
+      </span>
+    </div>
+  </div>
+
+  <!-- Navigation Links -->
+  <nav class="flex justify-center gap-6 mb-8">
+    <a
+      routerLink="/careers/teams"
+      class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors"
+    >
+      <span class="material-symbols-outlined">groups</span>
+      Our Teams
+    </a>
+    <a
+      routerLink="/careers/track"
+      class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors"
+    >
+      <span class="material-symbols-outlined">track_changes</span>
+      Track Application
+    </a>
+  </nav>
+
+  <!-- Search Bar -->
+  <div class="max-w-2xl mx-auto mb-10">
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="searchJobs()"
+        placeholder="Search by title, department, or location..."
+        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-gray-700"
+      />
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent mx-auto"></div>
+      <p class="mt-4 text-gray-500">Loading job listings...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="max-w-2xl mx-auto">
+    <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
+      <p class="font-medium">{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Job Listings -->
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <div *ngIf="filteredJobs.length === 0" class="text-center py-16">
+      <span class="material-symbols-outlined text-6xl text-gray-300">search_off</span>
+      <p class="mt-4 text-xl text-gray-500">No jobs found matching your search.</p>
+<button
+  type="button"
+  (click)="clearSearch()"
+  class="mt-4 text-green-600 hover:text-green-700 font-medium"
+>
+  Clear search
+</button>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <a
+        *ngFor="let job of filteredJobs"
+        [routerLink]="['/careers/jobs', job.id]"
+        class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl hover:border-green-300 transition-all group cursor-pointer"
+      >
+        <!-- Status Badge -->
+        <div class="flex items-center justify-between mb-4">
+          <span
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+            [ngClass]="{
+              'bg-green-100 text-green-800': !isExpired(job.deadline),
+              'bg-gray-100 text-gray-600': isExpired(job.deadline)
+            }"
+          >
+            <span *ngIf="!isExpired(job.deadline)" class="material-symbols-outlined text-xs mr-1">check_circle</span>
+            {{ isExpired(job.deadline) ? 'Closed' : 'Open' }}
+          </span>
+          <span class="text-xs text-gray-400">{{ job.employmentType }}</span>
+        </div>
+
+        <!-- Job Title -->
+        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors mb-2">
+          {{ job.title }}
+        </h3>
+
+        <!-- Details -->
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center text-sm text-gray-500">
+            <span class="material-symbols-outlined text-sm mr-2 text-gray-400">business</span>
+            {{ job.departmentName || 'General' }}
+          </div>
+          <div class="flex items-center text-sm text-gray-500">
+            <span class="material-symbols-outlined text-sm mr-2 text-gray-400">location_on</span>
+            {{ job.location }}
+          </div>
+          <div class="flex items-center text-sm text-gray-500">
+            <span class="material-symbols-outlined text-sm mr-2 text-gray-400">people</span>
+            {{ job.applicationsCount }} application{{ job.applicationsCount !== 1 ? 's' : '' }}
+          </div>
+        </div>
+
+        <!-- Deadline -->
+        <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+          <span class="text-xs text-gray-500">
+            Deadline: {{ formatDate(job.deadline) }}
+          </span>
+          <span
+            *ngIf="!isExpired(job.deadline)"
+            class="text-xs font-medium text-orange-600"
+          >
+            {{ daysRemaining(job.deadline) }} day{{ daysRemaining(job.deadline) !== 1 ? 's' : '' }} left
+          </span>
+          <span *ngIf="isExpired(job.deadline)" class="text-xs font-medium text-gray-400">Expired</span>
+        </div>
+
+        <!-- Apply Arrow -->
+        <div class="mt-4 flex items-center text-green-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
+          <span>View & Apply</span>
+          <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+        </div>
+      </a>
+    </div>
+  </ng-container>
+</div>

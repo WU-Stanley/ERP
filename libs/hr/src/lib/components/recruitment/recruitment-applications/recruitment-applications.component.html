@@ -1,0 +1,143 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Applications</h1>
+      <p class="text-sm text-gray-500 mt-1">Review and manage all job applications</p>
+    </div>
+    <a routerLink="/hr/recruitment" class="inline-flex items-center gap-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      Dashboard
+    </a>
+  </div>
+
+  <!-- Search -->
+  <div class="relative max-w-md">
+    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      (keyup.enter)="onSearch()"
+      placeholder="Search by name, email or job title..."
+      class="w-full pl-9 pr-10 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+    />
+    <button *ngIf="searchQuery" (click)="clearSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+      <span class="material-symbols-outlined text-sm">close</span>
+    </button>
+  </div>
+
+  <!-- Status Tabs -->
+  <div class="flex gap-1 border-b border-gray-200 overflow-x-auto">
+    <button
+      *ngFor="let tab of statusTabs"
+      (click)="setTab(tab)"
+      [class.border-wigwe-green]="activeTab === tab"
+      [class.text-wigwe-green]="activeTab === tab"
+      [class.border-transparent]="activeTab !== tab"
+      [class.text-gray-500]="activeTab !== tab"
+      class="px-4 py-2 border-b-2 text-sm font-medium whitespace-nowrap transition-colors hover:text-gray-900"
+    >
+      {{ tab }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-wigwe-green border-t-transparent"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+    <p class="text-sm font-medium">{{ errorMessage }}</p>
+  </div>
+
+  <!-- Table -->
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <!-- Count -->
+    <p class="text-sm text-gray-500">
+      Showing {{ applications.length }} of {{ totalCount }} application{{ totalCount !== 1 ? 's' : '' }}
+    </p>
+
+    <div *ngIf="applications.length > 0" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Applicant</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 hidden md:table-cell">Job Title</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">Applied</th>
+            <th class="text-center px-4 py-3 font-semibold text-gray-600 hidden lg:table-cell">AI Score</th>
+            <th class="text-center px-4 py-3 font-semibold text-gray-600">Status</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-600">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let app of applications" class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                  <span class="text-sm font-bold text-indigo-600">{{ app.applicantName.charAt(0).toUpperCase() }}</span>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-900">{{ app.applicantName }}</p>
+                  <p class="text-xs text-gray-400">{{ app.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4 hidden md:table-cell">
+              <p class="text-gray-700 font-medium">{{ app.jobTitle }}</p>
+              <p *ngIf="app.assignedToName" class="text-xs text-gray-400">
+                <span class="material-symbols-outlined text-xs align-middle">person</span>
+                {{ app.assignedToName }}
+              </p>
+            </td>
+            <td class="px-4 py-4 hidden lg:table-cell text-gray-500 text-xs">
+              {{ formatDate(app.createdAt) }}
+            </td>
+            <td class="px-4 py-4 hidden lg:table-cell text-center">
+              <span *ngIf="app.overallMatch !== null" [ngClass]="getMatchColor(app.overallMatch)" class="font-bold">
+                {{ app.overallMatch | number:'1.0-0' }}%
+              </span>
+              <span *ngIf="app.overallMatch === null" class="text-gray-300 text-xs">Not scanned</span>
+            </td>
+            <td class="px-4 py-4 text-center">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" [ngClass]="getStatusColor(app.status)">
+                {{ app.status }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-right">
+              <button (click)="viewApplication(app.id)"
+                class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-white bg-wigwe-green rounded-lg hover:bg-green-700 transition-colors">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="applications.length === 0" class="text-center py-16 bg-white border border-gray-200 rounded-xl">
+      <span class="material-symbols-outlined text-5xl text-gray-300">inbox</span>
+      <p class="text-gray-500 mt-3 font-medium">No applications found</p>
+      <p class="text-gray-400 text-sm mt-1">
+        {{ activeTab !== 'All' ? 'No applications with status "' + activeTab + '"' : 'No applications have been submitted yet' }}
+      </p>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="flex items-center justify-between pt-2">
+      <p class="text-sm text-gray-500">Page {{ pageNumber }} of {{ totalPages }}</p>
+      <div class="flex gap-2">
+        <button (click)="prevPage()" [disabled]="pageNumber === 1"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          <span class="material-symbols-outlined text-sm">chevron_left</span>
+        </button>
+        <button (click)="nextPage()" [disabled]="pageNumber >= totalPages"
+          class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          <span class="material-symbols-outlined text-sm">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>

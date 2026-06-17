@@ -1,0 +1,67 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Hero Section -->
+  <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Our Teams</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      Meet the people behind {{ companyName }}. Explore our departments and the roles that make our organization thrive.
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent mx-auto"></div>
+      <p class="mt-4 text-gray-500">Loading team information...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="max-w-2xl mx-auto">
+    <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
+      <p class="font-medium">{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Team Stats -->
+  <div *ngIf="!isLoading && !errorMessage" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-white rounded-xl p-6 text-center shadow-sm border border-gray-200">
+      <span class="material-symbols-outlined text-4xl text-green-500 mb-3">groups</span>
+      <p class="text-3xl font-bold text-gray-900">{{ departments.length }}</p>
+      <p class="text-sm text-gray-500 mt-1">Departments</p>
+    </div>
+    <div *ngIf="stats" class="bg-white rounded-xl p-6 text-center shadow-sm border border-gray-200">
+      <span class="material-symbols-outlined text-4xl text-blue-500 mb-3">work</span>
+      <p class="text-3xl font-bold text-gray-900">{{ stats.openPositions }}</p>
+      <p class="text-sm text-gray-500 mt-1">Open Positions</p>
+    </div>
+    <div *ngIf="stats" class="bg-white rounded-xl p-6 text-center shadow-sm border border-gray-200">
+      <span class="material-symbols-outlined text-4xl text-purple-500 mb-3">trending_up</span>
+      <p class="text-3xl font-bold text-gray-900">{{ stats.totalApplications }}+</p>
+      <p class="text-sm text-gray-500 mt-1">Applications Received</p>
+    </div>
+  </div>
+
+  <!-- Departments Grid -->
+  <div *ngIf="!isLoading && !errorMessage" class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div *ngFor="let dept of departments" class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-xl hover:border-green-300 transition-all group">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="material-symbols-outlined text-2xl text-green-600">domain</span>
+        <h2 class="text-xl font-semibold text-gray-900">{{ dept.name }}</h2>
+      </div>
+      <p class="text-sm text-gray-600 mb-4 line-clamp-3">{{ dept.description || 'No description available.' }}</p>
+      <a
+        routerLink="/careers"
+        class="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
+      >
+        View open positions
+        <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !errorMessage && departments.length === 0" class="text-center py-16">
+    <span class="material-symbols-outlined text-6xl text-gray-300">groups</span>
+    <p class="mt-4 text-xl text-gray-500">No departments available at this time.</p>
+  </div>
+</div>

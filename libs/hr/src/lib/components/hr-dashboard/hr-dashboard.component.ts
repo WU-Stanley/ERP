@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, HasAnyPermissionDirective, Permissions } from '@erp/auth';
 import { AppSwitcherFabComponent } from '@erp/core';
+import { NotificationBellComponent } from '../notification-bell/notification-bell.component';
 
 @Component({
   selector: 'lib-hr-dashboard',
@@ -13,6 +14,7 @@ import { AppSwitcherFabComponent } from '@erp/core';
     RouterModule,
     HasAnyPermissionDirective,
     AppSwitcherFabComponent,
+    NotificationBellComponent,
   ],
 })
 export class HrDashboardComponent implements OnInit {
@@ -21,6 +23,12 @@ export class HrDashboardComponent implements OnInit {
   dropdownOpen = false;
   referencesOpen = false;
   menuItems = [
+    {
+      label: 'My Profile',
+      icon: 'account_circle',
+      route: '/hr/profile',
+      permissions: [],
+    },
     {
       label: 'Dashboard',
       icon: 'dashboard',
@@ -36,30 +44,68 @@ export class HrDashboardComponent implements OnInit {
       icon: 'people',
       permissions: [
         Permissions.ViewEmployeeProfiles,
+        Permissions.CreateUser,
+        Permissions.ManageUsers,
         Permissions.AdminAccess,
         Permissions.SuperAdminAccess,
       ],
       children: [
-        { label: 'Dashboard', icon: 'dashboard', route: '/hr/employees/dashboard' },
         {
-          label: 'Employee Profiles',
+          label: 'Employee Directory',
           icon: 'badge',
-          route: '/hr/employees/profiles',
+          route: '/hr/employees',
+          permissions: [
+            Permissions.ViewEmployeeProfiles,
+            Permissions.ViewDepartmentEmployeeProfiles,
+            Permissions.ManageUsers,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
         {
           label: 'Department Employees',
           icon: 'groups',
-          route: '/hr/employees/department-profiles',
+          route: '/hr/departments',
+          permissions: [
+            Permissions.ViewDepartmentEmployeeProfiles,
+            Permissions.ViewEmployeeProfiles,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
         {
-          label: 'Onboarding',
+          label: 'Add Staff',
           icon: 'person_add',
           route: '/hr/employees/onboarding',
+          permissions: [
+            Permissions.CreateUser,
+            Permissions.ManageUsers,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
         {
-          label: 'Offboarding',
-          icon: 'person_remove',
-          route: '/hr/employees/offboarding',
+          label: 'Bulk Staff Upload',
+          icon: 'upload_file',
+          route: '/hr/employees/bulk-upload',
+          permissions: [
+            Permissions.CreateUser,
+            Permissions.ManageUsers,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Profile Updates',
+          icon: 'rule',
+          route: '/hr/employees/profile-updates',
+          permissions: [
+            Permissions.ApproveProfileUpdateInDepartment,
+            Permissions.UpdateEmployeeProfiles,
+            Permissions.ManageUsers,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
         },
       ],
     },
@@ -220,6 +266,78 @@ export class HrDashboardComponent implements OnInit {
       ],
     },
     {
+      label: 'ERP Modules',
+      icon: 'apps',
+      permissions: [
+        Permissions.AccessDashboard,
+        Permissions.AdminAccess,
+        Permissions.SuperAdminAccess,
+      ],
+      children: [
+        {
+          label: 'Finance',
+          icon: 'account_balance_wallet',
+          route: '/finance',
+          permissions: [
+            Permissions.ManagePayroll,
+            Permissions.ProcessPayroll,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Procurement',
+          icon: 'shopping_cart',
+          route: '/procurement',
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageDepartmentStructure,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Inventory',
+          icon: 'inventory_2',
+          route: '/procurement/inventory',
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageDepartmentStructure,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Helpdesk',
+          icon: 'support_agent',
+          route: '/hr/helpdesk',
+          permissions: [
+            Permissions.AccessDashboard,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Facilities & Assets',
+          icon: 'construction',
+          route: '/facilities',
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.ManageDepartmentStructure,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Registry / LMS',
+          icon: 'school',
+          route: '/registry',
+          permissions: [
+            Permissions.AccessDashboard,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+      ],
+    },
+    {
       label: 'Departments',
       icon: 'business',
       route: '/hr/departments',
@@ -231,6 +349,43 @@ export class HrDashboardComponent implements OnInit {
         Permissions.ManageDepartmentStructure,
         Permissions.AdminAccess,
         Permissions.SuperAdminAccess,
+      ],
+    },
+    {
+      label: 'Recruitment',
+      icon: 'work',
+      permissions: [
+        Permissions.AdminAccess,
+        Permissions.SuperAdminAccess,
+      ],
+      children: [
+        {
+          label: 'Dashboard',
+          icon: 'dashboard',
+          route: '/hr/recruitment',
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Job Postings',
+          icon: 'business_center',
+          route: '/hr/recruitment/job-postings',
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'Applications',
+          icon: 'description',
+          route: '/hr/recruitment/applications',
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
       ],
     },
     {

@@ -1,0 +1,299 @@
+<section class="space-y-6">
+  <!-- Module header -->
+  <header class="relative overflow-hidden rounded-[2rem] border border-slate-100 bg-gradient-to-br from-wigwe-navy via-slate-900 to-wigwe-green p-6 text-white shadow-2xl shadow-slate-900/15 sm:p-8">
+    <div class="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-wigwe-yellow/20 blur-3xl"></div>
+    <div class="absolute bottom-0 right-10 h-20 w-40 rounded-t-full bg-white/10 blur-2xl"></div>
+    <div class="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <p class="inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-wigwe-yellow ring-1 ring-white/15">
+          Service desk
+        </p>
+        <h2 class="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Helpdesk Command Centre</h2>
+        <p class="mt-2 max-w-2xl text-sm font-medium text-white/70">
+          Submit service requests, track support tickets, and stay updated on resolution progress.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" (click)="loadTickets()" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 text-xs font-black text-white backdrop-blur transition hover:-translate-y-0.5">
+          <span class="material-symbols-outlined text-lg">refresh</span>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="successMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 text-sm font-bold text-emerald-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">check_circle</span>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid gap-4 md:grid-cols-3">
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Open Tickets</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ summary?.openHelpdeskTicketCount ?? openTickets }}</p>
+      <p class="mt-2 text-xs font-bold text-slate-400">Awaiting response or resolution</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">High Priority</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ urgentTickets }}</p>
+      <p class="mt-2 text-xs font-bold text-slate-400">Urgent and high priority tickets</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Closed</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ closedTickets }}</p>
+      <p class="mt-2 text-xs font-bold text-slate-400">Resolved and closed requests</p>
+    </article>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex flex-wrap items-center gap-2">
+    <button type="button" (click)="setActiveTab('all')" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black transition" [class.bg-wigwe-green.text-white]="activeTab === 'all'" [class.border.border-slate-200.bg-white.text-slate-700.hover:border-wigwe-green.hover:text-wigwe-green]="activeTab !== 'all'">
+      <span class="material-symbols-outlined text-lg" [class.text-white]="activeTab === 'all'">list_alt</span>
+      <span [class.text-white]="activeTab === 'all'">All Tickets</span>
+    </button>
+    <button type="button" (click)="setActiveTab('mine')" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black transition" [class.bg-wigwe-green.text-white]="activeTab === 'mine'" [class.border.border-slate-200.bg-white.text-slate-700.hover:border-wigwe-green.hover:text-wigwe-green]="activeTab !== 'mine'">
+      <span class="material-symbols-outlined text-lg" [class.text-white]="activeTab === 'mine'">badge</span>
+      <span [class.text-white]="activeTab === 'mine'">My Tickets</span>
+    </button>
+    <button type="button" (click)="setActiveTab('new')" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black transition" [class.bg-wigwe-green.text-white]="activeTab === 'new'" [class.border.border-slate-200.bg-white.text-slate-700.hover:border-wigwe-green.hover:text-wigwe-green]="activeTab !== 'new'">
+      <span class="material-symbols-outlined text-lg" [class.text-white]="activeTab === 'new'">add_circle</span>
+      <span [class.text-white]="activeTab === 'new'">Submit Ticket</span>
+    </button>
+  </div>
+
+  <!-- New ticket form -->
+  @if(activeTab === 'new') {
+  <div class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+    <div class="mb-6 flex flex-col gap-1">
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Open a request</p>
+      <h3 class="text-lg font-black text-slate-900">Submit New Ticket</h3>
+      <p class="text-xs font-bold text-slate-500">Describe your issue and the support team will respond shortly.</p>
+    </div>
+
+    <form [formGroup]="ticketForm" (ngSubmit)="submitTicket()" class="grid gap-5">
+      <label class="space-y-1">
+        <span class="text-xs font-black uppercase tracking-wider text-slate-400">Title</span>
+        <input formControlName="title" placeholder="Brief summary of the issue" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+      </label>
+
+      <label class="space-y-1">
+        <span class="text-xs font-black uppercase tracking-wider text-slate-400">Description</span>
+        <textarea formControlName="description" rows="4" placeholder="Provide more details to help us assist you faster." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white"></textarea>
+      </label>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Category</span>
+          <select formControlName="category" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+            <option>General</option>
+            <option>ICT</option>
+            <option>Facilities</option>
+            <option>Registry</option>
+            <option>Finance</option>
+            <option>HR</option>
+          </select>
+        </label>
+
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Priority</span>
+          <select formControlName="priority" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+            <option>Low</option>
+            <option>Normal</option>
+            <option>High</option>
+            <option>Urgent</option>
+          </select>
+        </label>
+
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Preferred Resolution Date</span>
+          <input type="date" formControlName="dueAt" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+      </div>
+
+      <div class="flex flex-wrap gap-3 pt-2">
+        <button type="submit" [disabled]="isSaving" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60">
+          @if(isSaving) {
+          <span class="material-symbols-outlined text-lg">progress_activity</span>
+          Submitting...
+          } @else {
+          <span class="material-symbols-outlined text-lg">send</span>
+          Submit Ticket
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+  }
+
+  <!-- Ticket listing -->
+  @if(!isLoading && activeTab !== 'new') {
+  <section class="rounded-[1.75rem] border border-slate-100 bg-white shadow-sm">
+    <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h3 class="text-sm font-black text-slate-900">{{ activeTab === 'mine' ? 'My Tickets' : 'Ticket Queue' }}</h3>
+        <p class="text-[11px] font-bold text-slate-400">
+          @if(activeTab === 'mine') {
+          Tickets you submitted and their resolution status.
+          } @else {
+          All service requests across the institution.
+          }
+        </p>
+      </div>
+      <label class="flex items-center gap-2">
+        <span class="text-xs font-black uppercase tracking-wider text-slate-400">Filter</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="loadTickets()" class="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 outline-none">
+          <option value="">All statuses</option>
+          <option>Open</option>
+          <option>Assigned</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+          <option>Closed</option>
+          <option>Cancelled</option>
+        </select>
+      </label>
+    </div>
+
+    @if(tickets.length) {
+    <div class="divide-y divide-slate-100">
+      @for (ticket of tickets; track ticket.id) {
+      <article class="grid gap-4 px-5 py-4 lg:grid-cols-[1fr_0.55fr_0.55fr_0.55fr_1fr] lg:items-center">
+        <button type="button" (click)="openTicketDetail(ticket.id)" class="flex flex-col items-start text-left">
+          <span class="text-sm font-black text-wigwe-green hover:underline">{{ ticket.title }}</span>
+          <span class="text-[11px] font-bold text-slate-400">{{ ticket.ticketNumber }} · {{ ticket.createdAt | date: 'MMM d, y' }}</span>
+        </button>
+        <span class="text-xs font-black uppercase tracking-wider text-slate-500">{{ ticket.category }}</span>
+        <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="getTicketPriorityClass(ticket.priority)">
+          {{ ticket.priority }}
+        </span>
+        <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="getTicketStatusClass(ticket.status)">
+          {{ ticket.status }}
+        </span>
+        <div class="flex flex-wrap gap-2">
+          @if(ticket.status !== 'Closed' && ticket.status !== 'Resolved' && ticket.status !== 'Cancelled') {
+          <button type="button" (click)="updateTicketStatus(ticket.id, 'Assigned')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-blue-300 hover:text-blue-700">Assign</button>
+          <button type="button" (click)="updateTicketStatus(ticket.id, 'In Progress')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-blue-300 hover:text-blue-700">Start</button>
+          <button type="button" (click)="updateTicketStatus(ticket.id, 'Resolved')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-emerald-300 hover:text-emerald-700">Resolve</button>
+          }
+          <button type="button" (click)="updateTicketStatus(ticket.id, 'Closed')" class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black text-slate-600 hover:border-emerald-300 hover:text-emerald-700">Close</button>
+        </div>
+      </article>
+      }
+    </div>
+    } @else {
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">confirmation_number</span>
+      <h3 class="text-xl font-bold text-gray-700 mb-2">No tickets found</h3>
+      <p class="text-sm text-gray-500 max-w-md">
+        @if(activeTab === 'mine') {
+        You have not submitted any helpdesk tickets yet.
+        } @else {
+        There are no helpdesk tickets in the queue right now.
+        }
+      </p>
+      @if(isNotNewTicketTab()) {
+      <button type="button" (click)="setActiveTab('new')" class="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5">
+        <span class="material-symbols-outlined text-lg">add</span>
+        Submit Ticket
+      </button>
+      }
+    </div>
+    }
+  </section>
+  }
+
+  <!-- Ticket detail modal -->
+  @if(selectedTicket) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" (click)="closeDetail()">
+    <div class="h-full max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-2xl" (click)="$event.stopPropagation()">
+      <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Ticket detail</p>
+          <h3 class="text-lg font-black text-slate-900">{{ selectedTicket.ticketNumber }}</h3>
+        </div>
+        <button type="button" (click)="closeDetail()" class="rounded-2xl border border-slate-200 p-2 text-slate-500 transition hover:border-rose-200 hover:text-rose-600">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="h-full overflow-y-auto p-6">
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="space-y-1">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Title</p>
+            <p class="text-sm font-black text-slate-900">{{ selectedTicket.title }}</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Status</p>
+            <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="getTicketStatusClass(selectedTicket.status)">
+              {{ selectedTicket.status }}
+            </span>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Requester</p>
+            <p class="text-sm font-bold text-slate-700">{{ selectedTicket.requesterName }}</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Assignee</p>
+            <p class="text-sm font-bold text-slate-700">{{ selectedTicket.assigneeName }}</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Category / Priority</p>
+            <p class="text-sm font-bold text-slate-700">{{ selectedTicket.category }} · {{ selectedTicket.priority }}</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Due / Created</p>
+            <p class="text-sm font-bold text-slate-700">
+              {{ selectedTicket.dueAt ? (selectedTicket.dueAt | date: 'MMM d, y') : 'Not set' }} · {{ selectedTicket.createdAt | date: 'MMM d, y' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 space-y-2">
+          <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Description</p>
+          <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm font-bold text-slate-700">
+            {{ selectedTicket.description }}
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Comments</p>
+          <div class="max-h-64 space-y-3 overflow-y-auto rounded-2xl border border-slate-100 bg-slate-50 p-4">
+            @for(comment of selectedTicket.comments; track comment.id) {
+            <div class="rounded-2xl bg-white p-4 shadow-sm">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-sm font-black text-slate-900">{{ comment.userName }}</p>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ comment.createdAt | date: 'MMM d, y HH:mm' }}</span>
+              </div>
+              <p class="mt-2 text-sm font-bold text-slate-700">{{ comment.comment }}</p>
+              @if(comment.isInternal) {
+              <span class="mt-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-700">Internal</span>
+              }
+            </div>
+            }
+          </div>
+
+          <form class="grid gap-3" (ngSubmit)="addComment()">
+            <textarea [(ngModel)]="commentText" name="commentText" rows="3" placeholder="Add a comment..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white"></textarea>
+            <div class="flex justify-end">
+              <button type="submit" [disabled]="isCommenting" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60">
+                @if(isCommenting) {
+                <span class="material-symbols-outlined text-lg">progress_activity</span>
+                Posting...
+                } @else {
+                <span class="material-symbols-outlined text-lg">send</span>
+                Post Comment
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</section>

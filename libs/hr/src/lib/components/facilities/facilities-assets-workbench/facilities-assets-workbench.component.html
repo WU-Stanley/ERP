@@ -1,0 +1,165 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Facilities and assets</p>
+      <h2 class="mt-2 text-2xl font-black text-slate-900">Asset Register</h2>
+      <p class="mt-2 max-w-3xl text-sm font-semibold text-slate-500">
+        Register university assets, track locations, conditions, lifecycle status, purchase value, and warranty dates.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <a routerLink="/facilities" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-700 transition hover:border-wigwe-green hover:text-wigwe-green">
+        <span class="material-symbols-outlined text-lg">dashboard</span>
+        Module Home
+      </a>
+      <button type="button" (click)="loadAssets()" class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-4 text-xs font-black text-white transition hover:-translate-y-0.5">
+        <span class="material-symbols-outlined text-lg">refresh</span>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="successMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 text-sm font-bold text-emerald-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">check_circle</span>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Registered Assets</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ summary?.facilityAssetCount ?? assets.length }}</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">In Use</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ activeAssets }}</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Needs Attention</p>
+      <p class="mt-3 text-3xl font-black text-slate-900">{{ needsAttention }}</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">Asset Value</p>
+      <p class="mt-3 text-2xl font-black text-slate-900">{{ formatCurrency(totalAssetValue) }}</p>
+    </article>
+  </div>
+
+  <div *ngIf="isLoading" class="space-y-3">
+    <div *ngFor="let item of [1, 2, 3]" class="h-24 animate-pulse rounded-[1.5rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+  </div>
+
+  <div *ngIf="!isLoading" class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+    <form [formGroup]="assetForm" (ngSubmit)="saveAsset()" class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+      <div class="mb-5 flex items-center justify-between gap-3">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Asset record</p>
+          <h3 class="mt-1 text-lg font-black text-slate-900">{{ selectedAsset ? 'Edit Asset' : 'Register Asset' }}</h3>
+        </div>
+        <button *ngIf="selectedAsset" type="button" (click)="resetAssetForm()" class="text-xs font-black text-slate-500 hover:text-wigwe-green">Clear</button>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Asset Tag</span>
+          <input formControlName="assetTag" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Name</span>
+          <input formControlName="name" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Category</span>
+          <input formControlName="category" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Location</span>
+          <input formControlName="location" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Condition</span>
+          <select formControlName="condition" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+            <option>New</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>Poor</option>
+            <option>Damaged</option>
+          </select>
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Status</span>
+          <select formControlName="status" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white">
+            <option>InUse</option>
+            <option>Available</option>
+            <option>UnderMaintenance</option>
+            <option>Retired</option>
+            <option>Lost</option>
+          </select>
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Purchase Date</span>
+          <input type="date" formControlName="purchaseDate" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Purchase Cost</span>
+          <input type="number" formControlName="purchaseCost" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+        <label class="space-y-1 md:col-span-2">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Warranty Expiry</span>
+          <input type="date" formControlName="warrantyExpiryDate" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white" />
+        </label>
+      </div>
+
+      <button type="submit" [disabled]="isSaving" class="mt-5 inline-flex h-11 items-center justify-center rounded-2xl bg-wigwe-green px-5 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60">
+        {{ isSaving ? 'Saving...' : selectedAsset ? 'Update Asset' : 'Register Asset' }}
+      </button>
+    </form>
+
+    <section class="overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-sm">
+      <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <h3 class="text-sm font-black text-slate-900">Asset Register</h3>
+        <label class="flex items-center gap-2">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-400">Status</span>
+          <select [(ngModel)]="statusFilter" (ngModelChange)="loadAssets()" class="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 outline-none">
+            <option value="">All</option>
+            <option>InUse</option>
+            <option>Available</option>
+            <option>UnderMaintenance</option>
+            <option>Retired</option>
+            <option>Lost</option>
+          </select>
+        </label>
+      </div>
+
+      <div *ngIf="assets.length; else noAssets" class="divide-y divide-slate-100">
+        <button
+          *ngFor="let asset of assets; trackBy: trackById"
+          type="button"
+          (click)="editAsset(asset)"
+          class="grid w-full gap-4 px-5 py-4 text-left transition hover:bg-slate-50 lg:grid-cols-[1fr_0.65fr_0.55fr_0.55fr_0.6fr] lg:items-center"
+        >
+          <span>
+            <span class="block text-sm font-black text-slate-900">{{ asset.name }}</span>
+            <span class="text-xs font-bold text-slate-400">{{ asset.assetTag }} · {{ asset.category }}</span>
+          </span>
+          <span class="text-sm font-bold text-slate-700">{{ asset.location }}</span>
+          <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="conditionClass(asset.condition)">
+            {{ asset.condition }}
+          </span>
+          <span class="rounded-full px-3 py-1 text-center text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(asset.status)">
+            {{ asset.status }}
+          </span>
+          <span class="text-sm font-bold text-slate-700">{{ formatCurrency(asset.purchaseCost) }}</span>
+        </button>
+      </div>
+
+      <ng-template #noAssets>
+        <div class="p-8 text-center text-sm font-bold text-slate-500">No facility assets found.</div>
+      </ng-template>
+    </section>
+  </div>
+</section>

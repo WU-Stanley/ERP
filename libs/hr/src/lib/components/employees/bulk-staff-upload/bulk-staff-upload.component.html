@@ -1,0 +1,101 @@
+<section class="space-y-6 rounded-[2rem] bg-slate-50/80 p-3 sm:p-4">
+  <header class="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-wigwe-navy via-slate-900 to-wigwe-green p-6 text-white shadow-2xl shadow-slate-900/15 sm:p-8">
+    <div class="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-wigwe-yellow/20 blur-3xl"></div>
+    <div class="absolute bottom-0 right-10 h-20 w-40 rounded-t-full bg-white/10 blur-2xl"></div>
+    <div class="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <p class="inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-wigwe-yellow ring-1 ring-white/15">
+          HR bulk operations
+        </p>
+        <h2 class="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Bulk Staff Upload</h2>
+        <p class="mt-2 max-w-2xl text-sm font-medium text-white/70">
+          Download the Excel template, choose existing departments and employment values from dropdowns, then upload it to create staff in batches.
+        </p>
+      </div>
+      <button
+        type="button"
+        (click)="downloadTemplate()"
+        [disabled]="isLoadingTemplateData"
+        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-wigwe-yellow px-5 py-3 text-sm font-black text-slate-900 shadow-lg shadow-wigwe-yellow/20 transition hover:-translate-y-0.5 hover:bg-wigwe-gold"
+      >
+        <span class="material-symbols-outlined text-lg">{{ isLoadingTemplateData ? 'hourglass_top' : 'download' }}</span>
+        {{ isLoadingTemplateData ? 'Loading Template Data' : 'Download Excel Template' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">Upload File</h3>
+      <p class="mt-2 text-sm font-medium text-slate-500">
+        Accepted formats: <span class="font-black">.xlsx</span> and <span class="font-black">.csv</span>.
+        You may enter department, employment type, and job category by name or by ID.
+      </p>
+
+      <label
+        class="mt-6 flex cursor-pointer flex-col items-center justify-center rounded-[1.75rem] border-2 border-dashed border-slate-200 bg-slate-50/80 p-10 text-center transition duration-200 hover:-translate-y-0.5 hover:border-wigwe-yellow hover:bg-white hover:shadow-lg hover:shadow-slate-200/70"
+      >
+        <span class="material-symbols-outlined rounded-3xl bg-wigwe-green p-4 text-4xl text-white">
+          upload_file
+        </span>
+        <span class="mt-4 text-sm font-black text-slate-900">
+          {{ selectedFile?.name || 'Choose staff upload file' }}
+        </span>
+        <span class="mt-1 text-xs font-bold text-slate-400">Max file size: 10MB</span>
+        <input type="file" accept=".xlsx,.csv" class="hidden" (change)="onFileSelected($event)" />
+      </label>
+
+      <button
+        type="button"
+        (click)="upload()"
+        [disabled]="!selectedFile || isUploading"
+        class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-5 py-4 text-sm font-black text-white shadow-lg shadow-wigwe-green/15 transition hover:-translate-y-0.5 hover:bg-wigwe-teal disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+      >
+        <span class="material-symbols-outlined text-lg">{{ isUploading ? 'hourglass_top' : 'cloud_upload' }}</span>
+        {{ isUploading ? 'Uploading...' : 'Upload Staff' }}
+      </button>
+
+      <div *ngIf="errorMessage" class="mt-5 flex items-start gap-3 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-700">
+        <span class="material-symbols-outlined text-lg">error</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </section>
+
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">Required Columns</h3>
+      <p class="mt-2 text-sm font-medium text-slate-500">
+        The Excel template includes lookup sheets for valid selectable values.
+      </p>
+      <div class="mt-5 grid gap-3 sm:grid-cols-2">
+        <div *ngFor="let column of requiredColumns" class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-black text-slate-700">
+          {{ column }}
+        </div>
+      </div>
+
+      <div *ngIf="result" class="mt-8 rounded-[1.75rem] border border-slate-100 bg-slate-50 p-5">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Upload result</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-3">
+          <div class="rounded-2xl bg-white p-4">
+            <p class="text-xs font-bold text-slate-400">Rows</p>
+            <p class="mt-2 text-2xl font-black text-slate-900">{{ result.totalRows }}</p>
+          </div>
+          <div class="rounded-2xl bg-white p-4">
+            <p class="text-xs font-bold text-slate-400">Created</p>
+            <p class="mt-2 text-2xl font-black text-emerald-600">{{ result.createdRows }}</p>
+          </div>
+          <div class="rounded-2xl bg-white p-4">
+            <p class="text-xs font-bold text-slate-400">Failed</p>
+            <p class="mt-2 text-2xl font-black text-rose-600">{{ result.failedRows }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="result.errors?.length" class="mt-5 space-y-2">
+          <div *ngFor="let row of result.errors" class="rounded-2xl bg-white p-4 text-sm">
+            <p class="font-black text-slate-900">Row {{ row.rowNumber }} {{ row.email ? '- ' + row.email : '' }}</p>
+            <p class="mt-1 font-bold text-rose-600">{{ row.message }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

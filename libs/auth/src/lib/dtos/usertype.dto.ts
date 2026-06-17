@@ -9,10 +9,11 @@ export interface UserTypeDto {
 
 export interface UserDto {
   id: string;
+  employeeId?: string | null;
   fullName: string;
   email: string;
   userTypeId: string;
-  departmentId: string;
+  departmentId?: string | null;
 }
 export interface EmploymentTypeDto {
   id: string;

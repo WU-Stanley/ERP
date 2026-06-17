@@ -113,6 +113,16 @@ export class AuthDashboardComponent implements OnInit {
       ],
     },
     {
+      label: 'Audit Logs',
+      icon: 'manage_search',
+      route: '/auth/audit-logs',
+      permissions: [
+        Permissions.ViewAuditLogs,
+        Permissions.AdminAccess,
+        Permissions.SuperAdminAccess,
+      ],
+    },
+    {
       permissions: ['AccessDashboard', 'AdminAccess', 'SuperAdminAccess'],
       label: 'Settings',
       icon: 'settings',

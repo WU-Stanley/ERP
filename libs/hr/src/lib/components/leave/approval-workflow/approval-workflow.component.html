@@ -11,60 +11,78 @@
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-    <div
-      *ngFor="let flow of approvalWorkflows; let i = index"
-      class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer relative"
-    >
-      <div class="flex font-semibold text-lg justify-between">
-        {{ flow.name }}
-        <button
-          class="material-symbols-outlined ml-auto"
-          (click)="toggleMenu(i)"
-        >
-          more_vert
-        </button>
-        <div
-          *ngIf="activeMenuIndex === i"
-          class="absolute top-10 right-4 z-50 bg-white shadow-md rounded border w-32"
-        >
-          <ul class="flex flex-col text-sm text-gray-800">
-            <li>
-              <button
-                class="w-full text-left hover:bg-gray-100 px-4 py-2"
-                (click)="viewWrokflow(i)"
-              >
-                View
-              </button>
-            </li>
-            <li>
-              <button
-                class="w-full text-left hover:bg-gray-100 px-4 py-2"
-                (click)="editWorkflow(i)"
-              >
-                Edit
-              </button>
-            </li>
-          </ul>
+    @if(approvalWorkflows.length) {
+    @for (flow of approvalWorkflows; let i = $index; track flow.id) {
+      <div
+        class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer relative"
+      >
+        <div class="flex font-semibold text-lg justify-between">
+          {{ flow.name }}
+          <button
+            class="material-symbols-outlined ml-auto"
+            (click)="toggleMenu(i)"
+          >
+            more_vert
+          </button>
+          <div
+            *ngIf="activeMenuIndex === i"
+            class="absolute top-10 right-4 z-50 bg-white shadow-md rounded border w-32"
+          >
+            <ul class="flex flex-col text-sm text-gray-800">
+              <li>
+                <button
+                  class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                  (click)="viewWrokflow(i)"
+                >
+                  View
+                </button>
+              </li>
+              <li>
+                <button
+                  class="w-full text-left hover:bg-gray-100 px-4 py-2"
+                  (click)="editWorkflow(i)"
+                >
+                  Edit
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div class="text-sm text-gray-500 mb-2">
-        {{ flow.steps?.length }} Steps
-      </div>
+        <div class="text-sm text-gray-500 mb-2">
+          {{ flow.steps?.length }} Steps
+        </div>
 
-      <div class="space-y-1 text-sm">
-        <div *ngFor="let step of flow.steps">
-          <div class="text-gray-700">
-            <strong>Step {{ step.stepOrder }}:</strong>
-            {{ step.approverType }} -
-            {{
-              step.approverType === 'ROLE'
-                ? getRoleName(step.approverValue)
-                : getUserName(step.approverValue)
-            }}
+        <div class="space-y-1 text-sm">
+          <div *ngFor="let step of flow.steps">
+            <div class="text-gray-700">
+              <strong>Step {{ step.stepOrder }}:</strong>
+              {{ step.approverType }} -
+              {{
+                step.approverType === 'ROLE'
+                  ? getRoleName(step.approverValue)
+                  : getUserName(step.approverValue)
+              }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      }
+    } @else {
+      <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+        <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">
+          account_tree
+        </span>
+        <h3 class="text-xl font-bold text-gray-700 mb-2">
+          No approval workflows configured
+        </h3>
+        <p class="text-sm text-gray-500 max-w-md mb-6">
+          Create an approval workflow to define how leave requests are reviewed
+          and approved within your organization.
+        </p>
+        <lib-add-button label="New Approval Workflow" (click)="toggleForm()">
+        </lib-add-button>
+      </div>
+    }
   </div>
 </div>
 

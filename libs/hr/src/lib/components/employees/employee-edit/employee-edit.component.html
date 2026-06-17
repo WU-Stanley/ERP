@@ -1,0 +1,126 @@
+<section class="space-y-6">
+  <a
+    *ngIf="employee"
+    [routerLink]="['/hr/employees', employee.employeeId]"
+    class="inline-flex items-center gap-2 text-sm font-black text-slate-500 transition hover:text-wigwe-green"
+  >
+    <span class="material-symbols-outlined text-lg">arrow_back</span>
+    Employee Profile
+  </a>
+
+  <div *ngIf="isLoading" class="space-y-4">
+    <div class="h-28 animate-pulse rounded-[1.75rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+    <div class="h-96 animate-pulse rounded-[1.75rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <form *ngIf="!isLoading && employee" [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+    <header class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Employee profile</p>
+      <h2 class="mt-2 text-2xl font-black text-slate-900">Edit {{ employee.firstName }} {{ employee.lastName }}</h2>
+    </header>
+
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">Personal Information</h3>
+      <div class="mt-5 grid gap-4 md:grid-cols-3">
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">First Name</span>
+          <input formControlName="firstName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Middle Name</span>
+          <input formControlName="middleName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Last Name</span>
+          <input formControlName="lastName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Date of Birth</span>
+          <input type="date" formControlName="dateOfBirth" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Gender</span>
+          <input formControlName="gender" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Marital Status</span>
+          <input formControlName="maritalStatus" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+      </div>
+    </section>
+
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <h3 class="text-lg font-black text-slate-900">Contact Information</h3>
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Email</span>
+          <input type="email" formControlName="email" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Phone Number</span>
+          <input formControlName="phoneNumber" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2 md:col-span-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Address</span>
+          <input formControlName="address" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs font-black uppercase tracking-widest text-slate-400">Nationality</span>
+          <input formControlName="nationality" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+        </label>
+      </div>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Emergency Contact</h3>
+        <div class="mt-5 grid gap-4">
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Name</span>
+            <input formControlName="emergencyContactName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</span>
+            <input formControlName="emergencyContactPhone" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Relationship</span>
+            <input formControlName="relationship" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+        </div>
+      </section>
+
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Bank Details</h3>
+        <div class="mt-5 grid gap-4">
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Bank Name</span>
+            <input formControlName="bankName" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+          <label class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Account Number</span>
+            <input formControlName="bankAccountNumber" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <a [routerLink]="['/hr/employees', employee.employeeId]" class="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-black text-slate-700 transition hover:bg-slate-50">
+        Cancel
+      </a>
+      <button
+        type="submit"
+        [disabled]="isSaving"
+        class="inline-flex h-12 items-center justify-center rounded-2xl bg-wigwe-green px-6 text-sm font-black text-white shadow-lg shadow-wigwe-green/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isSaving ? 'Saving...' : 'Save Profile' }}
+      </button>
+    </div>
+  </form>
+</section>

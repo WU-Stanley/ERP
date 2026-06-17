@@ -44,6 +44,7 @@ export class DepartmentComponent implements OnInit {
   isDialogOpen = false;
   departments: DepartmentDto[] = [];
   users!: UserDto[];
+  editingDepartmentId: string | null = null;
   constructor(
     private authService: AuthService,
     private departmentService: DepartmentService,
@@ -58,11 +59,16 @@ export class DepartmentComponent implements OnInit {
       headOfDepartmentId: new FormControl(''),
     });
     this.authService.getAllStaff().subscribe((staffs) => {
-      this.users = staffs.data ?? [];
+      this.users = (staffs.data ?? []).filter((staff) => !!staff.employeeId);
     });
   }
   editDepartment(department: DepartmentDto) {
-    this.departmentForm.patchValue(department);
+    this.editingDepartmentId = department.id;
+    this.departmentForm.patchValue({
+      name: department.name,
+      description: department.description,
+      headOfDepartmentId: department.headOfDepartmentId ?? '',
+    });
     this.openDialog();
   }
   openDialog() {
@@ -71,18 +77,35 @@ export class DepartmentComponent implements OnInit {
   onAddDepartment() {
     if (this.departmentForm.invalid) return;
     this.isProcessing = true;
-    this.departmentService
-      .createDepartment(this.departmentForm.value)
-      .subscribe((res) => {
-        console.log('new department: ', res);
-        this.isProcessing = false;
-        this.isDialogOpen = false;
-        this.loadDepartments();
+    const { headOfDepartmentId, ...formValue } = this.departmentForm.value;
+    const payload = {
+      ...formValue,
+      ...(headOfDepartmentId ? { headOfDepartmentId } : {}),
+    };
+
+    const request$ = this.editingDepartmentId
+      ? this.departmentService.updateDepartment({ ...payload, id: this.editingDepartmentId })
+      : this.departmentService.createDepartment(payload);
+
+    request$.subscribe({
+        next: (res) => {
+          console.log(this.editingDepartmentId ? 'updated department: ' : 'new department: ', res);
+          this.isProcessing = false;
+          this.isDialogOpen = false;
+          this.editingDepartmentId = null;
+          this.departmentForm.reset();
+          this.loadDepartments();
+        },
+        error: (error) => {
+          console.error('department save failed:', error);
+          this.isProcessing = false;
+        },
       });
   }
 
   handleDialogClose(data: any | null) {
     this.isDialogOpen = false;
+    this.editingDepartmentId = null;
     if (data) {
       console.log('department Created:', data);
       this.loadDepartments();
@@ -94,7 +117,7 @@ export class DepartmentComponent implements OnInit {
     return this.departments?.filter(
       (p) =>
         p.name.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term)
+        (p.description ?? '').toLowerCase().includes(term)
     );
   }
   loadDepartments() {

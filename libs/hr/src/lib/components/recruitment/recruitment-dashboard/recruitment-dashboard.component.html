@@ -1,0 +1,108 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Recruitment Dashboard</h1>
+      <p class="text-sm text-gray-500 mt-1">Manage job postings, applications, and the hiring pipeline</p>
+    </div>
+    <div class="flex gap-2">
+      <a routerLink="/hr/recruitment/job-postings"
+         class="inline-flex items-center gap-1 px-4 py-2 bg-wigwe-green text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+        <span class="material-symbols-outlined text-sm">add</span>
+        New Job
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading / Error states -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-wigwe-green border-t-transparent"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+    <p class="font-medium">Error</p>
+    <p class="text-sm">{{ errorMessage }}</p>
+  </div>
+
+  <!-- Metrics Grid -->
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <a *ngFor="let card of metricCards" [routerLink]="card.route" [queryParams]="card.queryParams"
+         class="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-shadow cursor-pointer group">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center" [ngClass]="card.tone">
+            <span class="material-symbols-outlined text-xl text-white">{{ card.icon }}</span>
+          </div>
+          <span class="text-xs text-gray-400">{{ card.label }}</span>
+        </div>
+        <p class="text-3xl font-bold text-gray-900">{{ card.value }}</p>
+        <p class="text-xs text-gray-500 mt-1">{{ card.label }}</p>
+      </a>
+    </div>
+
+    <!-- AI Match Score -->
+    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6">
+      <div class="flex items-center gap-4">
+        <div class="flex-shrink-0">
+          <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span class="material-symbols-outlined text-3xl text-indigo-600">smart_toy</span>
+          </div>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-gray-900">AI Resume Scanning</h3>
+          <p class="text-sm text-gray-600 mt-1">Automatically scan and score resumes against job requirements</p>
+          <div class="mt-3 flex items-center gap-3">
+            <div class="flex-1 bg-white rounded-full h-3 overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all"
+                   [style.width.%]="avgMatchScore">
+              </div>
+            </div>
+            <span class="text-sm font-semibold text-indigo-600">{{ avgMatchScore | number: '1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a routerLink="/hr/recruitment/job-postings"
+           class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+          <span class="material-symbols-outlined text-blue-500">work</span>
+          <span class="text-sm font-medium text-gray-700">Manage Jobs</span>
+        </a>
+        <a routerLink="/hr/recruitment/applications"
+           class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+          <span class="material-symbols-outlined text-green-500">assignment</span>
+          <span class="text-sm font-medium text-gray-700">View Applications</span>
+        </a>
+        <a [routerLink]="'/hr/recruitment/applications'" [queryParams]="{ statusFilter: 'Interviewing' }"
+           class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+          <span class="material-symbols-outlined text-amber-500">videocam</span>
+          <span class="text-sm font-medium text-gray-700">Schedule Interviews</span>
+        </a>
+        <a [routerLink]="'/hr/recruitment/applications'" [queryParams]="{ statusFilter: 'Offer' }"
+           class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+          <span class="material-symbols-outlined text-emerald-500">send</span>
+          <span class="text-sm font-medium text-gray-700">Manage Offers</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Status Breakdown -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Application Pipeline</h3>
+      <div class="space-y-3">
+        <div *ngFor="let entry of stats?.statusBreakdown | keyvalue" class="flex items-center gap-4">
+          <span class="text-sm font-medium text-gray-600 w-32">{{ entry.key }}</span>
+          <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-wigwe-green to-emerald-400 rounded-full transition-all"
+                 [style.width.%]="getPercentage(entry.value)"></div>
+          </div>
+          <span class="text-sm font-semibold text-gray-700 w-12 text-right">{{ entry.value }}</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

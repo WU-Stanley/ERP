@@ -1,0 +1,179 @@
+<section class="space-y-6">
+  <a
+    routerLink="/hr/employees"
+    class="inline-flex items-center gap-2 text-sm font-black text-slate-500 transition hover:text-wigwe-green"
+  >
+    <span class="material-symbols-outlined text-lg">arrow_back</span>
+    Employee Directory
+  </a>
+
+  <div *ngIf="isLoading" class="space-y-4">
+    <div class="h-40 animate-pulse rounded-[1.75rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+    <div class="grid gap-4 lg:grid-cols-3">
+      <div *ngFor="let item of [1, 2, 3]" class="h-48 animate-pulse rounded-[1.5rem] bg-white shadow-sm ring-1 ring-slate-100"></div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="flex items-start gap-3 rounded-[1.5rem] border border-rose-100 bg-rose-50 p-5 text-sm font-bold text-rose-700 shadow-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !errorMessage && employee">
+    <header class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-wigwe-green text-2xl font-black text-white">
+            {{ fullName ? fullName.charAt(0) : 'E' }}
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-wigwe-gold">Employee profile</p>
+            <h2 class="mt-1 truncate text-2xl font-black text-slate-900">{{ fullName || 'Unnamed employee' }}</h2>
+            <p class="truncate text-sm font-bold text-slate-400">{{ employee.email }}</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(currentEmployment)">
+            {{ currentEmployment?.employmentStatus || (currentEmployment?.isActive ? 'Active' : 'Inactive') }}
+          </span>
+          <a
+            *ngIf="canEditProfile"
+            [routerLink]="['/hr/employees', employee.employeeId, 'edit']"
+            class="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-wigwe-green px-4 text-xs font-black text-white shadow-lg shadow-wigwe-green/20 transition hover:-translate-y-0.5"
+          >
+            <span class="material-symbols-outlined text-base">edit</span>
+            Edit Profile
+          </a>
+          <a
+            *ngIf="canManageEmployment"
+            [routerLink]="['/hr/employees', employee.employeeId, 'employment']"
+            [queryParams]="{ mode: 'assignment' }"
+            class="inline-flex h-10 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-700 transition hover:-translate-y-0.5 hover:border-wigwe-green hover:text-wigwe-green"
+          >
+            <span class="material-symbols-outlined text-base">work_update</span>
+            Change Employment
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Employment</h3>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Job Title</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ currentEmployment?.jobTitle || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Department</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ currentEmployment?.department?.name || 'Unassigned' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Employment Type</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ currentEmployment?.employmentType?.name || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date of Hire</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">
+              {{ currentEmployment?.dateOfHire ? (currentEmployment?.dateOfHire | date: 'MMM d, y') : 'Not set' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Grade Level</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ currentEmployment?.gradeLevel || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Benefits</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ currentEmployment?.benefits || 'Not set' }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Contact</h3>
+        <div class="mt-5 space-y-4">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.phoneNumber || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Address</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.address || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Nationality</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.nationality || 'Not set' }}</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-slate-900">Employment History</h3>
+        <a
+          *ngIf="canManageEmployment"
+          [routerLink]="['/hr/employees', employee.employeeId, 'employment']"
+          [queryParams]="{ mode: 'assignment' }"
+          class="text-xs font-black uppercase tracking-widest text-wigwe-green"
+        >
+          Add change
+        </a>
+      </div>
+      <div *ngIf="employee.employments?.length; else noEmploymentHistory" class="mt-5 divide-y divide-slate-100">
+        <div *ngFor="let employment of employee.employments" class="grid gap-3 py-4 md:grid-cols-[1.2fr_1fr_0.8fr_0.5fr] md:items-center">
+          <div>
+            <p class="text-sm font-black text-slate-900">{{ employment.jobTitle || 'No title' }}</p>
+            <p class="text-xs font-bold text-slate-400">{{ employment.department?.name || 'Unassigned' }}</p>
+          </div>
+          <p class="text-sm font-bold text-slate-700">{{ employment.employmentType?.name || 'No type' }}</p>
+          <p class="text-sm font-bold text-slate-700">
+            {{ employment.startDate ? (employment.startDate | date: 'MMM d, y') : 'Not set' }}
+          </p>
+          <span class="inline-flex w-fit rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest" [ngClass]="statusClass(employment)">
+            {{ employment.employmentStatus || (employment.isActive ? 'Active' : 'Inactive') }}
+          </span>
+        </div>
+      </div>
+      <ng-template #noEmploymentHistory>
+        <p class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-400">No employment history yet.</p>
+      </ng-template>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Emergency Contact</h3>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.emergencyContactName || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.emergencyContactPhone || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Relationship</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.relationship || 'Not set' }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+        <h3 class="text-lg font-black text-slate-900">Bank Details</h3>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Bank Name</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.bankName || 'Not set' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Account Number</p>
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ employee.bankAccountNumber || 'Not set' }}</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+</section>
