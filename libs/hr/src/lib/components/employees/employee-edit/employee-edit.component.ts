@@ -20,6 +20,9 @@ export class EmployeeEditComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
 
+  genders = ['Male', 'Female', 'Other'];
+  maritalStatuses = ['Single', 'Married', 'Divorced', 'Widowed', 'Separated'];
+
   form = this.fb.nonNullable.group({
     firstName: ['', Validators.required],
     middleName: [''],

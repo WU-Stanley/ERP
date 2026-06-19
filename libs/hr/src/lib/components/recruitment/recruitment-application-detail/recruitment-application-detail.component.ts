@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RecruitmentService } from '../../../services/recruitment.service';
 import { ApplicationDto, ApplicationScoreDto, InterviewDto, CreateInterviewDto, OfferLetterDto, CreateOfferLetterDto, QueryDto, CreateQueryDto } from '../../../dtos/recruitment.dto';
-import { AlertService } from '@erp/core';
+import { AlertService, CustomSelectComponent } from '@erp/core';
+import { environment } from '@env/environment';
+import { AuthService } from '@erp/auth';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 type ActiveTab = 'overview' | 'score' | 'interviews' | 'offers' | 'messages';
 
@@ -12,15 +15,19 @@ type ActiveTab = 'overview' | 'score' | 'interviews' | 'offers' | 'messages';
   selector: 'app-recruitment-application-detail',
   templateUrl: './recruitment-application-detail.component.html',
   styleUrls: ['./recruitment-application-detail.component.css'],
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, CustomSelectComponent],
 })
 export class RecruitmentApplicationDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly recruitmentService = inject(RecruitmentService);
   private readonly alertService = inject(AlertService);
+  private readonly authService = inject(AuthService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   applicationId = '';
+  showResumePreview = false;
+  isScanning = false;
   application: ApplicationDto | null = null;
   score: ApplicationScoreDto | null = null;
   interviews: InterviewDto[] = [];
@@ -45,6 +52,12 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   // Interview creation form
   showNewInterview = false;
   interviewForm = this.createInterviewForm();
+  staff: any[] = [];
+  selectedInterviewers: { employeeId?: string; email: string; name?: string }[] = [];
+  externalInterviewer = { name: '', email: '' };
+  selectedStaffId = '';
+  selectedStaffIds: string[] = [];
+
   private createInterviewForm() {
     return {
       type: 'Phone Screen',
@@ -92,8 +105,20 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
       this.loadInterviews(),
       this.loadOfferLetters(),
       this.loadQueries(),
+      this.loadStaff(),
     ]).finally(() => {
       this.isLoading = false;
+    });
+  }
+
+  loadStaff() {
+    return this.authService.getAllStaff().subscribe({
+      next: (res) => {
+        this.staff = res.data ?? [];
+      },
+      error: () => {
+        this.staff = [];
+      },
     });
   }
 
@@ -135,7 +160,7 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
     // Fetch offer letter if it exists
     return this.recruitmentService.getOfferLetter(this.applicationId).subscribe({
       next: (res) => {
-        this.offerLetters = [res.data];
+        this.offerLetters = res.data ? [res.data] : [];
       },
       error: () => {
         this.offerLetters = [];
@@ -176,14 +201,19 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
 
   // ---- Rescan Resume ----
   rescanResume() {
+    this.isScanning = true;
+    this.errorMessage = '';
+    this.successMessage = '';
     this.recruitmentService.scanResume(this.applicationId).subscribe({
       next: (res) => {
         this.score = res.data;
         this.successMessage = 'Resume re-scanned successfully.';
+        this.isScanning = false;
         setTimeout(() => (this.successMessage = ''), 4000);
       },
       error: (err) => {
         this.errorMessage = err?.error?.message || 'Resume scan failed.';
+        this.isScanning = false;
       },
     });
   }
@@ -195,11 +225,20 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
         type: this.interviewForm.type,
         scheduledFor: new Date(this.interviewForm.scheduledFor),
         notes: this.interviewForm.notes,
+        interviewers: this.selectedInterviewers.map(i => ({
+          employeeId: i.employeeId,
+          email: i.email,
+          name: i.name
+        }))
       };
       this.recruitmentService.createInterview(this.applicationId, dto).subscribe({
         next: () => {
           this.successMessage = 'Interview scheduled successfully.';
           this.showNewInterview = false;
+          this.selectedInterviewers = [];
+          this.selectedStaffIds = [];
+          this.selectedStaffId = '';
+          this.externalInterviewer = { name: '', email: '' };
           this.loadAll();
           setTimeout(() => (this.successMessage = ''), 4000);
         },
@@ -207,6 +246,62 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
           this.errorMessage = err?.error?.message || 'Failed to schedule interview.';
         },
       });
+    }
+  }
+
+  onStaffSelectionChange(selectedIds: string[]) {
+    // Keep external interviewers (those whose email is not in staff list)
+    const external = this.selectedInterviewers.filter(i => {
+      if (!i.email) return true;
+      const lowerEmail = i.email.toLowerCase();
+      return !this.staff.some(s => s.email?.toLowerCase() === lowerEmail);
+    });
+
+    // Get selected staff members details
+    const selectedStaff = this.staff
+      .filter(s => selectedIds.includes(s.id))
+      .map(s => ({
+        employeeId: s.employeeId || undefined,
+        email: s.email,
+        name: s.fullName
+      }));
+
+    // Combine them
+    this.selectedInterviewers = [...selectedStaff, ...external];
+  }
+
+  addExternalInterviewer() {
+    const email = this.externalInterviewer.email.trim();
+    const name = this.externalInterviewer.name.trim();
+    if (!email) return;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      this.alertService.showError('Please enter a valid email address.');
+      return;
+    }
+
+    const exists = this.selectedInterviewers.some(i => i.email.toLowerCase() === email.toLowerCase());
+    if (!exists) {
+      this.selectedInterviewers.push({
+        email: email,
+        name: name || undefined
+      });
+    }
+    this.externalInterviewer = { name: '', email: '' };
+  }
+
+  removeInterviewer(index: number) {
+    const removed = this.selectedInterviewers[index];
+    this.selectedInterviewers.splice(index, 1);
+
+    // If it was a staff member, also remove their ID from selectedStaffIds
+    if (removed && removed.email) {
+      const lowerEmail = removed.email.toLowerCase();
+      const staffMember = this.staff.find(s => s.email?.toLowerCase() === lowerEmail);
+      if (staffMember) {
+        this.selectedStaffIds = this.selectedStaffIds.filter(id => id !== staffMember.id);
+      }
     }
   }
 
@@ -274,6 +369,29 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   }
 
   // ---- Helpers ----
+  isStaffMember(email: string | null | undefined): boolean {
+    if (!email) return false;
+    const lowerEmail = email.toLowerCase();
+    const inStaff = this.staff.some(s => s.email?.toLowerCase() === lowerEmail);
+    if (inStaff) return true;
+    return lowerEmail.endsWith('@wigweuniversity.edu.ng');
+  }
+
+  getResumeUrl(filePath: string | null | undefined): string {
+    if (!filePath) return '';
+    const token = this.authService.getAccessToken() || localStorage.getItem('token') || '';
+    return `${environment.apiUrl}/v1/recruitment/applications/${this.applicationId}/resume?access_token=${encodeURIComponent(token)}`;
+  }
+
+  toggleResumePreview() {
+    this.showResumePreview = !this.showResumePreview;
+  }
+
+  getSafeResumeUrl(filePath: string | null | undefined): SafeResourceUrl {
+    const url = this.getResumeUrl(filePath);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
   formatDate(date: Date | string | null | undefined): string {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-NG', {

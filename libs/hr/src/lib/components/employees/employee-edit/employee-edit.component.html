@@ -45,11 +45,17 @@
         </label>
         <label class="space-y-2">
           <span class="text-xs font-black uppercase tracking-widest text-slate-400">Gender</span>
-          <input formControlName="gender" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          <select formControlName="gender" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10 cursor-pointer">
+            <option value="">Select Gender</option>
+            <option *ngFor="let option of genders" [value]="option">{{ option }}</option>
+          </select>
         </label>
         <label class="space-y-2">
           <span class="text-xs font-black uppercase tracking-widest text-slate-400">Marital Status</span>
-          <input formControlName="maritalStatus" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10" />
+          <select formControlName="maritalStatus" class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:border-wigwe-green focus:bg-white focus:ring-4 focus:ring-wigwe-green/10 cursor-pointer">
+            <option value="">Select Marital Status</option>
+            <option *ngFor="let option of maritalStatuses" [value]="option">{{ option }}</option>
+          </select>
         </label>
       </div>
     </section>

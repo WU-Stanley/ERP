@@ -154,8 +154,24 @@ export class EmploymentAssignmentComponent implements OnInit {
   }
 
   save() {
-    if (!this.employee || this.form.invalid) {
+    if (!this.employee) {
+      this.errorMessage = 'Employee profile is not loaded.';
+      return;
+    }
+
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
+      const invalidFields: string[] = [];
+      Object.keys(this.form.controls).forEach(key => {
+        const control = this.form.get(key);
+        if (control && control.invalid) {
+          // Format the field name to be user-friendly
+          const friendlyName = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          invalidFields.push(friendlyName);
+        }
+      });
+      this.errorMessage = `Please fill in all required fields: ${invalidFields.join(', ')}.`;
+      console.warn('Form validation failed for fields:', invalidFields);
       return;
     }
 
@@ -184,8 +200,9 @@ export class EmploymentAssignmentComponent implements OnInit {
           this.successMessage = this.saveSuccessMessage;
           this.router.navigate(['/hr/employees', this.employee?.employeeId]);
         },
-        error: () => {
-          this.errorMessage = 'Unable to save employment assignment.';
+        error: (err) => {
+          console.error('Error assigning employment:', err);
+          this.errorMessage = err?.error?.message || err?.message || 'Unable to save employment assignment.';
           this.isSaving = false;
         },
       });

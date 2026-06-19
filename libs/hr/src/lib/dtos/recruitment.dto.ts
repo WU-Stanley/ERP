@@ -87,6 +87,20 @@ export interface ApplicationScoreDto {
   scannedAt: Date | null;
 }
 
+export interface CreateInterviewerDto {
+  employeeId?: string;
+  email: string;
+  name?: string;
+}
+
+export interface InterviewerDto {
+  id: string;
+  employeeId: string | null;
+  employeeName: string | null;
+  email: string;
+  name: string | null;
+}
+
 export interface InterviewDto {
   id: string;
   applicationId: string;
@@ -98,12 +112,14 @@ export interface InterviewDto {
   status: string;
   notes: string | null;
   createdAt: Date;
+  interviewers?: InterviewerDto[];
 }
 
 export interface CreateInterviewDto {
   type: string;
   scheduledFor: Date;
   notes?: string;
+  interviewers?: CreateInterviewerDto[];
 }
 
 export interface OfferLetterDto {
