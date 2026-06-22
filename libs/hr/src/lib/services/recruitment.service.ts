@@ -22,6 +22,8 @@ import {
   RecruitmentStatsDto,
   PublicRecruitmentStatsDto,
   PublicJobListingDto,
+  IctOnboardingDto,
+  MicrosoftAccountProvisioningDto,
 } from '../dtos/recruitment.dto';
 
 @Injectable({
@@ -159,6 +161,17 @@ export class RecruitmentService {
   }
 
   // ==================== Stats ====================
+
+  getIctOnboardingQueue(): Observable<{ data: IctOnboardingDto[]; message: string }> {
+    return this.http.get<{ data: IctOnboardingDto[]; message: string }>(`${this.baseUrl}/ict-onboarding`);
+  }
+
+  provisionMicrosoftAccount(applicationId: string): Observable<{ data: MicrosoftAccountProvisioningDto; message: string }> {
+    return this.http.post<{ data: MicrosoftAccountProvisioningDto; message: string }>(
+      `${this.baseUrl}/applications/${applicationId}/ict-onboarding/microsoft-account`,
+      {},
+    );
+  }
 
   getStats(): Observable<{ data: RecruitmentStatsDto; message: string }> {
     return this.http.get<{ data: RecruitmentStatsDto; message: string }>(`${this.baseUrl}/stats`);

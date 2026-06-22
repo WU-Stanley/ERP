@@ -46,6 +46,8 @@ export class HrDashboardComponent implements OnInit {
         Permissions.ViewEmployeeProfiles,
         Permissions.CreateUser,
         Permissions.ManageUsers,
+        Permissions.InitiateOnboarding,
+        Permissions.CompleteOnboarding,
         Permissions.AdminAccess,
         Permissions.SuperAdminAccess,
       ],
@@ -80,6 +82,17 @@ export class HrDashboardComponent implements OnInit {
           permissions: [
             Permissions.CreateUser,
             Permissions.ManageUsers,
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+          ],
+        },
+        {
+          label: 'ICT Onboarding',
+          icon: 'manage_accounts',
+          route: '/hr/employees/ict-onboarding',
+          permissions: [
+            Permissions.InitiateOnboarding,
+            Permissions.CompleteOnboarding,
             Permissions.AdminAccess,
             Permissions.SuperAdminAccess,
           ],

@@ -46,7 +46,7 @@ import {
     },
   ],
   template: `
-    <div class="rich-editor-wrapper" [class.editor-disabled]="isDisabled">
+    <div class="rich-editor-wrapper w-full" [class.editor-disabled]="isDisabled">
       <ckeditor
         [editor]="Editor"
         [config]="editorConfig"
@@ -65,12 +65,14 @@ import {
       line-height: 1.6;
       border-bottom-left-radius: 0.5rem !important;
       border-bottom-right-radius: 0.5rem !important;
+      width: 100%;
     }
     .rich-editor-wrapper .ck-toolbar {
       border-top-left-radius: 0.5rem !important;
       border-top-right-radius: 0.5rem !important;
       border-color: #d1d5db !important;
       background: #f9fafb !important;
+      width: 100%;
     }
     .rich-editor-wrapper .ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused {
       border-color: #16a34a !important;

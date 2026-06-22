@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService } from '../../services/notification.service';
+import { AppNotification, NotificationService } from '../../services/notification.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'lib-notification-bell',
@@ -9,7 +10,7 @@ import { NotificationService } from '../../services/notification.service';
   templateUrl: './notification-bell.component.html'
 })
 export class NotificationBellComponent implements OnInit {
-  constructor(public readonly notificationService: NotificationService) {}
+  constructor(public readonly notificationService: NotificationService, private readonly router: Router) {}
 
   openPanel = false;
 
@@ -34,5 +35,13 @@ export class NotificationBellComponent implements OnInit {
 
   markRead(id: string) {
     this.notificationService.markAsRead(id);
+  }
+
+  openNotification(item: AppNotification) {
+    this.markRead(item.id);
+    if (item.entityType === 'EmployeeOnboarding') {
+      this.openPanel = false;
+      this.router.navigate(['/hr/employees/ict-onboarding']);
+    }
   }
 }

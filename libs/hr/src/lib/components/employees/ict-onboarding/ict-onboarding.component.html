@@ -1,0 +1,53 @@
+<section class="mx-auto max-w-7xl p-6">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-black uppercase tracking-[0.25em] text-wigwe-green">ICT onboarding</p>
+      <h1 class="mt-2 text-3xl font-black text-slate-900">Microsoft account provisioning</h1>
+      <p class="mt-2 text-sm font-semibold text-slate-500">Hired employees remain here until ICT creates their university account.</p>
+    </div>
+    <button type="button" (click)="loadQueue()" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50">Refresh</button>
+  </div>
+
+  @if (errorMessage) {
+    <div class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">{{ errorMessage }}</div>
+  }
+
+  <div class="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100 text-left">
+        <thead class="bg-slate-50 text-xs font-black uppercase tracking-wider text-slate-500">
+          <tr><th class="px-5 py-4">Employee</th><th class="px-5 py-4">Position</th><th class="px-5 py-4">Start date</th><th class="px-5 py-4">Status</th><th class="px-5 py-4">Microsoft email</th><th class="px-5 py-4"></th></tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (request of requests; track request.applicationId) {
+            <tr>
+              <td class="px-5 py-4"><p class="font-black text-slate-900">{{ request.employeeName }}</p><p class="text-xs font-semibold text-slate-500">{{ request.personalEmail }}</p></td>
+              <td class="px-5 py-4 text-sm font-bold text-slate-700">{{ request.position }}</td>
+              <td class="px-5 py-4 text-sm font-bold text-slate-600">{{ request.startDate ? (request.startDate | date:'mediumDate') : 'Not set' }}</td>
+              <td class="px-5 py-4"><span class="rounded-full px-3 py-1 text-xs font-black" [ngClass]="request.status === 'Provisioned' ? 'bg-emerald-100 text-emerald-700' : request.status === 'Failed' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'">{{ request.status }}</span><p *ngIf="request.error" class="mt-2 max-w-xs text-xs font-semibold text-red-600">{{ request.error }}</p></td>
+              <td class="px-5 py-4 text-sm font-bold text-slate-700">{{ request.microsoftEmail || '—' }}</td>
+              <td class="px-5 py-4 text-right"><button *ngIf="request.status !== 'Provisioned'" type="button" (click)="provision(request)" [disabled]="!!provisioningId" class="rounded-xl bg-wigwe-green px-4 py-2 text-sm font-black text-white disabled:cursor-wait disabled:opacity-50">{{ provisioningId === request.applicationId ? 'Creating…' : request.status === 'Failed' ? 'Retry' : 'Create account' }}</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="px-5 py-12 text-center text-sm font-bold text-slate-500">No hired employees are waiting for ICT onboarding.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+@if (credentials?.temporaryPassword) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+    <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+      <p class="text-xs font-black uppercase tracking-widest text-emerald-600">Account created</p>
+      <h2 class="mt-2 text-2xl font-black text-slate-900">Copy these credentials now</h2>
+      <p class="mt-2 text-sm font-semibold text-slate-500">The temporary password is shown only once. The employee must change it on first sign-in.</p>
+      <div class="mt-6 space-y-3">
+        <button type="button" (click)="copy(credentials?.microsoftEmail || null)" class="flex w-full items-center justify-between rounded-2xl bg-slate-50 p-4 text-left"><span><small class="block font-black uppercase text-slate-400">Email</small><strong>{{ credentials?.microsoftEmail }}</strong></span><span class="material-symbols-outlined">content_copy</span></button>
+        <button type="button" (click)="copy(credentials?.temporaryPassword || null)" class="flex w-full items-center justify-between rounded-2xl bg-slate-50 p-4 text-left"><span><small class="block font-black uppercase text-slate-400">Temporary password</small><strong>{{ credentials?.temporaryPassword }}</strong></span><span class="material-symbols-outlined">content_copy</span></button>
+      </div>
+      <button type="button" (click)="closeCredentials()" class="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 font-black text-white">I have saved the credentials</button>
+    </div>
+  </div>
+}

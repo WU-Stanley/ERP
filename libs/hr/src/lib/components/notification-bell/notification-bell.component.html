@@ -17,7 +17,7 @@
 
     <div class="mt-4 max-h-80 space-y-3 overflow-y-auto">
       @for (item of notifications; track item.id) {
-      <div class="rounded-2xl border p-3 transition" [class.border-slate-100.bg-slate-50]="!item.isRead" [class.border-transparent.bg-white]="item.isRead" (click)="markRead(item.id)">
+      <div class="rounded-2xl border p-3 transition" [class.cursor-pointer]="item.entityType === 'EmployeeOnboarding'" [class.border-slate-100.bg-slate-50]="!item.isRead" [class.border-transparent.bg-white]="item.isRead" (click)="openNotification(item)">
         <p class="text-[11px] font-black uppercase tracking-widest text-slate-400">{{ item.type }}</p>
         <p class="mt-1 text-sm font-black text-slate-900">{{ item.title }}</p>
         <p class="mt-1 text-xs font-bold text-slate-500">{{ item.message }}</p>

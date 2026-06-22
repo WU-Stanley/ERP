@@ -319,6 +319,19 @@ export const appRoutes: Route[] = [
         },
       },
       {
+        path: 'employees/ict-onboarding',
+        loadComponent: () => import('@erp/hr').then((m) => m.IctOnboardingComponent),
+        canActivate: [PermissionGuard],
+        data: {
+          permissions: [
+            Permissions.AdminAccess,
+            Permissions.SuperAdminAccess,
+            Permissions.InitiateOnboarding,
+            Permissions.CompleteOnboarding,
+          ],
+        },
+      },
+      {
         path: 'employees/bulk-upload',
         loadComponent: () => import('@erp/hr').then((m) => m.BulkStaffUploadComponent),
         canActivate: [PermissionGuard],

@@ -74,6 +74,23 @@ export interface UpdateApplicationStatusDto {
   assignedTo?: string | null;
 }
 
+export interface IctOnboardingDto {
+  applicationId: string;
+  employeeName: string;
+  personalEmail: string;
+  position: string;
+  startDate: Date | null;
+  status: 'NotStarted' | 'Pending' | 'Provisioning' | 'Provisioned' | 'Failed';
+  microsoftEmail: string | null;
+  microsoftUserId: string | null;
+  provisionedAt: Date | null;
+  error: string | null;
+}
+
+export interface MicrosoftAccountProvisioningDto extends IctOnboardingDto {
+  temporaryPassword: string | null;
+}
+
 export interface ApplicationScoreDto {
   id: string;
   applicationId: string;
@@ -137,6 +154,8 @@ export interface OfferLetterDto {
   expiresAt: Date | null;
   signedAt: Date | null;
   createdAt: Date;
+  signedName?: string | null;
+  signatureData?: string | null;
 }
 
 export interface CreateOfferLetterDto {
@@ -152,6 +171,8 @@ export interface CreateOfferLetterDto {
 export interface OfferResponseDto {
   response: string;
   comments?: string;
+  signedName?: string;
+  signatureData?: string;
 }
 
 export interface QueryDto {

@@ -15,6 +15,7 @@ export * from './lib/components/employees/profile-update-review/profile-update-r
 export * from './lib/components/employees/employment-assignment/employment-assignment.component';
 export * from './lib/components/employees/department-staff/department-staff.component';
 export * from './lib/components/employees/bulk-staff-upload/bulk-staff-upload.component';
+export * from './lib/components/employees/ict-onboarding/ict-onboarding.component';
 export * from './lib/components/documents/document-management-workbench/document-management-workbench.component';
 export * from './lib/components/facilities/facilities-assets-workbench/facilities-assets-workbench.component';
 export * from './lib/components/finance/finance-payroll-workbench/finance-payroll-workbench.component';

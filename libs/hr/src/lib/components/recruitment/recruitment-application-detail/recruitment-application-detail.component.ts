@@ -8,6 +8,7 @@ import { AlertService, CustomSelectComponent } from '@erp/core';
 import { environment } from '@env/environment';
 import { AuthService } from '@erp/auth';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { RichTextEditorComponent } from '@erp/hr';
 
 type ActiveTab = 'overview' | 'score' | 'interviews' | 'offers' | 'messages';
 
@@ -15,7 +16,7 @@ type ActiveTab = 'overview' | 'score' | 'interviews' | 'offers' | 'messages';
   selector: 'app-recruitment-application-detail',
   templateUrl: './recruitment-application-detail.component.html',
   styleUrls: ['./recruitment-application-detail.component.css'],
-  imports: [CommonModule, RouterModule, FormsModule, CustomSelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, CustomSelectComponent, RichTextEditorComponent],
 })
 export class RecruitmentApplicationDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -84,6 +85,123 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   // Query form
   queryText = '';
 
+  selectedTemplate = '';
+  showPreview = false;
+  showSendConfirm = false;
+
+  private readonly offerTemplates: Record<string, string> = {
+    academic: `<h2>Offer of Employment - Academic Staff</h2>
+<p>Dear {{applicantName}},</p>
+<p>We are pleased to offer you the position of <strong>{{position}}</strong> at <strong>{{companyName}}</strong>. This is a full-time academic appointment.</p>
+<h3>Position Details</h3>
+<ul>
+<li><strong>Position Title:</strong> {{position}}</li>
+<li><strong>Start Date:</strong> {{startDate}}</li>
+</ul>
+<h3>Compensation &amp; Benefits</h3>
+<p>The annual salary is <strong>₦{{salary}}</strong>. Additional benefits include: {{benefits}}.</p>
+<h3>Terms</h3>
+<p>Please confirm your acceptance by signing and returning a copy of this letter. We look forward to welcoming you.</p>
+<p>Best regards,<br/><strong>Human Resources</strong><br/>{{companyName}}</p>`,
+    administrative: `<h2>Offer of Employment - Administrative Staff</h2>
+<p>Dear {{applicantName}},</p>
+<p>We are pleased to extend an offer for the position of <strong>{{position}}</strong> at <strong>{{companyName}}</strong>.</p>
+<h3>Role Overview</h3>
+<p>You will be responsible for supporting the day-to-day administrative operations of the department. This is a full-time role with a competitive compensation package.</p>
+<h3>Key Terms</h3>
+<ul>
+<li><strong>Position:</strong> {{position}}</li>
+<li><strong>Start Date:</strong> {{startDate}}</li>
+<li><strong>Salary:</strong> ₦{{salary}} per annum</li>
+</ul>
+<h3>Benefits</h3>
+<p>{{benefits}}</p>
+<p>Please review, sign, and return this offer letter to confirm your acceptance.</p>
+<p>Best regards,<br/><strong>Human Resources</strong><br/>{{companyName}}</p>`,
+    parttime: `<h2>Offer of Engagement - Part-Time Staff</h2>
+<p>Dear {{applicantName}},</p>
+<p>We are pleased to offer you a part-time engagement as <strong>{{position}}</strong> at <strong>{{companyName}}</strong>.</p>
+<h3>Engagement Details</h3>
+<ul>
+<li><strong>Role:</strong> {{position}}</li>
+<li><strong>Start Date:</strong> {{startDate}}</li>
+<li><strong>Compensation:</strong> ₦{{salary}}</li>
+</ul>
+<h3>Additional Information</h3>
+<p>{{benefits}}</p>
+<p>Kindly confirm your acceptance by signing below.</p>
+<p>Best regards,<br/><strong>Human Resources</strong><br/>{{companyName}}</p>`,
+  };
+
+  applyTemplate(): void {
+    if (!this.selectedTemplate || !this.application) return;
+    const template = this.offerTemplates[this.selectedTemplate];
+    if (!template) return;
+    const appName = this.application.applicantName || '[Applicant Name]';
+    const position = this.offerForm.position || this.application.jobTitle || '[Position]';
+    const company = this.offerForm.companyName || 'Wigwe University';
+    const salary = this.offerForm.salary || '0';
+    const startDate = this.offerForm.startDate
+      ? new Date(this.offerForm.startDate).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })
+      : '[Start Date]';
+    const benefits = this.offerForm.benefits || '[Benefits details]';
+
+    this.offerForm.content = template
+      .replace(/\{\{applicantName\}\}/g, appName)
+      .replace(/\{\{position\}\}/g, position)
+      .replace(/\{\{companyName\}\}/g, company)
+      .replace(/\{\{salary\}\}/g, salary)
+      .replace(/\{\{startDate\}\}/g, startDate)
+      .replace(/\{\{benefits\}\}/g, benefits);
+    this.selectedTemplate = '';
+    this.autoSaveOffer();
+  }
+
+  togglePreview(): void {
+    this.showPreview = !this.showPreview;
+  }
+
+  autoSaveOffer(): void {
+    if (!this.applicationId) return;
+    sessionStorage.setItem(`offerForm_${this.applicationId}`, JSON.stringify(this.offerForm));
+  }
+
+  private restoreOfferDraft(): void {
+    if (!this.applicationId) return;
+    const saved = sessionStorage.getItem(`offerForm_${this.applicationId}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        this.offerForm = { ...this.offerForm, ...parsed };
+      } catch { /* ignore */ }
+    }
+  }
+
+  promptSendOffer(offerId: string): void {
+    this.pendingSendOfferId = offerId;
+    this.showSendConfirm = true;
+  }
+
+  pendingSendOfferId: string | null = null;
+
+  confirmSend(): void {
+    if (!this.pendingSendOfferId) return;
+    this.recruitmentService.updateOfferStatus(this.pendingSendOfferId, 'Sent').subscribe({
+      next: () => {
+        this.successMessage = 'Offer letter sent successfully.';
+        this.showSendConfirm = false;
+        this.pendingSendOfferId = null;
+        this.loadAll();
+        setTimeout(() => (this.successMessage = ''), 4000);
+      },
+      error: () => {
+        this.errorMessage = 'Unable to send offer.';
+        this.showSendConfirm = false;
+        this.pendingSendOfferId = null;
+      },
+    });
+  }
+
   ngOnInit() {
     this.applicationId = this.route.snapshot.paramMap.get('id') ?? '';
     if (!this.applicationId) {
@@ -91,6 +209,7 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
       this.isLoading = false;
       return;
     }
+    this.restoreOfferDraft();
     this.loadAll();
   }
 
@@ -319,6 +438,14 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   // ---- Create Offer Letter ----
   createOfferLetter() {
     if (!this.application) return;
+    if (!this.offerForm.startDate || isNaN(new Date(this.offerForm.startDate).getTime())) {
+      this.errorMessage = 'Please select a valid start date.';
+      return;
+    }
+    if (!this.offerForm.expiresAt || isNaN(new Date(this.offerForm.expiresAt).getTime())) {
+      this.errorMessage = 'Please select a valid expiration date.';
+      return;
+    }
     const dto: CreateOfferLetterDto = {
       companyName: this.offerForm.companyName || 'Wigwe University',
       position: this.offerForm.position || this.application.jobTitle,
@@ -328,10 +455,11 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
       content: this.offerForm.content,
       expiresAt: new Date(this.offerForm.expiresAt),
     };
-    this.recruitmentService.createOfferLetter(this.applicationId, dto).subscribe({
+        this.recruitmentService.createOfferLetter(this.applicationId, dto).subscribe({
       next: () => {
         this.successMessage = 'Offer letter created successfully.';
         this.showNewOffer = false;
+        this.clearOfferDraft();
         this.loadAll();
         setTimeout(() => (this.successMessage = ''), 4000);
       },
@@ -343,6 +471,10 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
 
   updateOfferStatus(status: string) {
     if (this.offerLetters.length === 0) return;
+    if (status === 'Sent') {
+      this.promptSendOffer(this.offerLetters[0].id);
+      return;
+    }
     this.recruitmentService.updateOfferStatus(this.offerLetters[0].id, status).subscribe({
       next: () => {
         this.loadAll();
@@ -351,6 +483,11 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
         this.errorMessage = 'Unable to update offer status.';
       },
     });
+  }
+
+  clearOfferDraft(): void {
+    if (!this.applicationId) return;
+    sessionStorage.removeItem(`offerForm_${this.applicationId}`);
   }
 
   // ---- Send Query/Message ----
