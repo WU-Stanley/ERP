@@ -25,6 +25,7 @@ export interface PaginatedResponse<T> {
 
 export interface EmployeeDetailsDto {
   employeeId: string;
+  employeeCode?: string;
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -41,6 +42,9 @@ export interface EmployeeDetailsDto {
   bankName?: string;
   bankAccountNumber?: string;
   profilePicture?: string;
+  cvUrl?: string;
+  identificationUrl?: string;
+  certificateUrl?: string;
   userId: string;
   createdAt?: string;
   updatedAt?: string;
@@ -107,6 +111,9 @@ export interface EmployeeSelfServiceUpdateDto {
   relationship: string;
   bankName: string;
   bankAccountNumber: string;
+  cvUrl?: string;
+  identificationUrl?: string;
+  certificateUrl?: string;
 }
 
 export interface EmployeeProfileUpdateRequestDto {

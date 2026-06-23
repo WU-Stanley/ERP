@@ -51,7 +51,7 @@ export const LeaveRequestStore = signalStore(
         console.log('Leave requests fetched: ', response);
         if (response.status) {
           patchState(store, {
-            leaveRequests: response.data,
+            leaveRequests: response.data?.items ?? [],
             isLoading: false,
           });
         } else {
@@ -77,7 +77,7 @@ export const LeaveRequestStore = signalStore(
         );
         if (response.status) {
           patchState(store, {
-            leaveRequests: response.data,
+            leaveRequests: response.data?.items ?? [],
             isLoading: false,
           });
         } else {
@@ -170,7 +170,10 @@ export const LeaveRequestStore = signalStore(
         console.error('[STORE] Create error:', error);
         patchState(store, {
           isLoading: false,
-          error: error.message || 'An unexpected error occurred.',
+          error:
+            error?.error?.message ||
+            error?.message ||
+            'An unexpected error occurred.',
         });
       }
     },
@@ -187,7 +190,11 @@ export const LeaveRequestStore = signalStore(
           const updated = response.data as LeaveRequestDto;
           const updatedList = store
             .leaveRequests()
-            .map((lt) => (lt.id === updated.id ? updated : lt));
+            .map((lt) =>
+              lt.id === updated.id
+                ? { ...lt, ...updated, leaveType: updated.leaveType ?? lt.leaveType }
+                : lt
+            );
 
           patchState(store, {
             leaveRequests: updatedList,
@@ -208,7 +215,10 @@ export const LeaveRequestStore = signalStore(
         console.error('[STORE] Update error:', error);
         patchState(store, {
           isLoading: false,
-          error: error.message || 'An unexpected error occurred.',
+          error:
+            error?.error?.message ||
+            error?.message ||
+            'An unexpected error occurred.',
         });
       }
     },
@@ -244,7 +254,10 @@ export const LeaveRequestStore = signalStore(
         console.error('[STORE] Delete error:', error);
         patchState(store, {
           isLoading: false,
-          error: error.message || 'An unexpected error occurred.',
+          error:
+            error?.error?.message ||
+            error?.message ||
+            'An unexpected error occurred.',
         });
       }
     },

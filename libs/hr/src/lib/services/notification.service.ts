@@ -31,6 +31,46 @@ export class NotificationService {
     effect(() => {
       this.unreadCount.set(this.notifications().filter((item) => !item.isRead).length);
     });
+    this.requestNotificationPermission();
+  }
+
+  private requestNotificationPermission() {
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+  }
+
+  private playNotificationSound() {
+    try {
+      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      
+      const playTone = (frequency: number, startTime: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(frequency, startTime);
+        
+        gainNode.gain.setValueAtTime(0.3, startTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+      
+      const now = ctx.currentTime;
+      playTone(659.25, now, 0.4); // E5
+      playTone(880.00, now + 0.15, 0.6); // A5
+    } catch (e) {
+      console.warn('Web Audio chime playback failed', e);
+    }
   }
 
   startConnection() {
@@ -57,6 +97,12 @@ export class NotificationService {
     this.hubConnection.on('NewNotification', (notification: AppNotification) => {
       this.notifications.update((list) => [notification, ...list]);
       this.lastError.set(null);
+      this.playNotificationSound();
+      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification(notification.title, {
+          body: notification.message
+        });
+      }
     });
 
     this.hubConnection.onreconnecting((error) => {

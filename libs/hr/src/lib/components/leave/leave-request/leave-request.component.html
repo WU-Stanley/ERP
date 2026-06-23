@@ -103,7 +103,7 @@
                }}</span
              >
           </div>
-          @if (recentLeaveRequest.status !=='Approved') {
+          @if (recentLeaveRequest.status === 'Pending') {
           <div class="flex gap-2 mt-2">
             <lib-flat-button
               (submitAction)="deleteLeave(recentLeaveRequest)"
@@ -175,6 +175,7 @@
             {{ leave.reason | wordSlice : 10 }}
           </td>
           <td class="px-4 py-3 font-medium text-gray-800 relative">
+            @if (leave.status === 'Pending') {
             <button
               (click)="toggleMenu(i)"
               class="p-2 rounded hover:bg-gray-200"
@@ -199,6 +200,7 @@
                 Delete
               </button>
             </div>
+            }
           </td>
         </tr>
       </tbody>
@@ -224,6 +226,7 @@
   </ng-template>
   <ng-container *ngIf="showRequestForm">
     <lib-leave-request-form
+      [leaveRequest]="editingLeaveRequest"
       (closeFormEvent)="toggleLeaveRequestForm()"
     ></lib-leave-request-form>
   </ng-container>

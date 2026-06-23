@@ -135,7 +135,25 @@ export class RecruitmentService {
   // ==================== Offer Letters ====================
 
   createOfferLetter(id: string, dto: CreateOfferLetterDto): Observable<{ data: OfferLetterDto; message: string }> {
-    return this.http.post<{ data: OfferLetterDto; message: string }>(`${this.baseUrl}/applications/${id}/offer-letter`, dto);
+    const formData = new FormData();
+    formData.append('companyName', dto.companyName);
+    formData.append('position', dto.position);
+    formData.append('salary', dto.salary);
+    if (dto.startDate) {
+      formData.append('startDate', dto.startDate instanceof Date ? dto.startDate.toISOString() : new Date(dto.startDate).toISOString());
+    }
+    formData.append('benefits', dto.benefits || '');
+    if (dto.content) formData.append('content', dto.content);
+    if (dto.gradeLevel) formData.append('gradeLevel', dto.gradeLevel);
+    if (dto.attachment) formData.append('attachment', dto.attachment, dto.attachment.name);
+    if (dto.expiresAt) {
+      formData.append('expiresAt', dto.expiresAt instanceof Date ? dto.expiresAt.toISOString() : new Date(dto.expiresAt).toISOString());
+    }
+    return this.http.post<{ data: OfferLetterDto; message: string }>(`${this.baseUrl}/applications/${id}/offer-letter`, formData);
+  }
+
+  confirmResumption(applicationId: string): Observable<{ data: any; message: string }> {
+    return this.http.post<{ data: any; message: string }>(`${this.baseUrl}/applications/${applicationId}/confirm-resumption`, {});
   }
 
   getOfferLetter(id: string): Observable<{ data: OfferLetterDto; message: string }> {

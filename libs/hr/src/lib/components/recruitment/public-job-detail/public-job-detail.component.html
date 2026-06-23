@@ -75,10 +75,10 @@
             <div *ngIf="successMessage" class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
               <p class="font-semibold">{{ successMessage }}</p>
               <p class="mt-2">Your application reference is:</p>
-              <p class="mt-1 break-all rounded bg-white px-3 py-2 font-mono text-xs text-slate-900">{{ applicationReference }}</p>
+              <p class="mt-1 break-all rounded bg-white px-3 py-2 font-mono text-xs text-slate-900">{{ applicationReference | slice:0:8 }}</p>
               <a
                 [routerLink]="['/careers/track']"
-                [queryParams]="{ applicationId: applicationReference, email: applicationForm.email }"
+                [queryParams]="{ applicationId: applicationReference | slice:0:8, email: applicationForm.email }"
                 class="mt-3 inline-flex text-sm font-semibold text-green-700 hover:text-green-800"
               >
                 Track application

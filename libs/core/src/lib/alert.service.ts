@@ -24,4 +24,28 @@ export class AlertService {
       panelClass: classList,
     });
   }
+
+  confirm(
+    message: string,
+    action = 'Confirm',
+    classList: string[] = ['warning-snackbar', 'rounded-md']
+  ): Promise<boolean> {
+    const snackBarRef = this.matSnackBar.open(message, action, {
+      duration: 8000,
+      panelClass: classList,
+    });
+
+    return new Promise<boolean>((resolve) => {
+      let resolved = false;
+      snackBarRef.onAction().subscribe(() => {
+        resolved = true;
+        resolve(true);
+      });
+      snackBarRef.afterDismissed().subscribe(() => {
+        if (!resolved) {
+          resolve(false);
+        }
+      });
+    });
+  }
 }

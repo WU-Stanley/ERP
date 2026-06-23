@@ -88,6 +88,7 @@ export class LeavePolicyFormComponent implements OnInit {
       leaveTypeId: ['', Validators.required],
       employmentTypeId: ['', Validators.required], // e.g., "FullTime", "Contract"
       roleName: [''], // Optional
+      dependentLeaveTypeId: [''], // Optional dependency
       annualEntitlement: [20, [Validators.required, Validators.min(0)]],
       isAccrualBased: [false],
       maxDaysPerRequest: [20, [Validators.required, Validators.min(0)]],
@@ -129,6 +130,7 @@ export class LeavePolicyFormComponent implements OnInit {
     console.log('Editing Leave Policy: ', data);
     this.leavePolicyForm.patchValue({
       leaveTypeId: data.leaveTypeId,
+      dependentLeaveTypeId: data.dependentLeaveTypeId,
       employmentTypeId: data.employmentType, // e.g., "FullTime", "Contract"
       roleName: data.roleName,
       annualEntitlement: data.annualEntitlement,

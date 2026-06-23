@@ -65,13 +65,16 @@ export class ProfileUpdateReviewComponent implements OnInit {
 
   fieldsFor(request: EmployeeProfileUpdateRequestDto) {
     return [
-      { label: 'Phone', current: request.currentValues.phoneNumber, proposed: request.proposedValues.phoneNumber },
-      { label: 'Address', current: request.currentValues.address, proposed: request.proposedValues.address },
-      { label: 'Next of Kin', current: request.currentValues.emergencyContactName, proposed: request.proposedValues.emergencyContactName },
-      { label: 'Next of Kin Phone', current: request.currentValues.emergencyContactPhone, proposed: request.proposedValues.emergencyContactPhone },
-      { label: 'Relationship', current: request.currentValues.relationship, proposed: request.proposedValues.relationship },
-      { label: 'Bank', current: request.currentValues.bankName, proposed: request.proposedValues.bankName },
-      { label: 'Account Number', current: request.currentValues.bankAccountNumber, proposed: request.proposedValues.bankAccountNumber },
+      { label: 'Phone', current: request.currentValues.phoneNumber, proposed: request.proposedValues.phoneNumber, isFile: false },
+      { label: 'Address', current: request.currentValues.address, proposed: request.proposedValues.address, isFile: false },
+      { label: 'Next of Kin', current: request.currentValues.emergencyContactName, proposed: request.proposedValues.emergencyContactName, isFile: false },
+      { label: 'Next of Kin Phone', current: request.currentValues.emergencyContactPhone, proposed: request.proposedValues.emergencyContactPhone, isFile: false },
+      { label: 'Relationship', current: request.currentValues.relationship, proposed: request.proposedValues.relationship, isFile: false },
+      { label: 'Bank', current: request.currentValues.bankName, proposed: request.proposedValues.bankName, isFile: false },
+      { label: 'Account Number', current: request.currentValues.bankAccountNumber, proposed: request.proposedValues.bankAccountNumber, isFile: false },
+      { label: 'CV / Resume', current: request.currentValues.cvUrl, proposed: request.proposedValues.cvUrl, isFile: true },
+      { label: 'ID Document', current: request.currentValues.identificationUrl, proposed: request.proposedValues.identificationUrl, isFile: true },
+      { label: 'Certificate', current: request.currentValues.certificateUrl, proposed: request.proposedValues.certificateUrl, isFile: true },
     ];
   }
 }

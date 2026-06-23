@@ -39,8 +39,30 @@
         <div class="divide-y divide-slate-100">
           <div *ngFor="let field of fieldsFor(request)" class="grid gap-2 px-4 py-3 text-sm md:grid-cols-3">
             <p class="font-black text-slate-700">{{ field.label }}</p>
-            <p class="font-bold text-slate-400">{{ field.current || 'Not set' }}</p>
-            <p class="font-bold text-slate-900">{{ field.proposed || 'Not set' }}</p>
+            
+            <ng-container *ngIf="field.isFile; else textCurrent">
+              <p class="font-bold text-slate-400">
+                <a *ngIf="field.current" [href]="'https://localhost:8000/' + field.current" target="_blank" class="text-wigwe-green hover:underline inline-flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs">open_in_new</span> View Document
+                </a>
+                <span *ngIf="!field.current">Not set</span>
+              </p>
+            </ng-container>
+            <ng-template #textCurrent>
+              <p class="font-bold text-slate-400">{{ field.current || 'Not set' }}</p>
+            </ng-template>
+
+            <ng-container *ngIf="field.isFile; else textProposed">
+              <p class="font-bold text-slate-900">
+                <a *ngIf="field.proposed" [href]="'https://localhost:8000/' + field.proposed" target="_blank" class="text-wigwe-green hover:underline inline-flex items-center gap-1 font-black">
+                  <span class="material-symbols-outlined text-xs">open_in_new</span> View Document
+                </a>
+                <span *ngIf="!field.proposed">Not set</span>
+              </p>
+            </ng-container>
+            <ng-template #textProposed>
+              <p class="font-bold text-slate-900">{{ field.proposed || 'Not set' }}</p>
+            </ng-template>
           </div>
         </div>
       </div>

@@ -29,7 +29,14 @@ export class EmployeeSelfServiceProfileComponent implements OnInit {
     relationship: [''],
     bankName: [''],
     bankAccountNumber: [''],
+    cvUrl: [''],
+    identificationUrl: [''],
+    certificateUrl: [''],
   });
+
+  isUploadingCv = false;
+  isUploadingId = false;
+  isUploadingCert = false;
 
   constructor(private employeeService: EmployeeService) {}
 
@@ -55,6 +62,9 @@ export class EmployeeSelfServiceProfileComponent implements OnInit {
             relationship: this.employee.relationship ?? '',
             bankName: this.employee.bankName ?? '',
             bankAccountNumber: this.employee.bankAccountNumber ?? '',
+            cvUrl: this.employee.cvUrl ?? '',
+            identificationUrl: this.employee.identificationUrl ?? '',
+            certificateUrl: this.employee.certificateUrl ?? '',
           });
         }
         this.loadRequests();
@@ -111,5 +121,35 @@ export class EmployeeSelfServiceProfileComponent implements OnInit {
       return 'bg-rose-50 text-rose-700';
     }
     return 'bg-amber-50 text-amber-700';
+  }
+
+  uploadFile(event: Event, field: 'cvUrl' | 'identificationUrl' | 'certificateUrl') {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    if (field === 'cvUrl') this.isUploadingCv = true;
+    if (field === 'identificationUrl') this.isUploadingId = true;
+    if (field === 'certificateUrl') this.isUploadingCert = true;
+
+    this.employeeService.uploadDocument(file).subscribe({
+      next: (res) => {
+        if (res.data) {
+          this.form.patchValue({ [field]: res.data });
+          this.successMessage = 'Document uploaded successfully.';
+        }
+        this.clearUploadStates();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to upload document.';
+        this.clearUploadStates();
+      }
+    });
+  }
+
+  private clearUploadStates() {
+    this.isUploadingCv = false;
+    this.isUploadingId = false;
+    this.isUploadingCert = false;
   }
 }

@@ -57,6 +57,25 @@ body {
   color: #ffffff !important;
 }
 
+/* Confirmation snackbar: keep destructive actions legible on Material's dark surface. */
+.mat-mdc-snack-bar-container.warning-snackbar {
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.mat-mdc-snack-bar-container.warning-snackbar .mat-mdc-snack-bar-action {
+  background-color: #b91c1c !important;
+  border-radius: 6px;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.mat-mdc-snack-bar-container.warning-snackbar
+  .mat-mdc-snack-bar-action
+  .mdc-button__label {
+  color: #ffffff !important;
+}
+
 /* Target the scrollbar itself */
 ::-webkit-scrollbar {
   width: 8px; /* Set the width of the vertical scrollbar */

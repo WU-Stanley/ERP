@@ -6,6 +6,7 @@ import {
   SubmitRoundedButtonComponent,
   CancelRoundedButtonComponent,
   FlatButtonComponent,
+  AlertService,
 } from '@erp/core';
 import { LeaveRequestStore } from '../../../state/leave-request.store';
 import { LeaveRequestFormComponent } from '../../forms/leave-request-form/leave-request-form.component';
@@ -36,9 +37,10 @@ export class LeaveRequestComponent implements OnInit {
   user = JSON.parse(localStorage.getItem('user') || '{}');
   activeMenuIndex: number | null = null;
   showRequestForm = false;
+  editingLeaveRequest: LeaveRequestDto | null = null;
   recentLeaveRequest!: LeaveRequestDto | null;
 
-  constructor() {
+  constructor(private alertService: AlertService) {
     // Initialize any necessary data or state
   }
 
@@ -56,14 +58,40 @@ export class LeaveRequestComponent implements OnInit {
     this.activeMenuIndex = this.showMenu ? index : null;
   }
   toggleLeaveRequestForm() {
+    if (this.showRequestForm) {
+      this.editingLeaveRequest = null;
+      this.recentLeaveRequest = this.leaveRequests()[0] ?? null;
+    }
     this.showRequestForm = !this.showRequestForm;
   }
-  deleteLeave(leave: any) {
-    // Implement delete logic here
+  async deleteLeave(leave: LeaveRequestDto) {
+    if (!leave.id) {
+      return;
+    }
+
+    const confirmed = await this.alertService.confirm(
+      'Withdraw this pending leave request?',
+      'Withdraw'
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    await this.leaveRequestStore.deleteLeaveRequest(leave.id);
+    const error = this.leaveRequestStore.error();
+    if (error) {
+      this.alertService.showError(error);
+    } else {
+      this.alertService.showSuccess('Leave request withdrawn successfully.');
+      if (this.recentLeaveRequest?.id === leave.id) {
+        this.recentLeaveRequest = this.leaveRequests()[0] ?? null;
+      }
+    }
     this.activeMenuIndex = null;
   }
-  editLeave(leave: any) {
-    // Implement edit logic here
+  editLeave(leave: LeaveRequestDto) {
+    this.editingLeaveRequest = leave;
+    this.showRequestForm = true;
     this.activeMenuIndex = null;
   }
 }

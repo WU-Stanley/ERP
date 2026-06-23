@@ -29,6 +29,9 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   applicationId = '';
   showResumePreview = false;
   isScanning = false;
+  isScheduling = false;
+  isCreatingOffer = false;
+  isConfirmingResumption = false;
   application: ApplicationDto | null = null;
   score: ApplicationScoreDto | null = null;
   interviews: InterviewDto[] = [];
@@ -79,6 +82,8 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
       benefits: '',
       content: '',
       expiresAt: '',
+      gradeLevel: '',
+      attachment: null as File | null
     };
   }
 
@@ -245,6 +250,14 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
     return this.recruitmentService.getApplication(this.applicationId).subscribe({
       next: (res) => {
         this.application = res.data;
+        if (this.application) {
+          if (!this.offerForm.companyName) {
+            this.offerForm.companyName = 'Wigwe University';
+          }
+          if (!this.offerForm.position) {
+            this.offerForm.position = this.application.jobTitle;
+          }
+        }
       },
       error: () => {
         this.errorMessage = 'Unable to load application details.';
@@ -340,6 +353,7 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   // ---- Create Interview ----
   createInterview() {
     if (this.interviewForm.scheduledFor && this.application) {
+      this.isScheduling = true;
       const dto: CreateInterviewDto = {
         type: this.interviewForm.type,
         scheduledFor: new Date(this.interviewForm.scheduledFor),
@@ -359,10 +373,12 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
           this.selectedStaffId = '';
           this.externalInterviewer = { name: '', email: '' };
           this.loadAll();
+          this.isScheduling = false;
           setTimeout(() => (this.successMessage = ''), 4000);
         },
         error: (err) => {
           this.errorMessage = err?.error?.message || 'Failed to schedule interview.';
+          this.isScheduling = false;
         },
       });
     }
@@ -436,6 +452,13 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
   }
 
   // ---- Create Offer Letter ----
+  onOfferAttachmentChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.offerForm.attachment = input.files[0];
+    }
+  }
+
   createOfferLetter() {
     if (!this.application) return;
     if (!this.offerForm.startDate || isNaN(new Date(this.offerForm.startDate).getTime())) {
@@ -446,6 +469,7 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
       this.errorMessage = 'Please select a valid expiration date.';
       return;
     }
+    this.isCreatingOffer = true;
     const dto: CreateOfferLetterDto = {
       companyName: this.offerForm.companyName || 'Wigwe University',
       position: this.offerForm.position || this.application.jobTitle,
@@ -453,19 +477,42 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
       startDate: new Date(this.offerForm.startDate),
       benefits: this.offerForm.benefits,
       content: this.offerForm.content,
+      gradeLevel: this.offerForm.gradeLevel,
+      attachment: this.offerForm.attachment || undefined,
       expiresAt: new Date(this.offerForm.expiresAt),
     };
-        this.recruitmentService.createOfferLetter(this.applicationId, dto).subscribe({
+    this.recruitmentService.createOfferLetter(this.applicationId, dto).subscribe({
       next: () => {
         this.successMessage = 'Offer letter created successfully.';
         this.showNewOffer = false;
         this.clearOfferDraft();
         this.loadAll();
+        this.isCreatingOffer = false;
         setTimeout(() => (this.successMessage = ''), 4000);
       },
       error: (err) => {
         this.errorMessage = err?.error?.message || 'Failed to create offer letter.';
+        this.isCreatingOffer = false;
       },
+    });
+  }
+
+  confirmResumption() {
+    if (!this.application) return;
+    this.isConfirmingResumption = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.recruitmentService.confirmResumption(this.applicationId).subscribe({
+      next: (res) => {
+        this.successMessage = 'Resumption confirmed and ICT onboarding initiated.';
+        this.loadAll();
+        this.isConfirmingResumption = false;
+        setTimeout(() => (this.successMessage = ''), 4000);
+      },
+      error: (err) => {
+        this.errorMessage = err?.error?.message || 'Failed to confirm resumption.';
+        this.isConfirmingResumption = false;
+      }
     });
   }
 
@@ -518,6 +565,11 @@ export class RecruitmentApplicationDetailComponent implements OnInit {
     if (!filePath) return '';
     const token = this.authService.getAccessToken() || localStorage.getItem('token') || '';
     return `${environment.apiUrl}/v1/recruitment/applications/${this.applicationId}/resume?access_token=${encodeURIComponent(token)}`;
+  }
+
+  getOfferAttachmentUrl(attachmentPath: string | null | undefined): string {
+    if (!attachmentPath) return '';
+    return `${environment.apiUrl}${attachmentPath}`;
   }
 
   toggleResumePreview() {

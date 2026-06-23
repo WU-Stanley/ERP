@@ -30,6 +30,16 @@
       label="Employment Type"
       placeholder="Select Employment type"
     ></lib-custom-select>
+    <lib-custom-select
+      [readonly]="readonly"
+      width="full"
+      formControlName="dependentLeaveTypeId"
+      [options]="leaveTypes()"
+      [labelKey]="'name'"
+      type="text"
+      label="Dependent Leave Type (Optional)"
+      placeholder="Select Dependent Leave Type"
+    ></lib-custom-select>
     <lib-custom-input
       [readonly]="readonly"
       type="number"

@@ -1,5 +1,15 @@
 import { EmploymentTypeDto, UserDto } from '@erp/auth';
 
+export interface PaginatedLeaveResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages?: number;
+  hasPrevious?: boolean;
+  hasNext?: boolean;
+}
+
 export interface LeaveRequestCreateDto {
   leaveTypeId: string; // Guid
   startDate: Date;
@@ -86,6 +96,7 @@ export interface LeaveTypeVisibilityDto {
 
 export interface LeavePolicyDto {
   leaveTypeId: any;
+  dependentLeaveTypeId?: string;
   employmentTypeId?: string; // e.g., "FullTime", "Contract"
   roleName?: string; // Optional: if some roles have custom entitlement
   annualEntitlement: number;

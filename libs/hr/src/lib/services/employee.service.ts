@@ -73,6 +73,16 @@ export class EmployeeService {
     );
   }
 
+  uploadDocument(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<string>>(
+      `${this.env.apiUrl}/Employees/me/upload-document`,
+      formData,
+      { withCredentials: true }
+    );
+  }
+
   getOwnProfileUpdateRequests() {
     return this.http.get<ApiResponse<EmployeeProfileUpdateRequestDto[]>>(
       `${this.env.apiUrl}/Employees/me/profile-update-requests`,

@@ -2,7 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ApiResponse } from '@erp/auth';
 import { AppEnvironment, ENVIRONMENT } from '@erp/core';
-import { LeaveRequestCreateDto, LeaveRequestDto } from '../dtos/leave.dto';
+import {
+  LeaveRequestDto,
+  PaginatedLeaveResponse,
+} from '../dtos/leave.dto';
 
 @Injectable({ providedIn: 'root' })
 export class LeaveRequestService {
@@ -18,7 +21,7 @@ export class LeaveRequestService {
     );
   }
   getLeaveRequests() {
-    return this.http.get<ApiResponse<LeaveRequestDto[]>>(
+    return this.http.get<ApiResponse<PaginatedLeaveResponse<LeaveRequestDto>>>(
       this.env.apiUrl + '/leave/all-leave-requests'
     );
   }
@@ -35,7 +38,7 @@ export class LeaveRequestService {
     );
   }
   myLeaveRequests(userId: string) {
-    return this.http.get<ApiResponse<LeaveRequestDto[]>>(
+    return this.http.get<ApiResponse<PaginatedLeaveResponse<LeaveRequestDto>>>(
       this.env.apiUrl + '/leave/user-requests/' + userId
     );
   }

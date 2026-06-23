@@ -60,6 +60,7 @@ export interface ApplicationDto {
   updatedAt: Date;
   overallMatch: number | null;
   scoredAt: Date | null;
+  ictOnboardingStatus: string;
 }
 
 export interface ApplicationListDto {
@@ -148,7 +149,9 @@ export interface OfferLetterDto {
   salary: number;
   startDate: Date | null;
   benefits: string;
-  content: string;
+  content: string | null;
+  gradeLevel?: string | null;
+  attachmentPath?: string | null;
   status: string;
   sentAt: Date | null;
   expiresAt: Date | null;
@@ -164,7 +167,9 @@ export interface CreateOfferLetterDto {
   salary: string;
   startDate: Date;
   benefits: string;
-  content: string;
+  content?: string | null;
+  gradeLevel?: string;
+  attachment?: File;
   expiresAt: Date;
 }
 
